@@ -1,0 +1,94 @@
+{
+  "TECS": {
+    "highest_price": 55.310001373291016,
+    "stop_level": 53.65070133209228
+  },
+  "IAK": {
+    "highest_price": 134.32000732421875,
+    "stop_level": 130.29040710449217
+  },
+  "ASAN": {
+    "highest_price": 18.25,
+    "stop_level": 17.7025
+  },
+  "FBTC": {
+    "highest_price": 75.94999694824219,
+    "stop_level": 73.67149703979491
+  },
+  "BERZ": {
+    "highest_price": 14.869999885559082,
+    "stop_level": 14.42389988899231
+  },
+  "CWEB": {
+    "highest_price": 49.09000015258789,
+    "stop_level": 47.61730014801025
+  },
+  "TQQQ": {
+    "highest_price": 67.41000366210938,
+    "stop_level": 65.3877035522461
+  },
+  "KWEB": {
+    "highest_price": 36.9900016784668,
+    "stop_level": 35.88030162811279
+  },
+  "STVN": {
+    "highest_price": 21.559999465942383,
+    "stop_level": 20.91319948196411
+  },
+  "VKTX": {
+    "highest_price": 29.100000381469727,
+    "stop_level": 28.227000370025635
+  },
+  "BBAI": {
+    "highest_price": 3.3399999141693115,
+    "stop_level": 3.239799916744232
+  },
+  "KC": {
+    "highest_price": 17.540000915527344,
+    "stop_level": 17.013800888061525
+  },
+  "EPI": {
+    "highest_price": 41.66999816894531,
+    "stop_level": 40.41989822387695
+  },
+  "FILL": {
+    "highest_price": 23.18000030517578,
+    "stop_level": 22.484600296020506
+  },
+  "DGRS": {
+    "highest_price": 48.40999984741211,
+    "stop_level": 46.957699851989744
+  },
+  "SMIN": {
+    "highest_price": 65.8499984741211,
+    "stop_level": 63.87449851989746
+  },
+  "GSPY": {
+    "highest_price": 31.707000732421875,
+    "stop_level": 30.75579071044922
+  },
+  "VAMO": {
+    "highest_price": 28.854999542236328,
+    "stop_level": 27.989349555969238
+  },
+  "BJ": {
+    "highest_price": 115.5,
+    "stop_level": 112.035
+  },
+  "ITM": {
+    "highest_price": 46.130001068115234,
+    "stop_level": 44.74610103607178
+  },
+  "XHB": {
+    "highest_price": 101.87999725341797,
+    "stop_level": 98.82359733581542
+  },
+  "PTIR": {
+    "highest_price": 140.9199981689453,
+    "stop_level": 136.69239822387695
+  },
+  "ITB": {
+    "highest_price": 99.94000244140625,
+    "stop_level": 96.94180236816406
+  }
+}

@@ -356,16 +356,40 @@ def add_asset():
             df = DataLoader.get_asset_data(ticker, days=1)
             current_price = float(df['Close'].iloc[-1]) if not df.empty and 'Close' in df.columns else form.avg_price.data
             
-            # Adicionar ou atualizar ativo
-            if ticker in data['portfolio']:
-                # Cálculo de preço médio ponderado
+            # Check if this is an update to an existing position
+            is_update = ticker in data['portfolio']
+            
+            if is_update:
+                # For updates, only consider the additional investment if any
                 old_qty = data['portfolio'][ticker].get('quantity', 0)
                 old_price = data['portfolio'][ticker].get('avg_price', 0)
                 new_qty = form.quantity.data
                 new_price = form.avg_price.data
                 
-                total_qty = old_qty + new_qty
-                avg_price = ((old_qty * old_price) + (new_qty * new_price)) / total_qty if total_qty > 0 else 0
+                # Calculate only the additional investment
+                additional_investment = 0
+                if new_qty > old_qty:
+                    # Only check balance for additional shares
+                    additional_qty = new_qty - old_qty
+                    additional_investment = additional_qty * new_price
+                    
+                    # Check if sufficient balance for additional investment
+                    if additional_investment > data.get('account_balance', 0):
+                        flash(f'Saldo insuficiente para adicionar {additional_qty} ações. Necessário: ${additional_investment:.2f}, Disponível: ${data.get("account_balance", 0):.2f}', 'warning')
+                        # Allow the update to proceed anyway - user is editing existing position
+                
+                # Update the position with new values
+                total_qty = new_qty
+                avg_price = ((old_qty * old_price) + ((new_qty - old_qty) * new_price)) / total_qty if total_qty > 0 else 0
+                
+                # If reducing position size, return money to account
+                if new_qty < old_qty:
+                    reduced_qty = old_qty - new_qty
+                    returned_funds = reduced_qty * old_price
+                    data['account_balance'] += returned_funds
+                # If increasing position size, deduct from account
+                elif new_qty > old_qty:
+                    data['account_balance'] -= additional_investment
                 
                 data['portfolio'][ticker] = {
                     'symbol': ticker,
@@ -381,6 +405,18 @@ def add_asset():
                 }
                 flash(f'Ativo {ticker} atualizado com sucesso!', 'success')
             else:
+                # For new positions, check available balance
+                investment_amount = form.quantity.data * form.avg_price.data
+                
+                # Check if sufficient balance
+                if investment_amount > data.get('account_balance', 0):
+                    flash(f'Saldo insuficiente para comprar {form.quantity.data} ações. Necessário: ${investment_amount:.2f}, Disponível: ${data.get("account_balance", 0):.2f}', 'danger')
+                    return redirect(url_for('portfolio'))
+                
+                # Deduct from account balance
+                data['account_balance'] -= investment_amount
+                
+                # Add new position
                 data['portfolio'][ticker] = {
                     'symbol': ticker,
                     'quantity': form.quantity.data,
@@ -398,15 +434,57 @@ def add_asset():
             
             save_portfolio(data)
             
+            # Take a snapshot after portfolio change
+            add_portfolio_snapshot()
+            
             # Send notification
             notification_system.alert_trade_recommendation(
-                ticker, "COMPRA", form.quantity.data, 
-                form.avg_price.data, "Adicionado manualmente à carteira"
+                ticker, "COMPRA" if not is_update else "ATUALIZAÇÃO", form.quantity.data, 
+                form.avg_price.data, "Adicionado/atualizado manualmente à carteira"
             )
         else:
             flash(f'Ticker {ticker} inválido ou não encontrado!', 'danger')
         
     return redirect(url_for('portfolio'))
+
+@app.route('/portfolio/edit/<ticker>', methods=['GET', 'POST'])
+def edit_asset(ticker):
+    data = load_portfolio()
+    
+    if ticker not in data['portfolio']:
+        flash(f'Ativo {ticker} não encontrado na carteira!', 'danger')
+        return redirect(url_for('portfolio'))
+    
+    form = AssetForm()
+    
+    if request.method == 'POST' and form.validate_on_submit():
+        new_qty = form.quantity.data
+        new_price = form.avg_price.data
+        
+        # Obter preço atual
+        df = DataLoader.get_asset_data(ticker, days=1)
+        current_price = float(df['Close'].iloc[-1]) if not df.empty and 'Close' in df.columns else new_price
+        
+        # Atualizar posição
+        data['portfolio'][ticker]['quantity'] = new_qty
+        data['portfolio'][ticker]['avg_price'] = new_price
+        data['portfolio'][ticker]['current_price'] = current_price
+        data['portfolio'][ticker]['current_position'] = new_qty * current_price
+        
+        save_portfolio(data)
+        add_portfolio_snapshot()
+        
+        flash(f'Ativo {ticker} atualizado com sucesso!', 'success')
+        return redirect(url_for('portfolio'))
+    
+    # Preencher formulário com dados existentes
+    if request.method == 'GET':
+        position = data['portfolio'][ticker]
+        form.ticker.data = ticker
+        form.quantity.data = position.get('quantity', 0)
+        form.avg_price.data = position.get('avg_price', 0)
+    
+    return render_template('edit_asset.html', form=form, ticker=ticker, asset=data['portfolio'][ticker])
 
 @app.route('/portfolio/delete/<ticker>')
 def delete_asset(ticker):
@@ -557,30 +635,38 @@ def trade():
         commission = trading_system.calculate_xp_commission(operation_value)
         
         if trade_type == "COMPRA":
-            # Verificar saldo
-            if operation_value + commission > data.get('account_balance', 0):
-                flash('Saldo insuficiente para esta operação!', 'danger')
-                return redirect(url_for('trade'))
+            # Verificar se é uma posição existente
+            is_existing = ticker in data['portfolio']
             
-            # Atualizar portfólio
-            if ticker in data['portfolio']:
-                # Cálculo de preço médio ponderado
+            if is_existing:
+                # Para posições existentes
                 old_qty = data['portfolio'][ticker].get('quantity', 0)
                 old_price = data['portfolio'][ticker].get('avg_price', 0)
                 
-                total_qty = old_qty + quantity
-                avg_price = ((old_qty * old_price) + (quantity * price)) / total_qty if total_qty > 0 else 0
+                # Atualizar portfólio
+                new_qty = old_qty + quantity
+                avg_price = ((old_qty * old_price) + (quantity * price)) / new_qty if new_qty > 0 else 0
                 
-                data['portfolio'][ticker]['quantity'] = total_qty
+                # Verificar saldo apenas para novas ações
+                if operation_value + commission > data.get('account_balance', 0):
+                    flash('Saldo insuficiente para esta operação!', 'danger')
+                    return redirect(url_for('trade'))
+                
+                data['portfolio'][ticker]['quantity'] = new_qty
                 data['portfolio'][ticker]['avg_price'] = avg_price
                 data['portfolio'][ticker]['current_price'] = price
-                data['portfolio'][ticker]['current_position'] = total_qty * price
+                data['portfolio'][ticker]['current_position'] = new_qty * price
                 data['portfolio'][ticker]['last_buy'] = {
                     'price': price,
                     'quantity': quantity,
                     'date': datetime.now().isoformat()
                 }
             else:
+                # Para novas posições
+                if operation_value + commission > data.get('account_balance', 0):
+                    flash('Saldo insuficiente para esta operação!', 'danger')
+                    return redirect(url_for('trade'))
+                
                 data['portfolio'][ticker] = {
                     'symbol': ticker,
                     'quantity': quantity,
@@ -616,14 +702,18 @@ def trade():
                 return redirect(url_for('trade'))
             
             current_qty = data['portfolio'][ticker].get('quantity', 0)
+            
+            # Se a quantidade for exatamente igual à existente, considera-se venda completa
+            # Se for menor, considera-se venda parcial
             if quantity > current_qty:
                 flash(f'Quantidade insuficiente. Você possui {current_qty} {ticker}.', 'danger')
                 return redirect(url_for('trade'))
             
             # Atualizar portfólio
-            data['portfolio'][ticker]['quantity'] -= quantity
+            new_qty = current_qty - quantity
+            data['portfolio'][ticker]['quantity'] = new_qty
             data['portfolio'][ticker]['current_price'] = price
-            data['portfolio'][ticker]['current_position'] = data['portfolio'][ticker]['quantity'] * price
+            data['portfolio'][ticker]['current_position'] = new_qty * price
             data['portfolio'][ticker]['last_sell'] = {
                 'price': price,
                 'quantity': quantity,
@@ -631,7 +721,7 @@ def trade():
             }
             
             # Se quantidade = 0, remover ativo
-            if data['portfolio'][ticker]['quantity'] <= 0:
+            if new_qty <= 0:
                 del data['portfolio'][ticker]
             
             # Atualizar saldo
