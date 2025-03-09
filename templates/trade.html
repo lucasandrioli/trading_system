@@ -1,0 +1,50 @@
+# /templates/trade.html
+{% extends "base.html" %}
+
+{% block title %}Operações - Sistema de Trading{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Registrar Operação</h1>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Nova Operação</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/trade">
+                        {{ form.csrf_token }}
+                        <div class="mb-3">
+                            <label for="ticker" class="form-label">Ticker</label>
+                            {{ form.ticker(class="form-control", placeholder="Ex: AAPL", value=request.args.get('ticker', '')) }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Quantidade</label>
+                            {{ form.quantity(class="form-control", type="number", min=1) }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Preço</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.price(class="form-control", type="number", step="0.01", min=0.01) }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="trade_type" class="form-label">Tipo de Operação</label>
+                            <select name="trade_type" id="trade_type" class="form-select" required>
+                                <option value="COMPRA">COMPRA</option>
+                                <option value="VENDA">VENDA</option>
+                            </select>
+                        </div>
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
