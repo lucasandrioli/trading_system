@@ -6,6 +6,7 @@
     <title>{% block title %}Sistema de Trading{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     <style>
         .sidebar {
             position: fixed;
@@ -91,6 +92,22 @@
                             <li><a class="dropdown-item" href="/analyze?risk=medium">Perfil de Risco: Médio</a></li>
                             <li><a class="dropdown-item" href="/analyze?risk=high">Perfil de Risco: Alto</a></li>
                             <li><a class="dropdown-item" href="/analyze?risk=ultra">Perfil de Risco: Ultra</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/optimize">Otimizar Carteira</a></li>
+                            <li><a class="dropdown-item" href="/backtest">Backtest</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-tools"></i> Ferramentas
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
+                            <li><a class="dropdown-item" href="/parameters">Parâmetros de Trading</a></li>
+                            <li><a class="dropdown-item" href="/notifications">Configurar Notificações</a></li>
+                            <li><a class="dropdown-item" href="/download_portfolio">Exportar Portfólio</a></li>
+                            <li><a class="dropdown-item" href="/upload-json">Importar Portfólio</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/diagnostics">Diagnósticos</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -119,6 +136,41 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/analyze' %}active{% endif %}" href="/analyze?risk=medium">
+                                <i class="bi bi-graph-up"></i> Análise
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/indicators' %}active{% endif %}" href="/indicators">
+                                <i class="bi bi-activity"></i> Indicadores
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/fundamentals' %}active{% endif %}" href="/fundamentals">
+                                <i class="bi bi-file-earmark-text"></i> Fundamentos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/news' %}active{% endif %}" href="/news">
+                                <i class="bi bi-newspaper"></i> Notícias
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/market_sentiment' %}active{% endif %}" href="/market_sentiment">
+                                <i class="bi bi-thermometer"></i> Mercado
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/backtest' %}active{% endif %}" href="/backtest">
+                                <i class="bi bi-calendar-check"></i> Backtest
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/optimize' %}active{% endif %}" href="/optimize">
+                                <i class="bi bi-sliders"></i> Otimização
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {% if request.path == '/trade' %}active{% endif %}" href="/trade">
                                 <i class="bi bi-currency-exchange"></i> Operações
                             </a>
@@ -131,6 +183,21 @@
                         <li class="nav-item">
                             <a class="nav-link {% if request.path == '/goals' %}active{% endif %}" href="/goals">
                                 <i class="bi bi-trophy"></i> Metas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/notifications' %}active{% endif %}" href="/notifications">
+                                <i class="bi bi-bell"></i> Notificações
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/parameters' %}active{% endif %}" href="/parameters">
+                                <i class="bi bi-gear"></i> Parâmetros
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/diagnostics' %}active{% endif %}" href="/diagnostics">
+                                <i class="bi bi-speedometer"></i> Diagnósticos
                             </a>
                         </li>
                     </ul>
@@ -153,6 +220,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

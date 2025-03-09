@@ -1,4 +1,3 @@
-# /templates/watchlist.html
 {% extends "base.html" %}
 
 {% block title %}Watchlist - Sistema de Trading{% endblock %}
@@ -28,6 +27,17 @@
                             {{ form.submit(class="btn btn-primary") }}
                         </div>
                     </form>
+                </div>
+                
+                <div class="card-footer">
+                    <div class="d-grid gap-2">
+                        <a href="/analyze?risk=medium" class="btn btn-success">
+                            <i class="bi bi-graph-up"></i> Analisar Watchlist
+                        </a>
+                        <a href="/market_sentiment" class="btn btn-outline-primary">
+                            <i class="bi bi-thermometer"></i> Sentimento de Mercado
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -61,10 +71,19 @@
                                     </td>
                                     <td>
                                         <div class="btn-group">
-                                            <a href="/trade?ticker={{ ticker }}" class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-currency-exchange"></i> Operar
+                                            <a href="/indicators?ticker={{ ticker }}" class="btn btn-sm btn-outline-primary" title="Análise Técnica">
+                                                <i class="bi bi-activity"></i>
                                             </a>
-                                            <a href="/watchlist/delete/{{ ticker }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remover {{ ticker }} da watchlist?')">
+                                            <a href="/fundamentals?ticker={{ ticker }}" class="btn btn-sm btn-outline-info" title="Fundamentos">
+                                                <i class="bi bi-file-text"></i>
+                                            </a>
+                                            <a href="/news?ticker={{ ticker }}" class="btn btn-sm btn-outline-warning" title="Notícias">
+                                                <i class="bi bi-newspaper"></i>
+                                            </a>
+                                            <a href="/trade?ticker={{ ticker }}" class="btn btn-sm btn-outline-success" title="Comprar">
+                                                <i class="bi bi-plus-circle"></i>
+                                            </a>
+                                            <a href="/watchlist/delete/{{ ticker }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remover {{ ticker }} da watchlist?')" title="Remover">
                                                 <i class="bi bi-trash"></i>
                                             </a>
                                         </div>

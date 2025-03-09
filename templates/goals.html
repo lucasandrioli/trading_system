@@ -1,4 +1,3 @@
-# /templates/goals.html
 {% extends "base.html" %}
 
 {% block title %}Metas - Sistema de Trading{% endblock %}
@@ -7,7 +6,7 @@
 <div class="container-fluid">
     <h1 class="mb-4">Metas de Recuperação</h1>
     
-    <div class="row justify-content-center">
+    <div class="row">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
@@ -34,6 +33,7 @@
                         </div>
                     </form>
                 </div>
+                
                 {% if goals %}
                 <div class="card-footer">
                     <h5>Metas Atuais</h5>
@@ -47,6 +47,168 @@
                 {% endif %}
             </div>
         </div>
+        
+        {% if recovery_data %}
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Progresso da Recuperação</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Valor Inicial:</span>
+                        <span>${{ "%.2f"|format(recovery_data.initial_value) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Valor Atual:</span>
+                        <span>${{ "%.2f"|format(recovery_data.current_value) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Lucro/Prejuízo:</span>
+                        <span class="{% if recovery_data.current_pnl >= 0 %}positive{% else %}negative{% endif %}">
+                            ${{ "%.2f"|format(recovery_data.current_pnl) }}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Meta:</span>
+                        <span>${{ "%.2f"|format(recovery_data.target) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Progresso:</span>
+                        <span class="{% if recovery_data.progress_pct >= 0 %}positive{% else %}negative{% endif %}">
+                            {{ "%.1f"|format(recovery_data.progress_pct) }}%
+                        </span>
+                    </div>
+                    
+                    <h6 class="mt-4">Progresso da Recuperação</h6>
+                    <div class="progress mb-2">
+                        <div class="progress-bar {% if recovery_data.progress_pct < 0 %}bg-danger{% endif %}" 
+                             role="progressbar" 
+                             style="width: {{ max(0, recovery_data.progress_pct) }}%">
+                            {{ "%.1f"|format(recovery_data.progress_pct) }}%
+                        </div>
+                    </div>
+                    
+                    <h6 class="mt-4">Prazo</h6>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Dias Passados:</span>
+                        <span>{{ recovery_data.days_passed }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Dias Restantes:</span>
+                        <span>{{ recovery_data.days_remaining }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Meta Diária:</span>
+                        <span>${{ "%.2f"|format(recovery_data.daily_target) }}</span>
+                    </div>
+                    <div class="progress mb-2">
+                        <div class="progress-bar 
+                            {% if recovery_data.days_remaining < 5 %}bg-danger
+                            {% elif recovery_data.days_remaining < 10 %}bg-warning
+                            {% else %}bg-success{% endif %}" 
+                            role="progressbar" 
+                            style="width: {{ (recovery_data.days_passed / recovery_data.days_total * 100) if recovery_data.days_total else 0 }}%">
+                            {{ "%.1f"|format((recovery_data.days_passed / recovery_data.days_total * 100) if recovery_data.days_total else 0) }}%
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <small>Início</small>
+                        <small>Tempo Decorrido</small>
+                        <small>Prazo Final</small>
+                    </div>
+                    
+                    <div class="alert {% if recovery_data.on_track %}alert-success{% else %}alert-warning{% endif %} mt-4">
+                        <strong>Status:</strong> 
+                        {% if recovery_data.on_track %}
+                        Recuperação no caminho certo! Você está mantendo o ritmo necessário.
+                        {% else %}
+                        Você precisa acelerar o ritmo de recuperação. A meta diária está acima do progresso atual.
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
+    
+    {% if recovery_data and recovery_data.history %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Histórico do Portfólio</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="portfolioHistoryChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% if recovery_data and recovery_data.history %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('portfolioHistoryChart').getContext('2d');
+        
+        const chartData = {
+            labels: {{ [h.date for h in recovery_data.history]|tojson }},
+            datasets: [
+                {
+                    label: 'Valor Total',
+                    data: {{ [h.total_value for h in recovery_data.history]|tojson }},
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1
+                }
+            ]
+        };
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': $';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toFixed(2);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}
