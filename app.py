@@ -491,6 +491,29 @@ def api_market_sentiment():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/upload-json', methods=['GET', 'POST'])
+def upload_json():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('Nenhum arquivo selecionado', 'danger')
+            return redirect(request.url)
+        
+        file = request.files['file']
+        if file.filename == '':
+            flash('Nenhum arquivo selecionado', 'danger')
+            return redirect(request.url)
+        
+        if file:
+            try:
+                data = json.load(file)
+                save_portfolio(data)
+                flash('Portfólio carregado com sucesso!', 'success')
+                return redirect(url_for('index'))
+            except Exception as e:
+                flash(f'Erro ao carregar arquivo: {str(e)}', 'danger')
+    
+    return render_template('upload.html')
+
 # Iniciar o servidor se executado diretamente
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001,debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)

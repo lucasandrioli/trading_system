@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Carregar JSON - Sistema de Trading{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Carregar Arquivo JSON</h1>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Upload de Portfólio</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Arquivo JSON</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".json">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Carregar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
