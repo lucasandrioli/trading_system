@@ -63,8 +63,26 @@
                         <span>Meta Diária:</span>
                         <span class="fw-bold">${{ "%.2f"|format(goals.target_recovery / goals.days) }}</span>
                     </div>
+                    
+                    {% if summary.recovery_status %}
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Progresso:</span>
+                        <span class="fw-bold {% if summary.recovery_status.current_pnl >= 0 %}positive{% else %}negative{% endif %}">
+                            {{ "%.1f"|format(summary.recovery_status.progress_pct) }}%
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Status:</span>
+                        <span class="badge {% if summary.recovery_status.on_track %}bg-success{% else %}bg-warning{% endif %}">
+                            {{ 'No Caminho' if summary.recovery_status.on_track else 'Precisa Acelerar' }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
                     <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: {{ (summary.profit_loss / goals.target_recovery * 100) if goals.target_recovery > 0 else 0 }}%">
+                        <div class="progress-bar {% if summary.profit_loss < 0 %}bg-danger{% endif %}" 
+                             role="progressbar" 
+                             style="width: {{ (summary.profit_loss / goals.target_recovery * 100) if goals.target_recovery > 0 else 0 }}%">
                             {{ "%.1f"|format((summary.profit_loss / goals.target_recovery * 100) if goals.target_recovery > 0 else 0) }}%
                         </div>
                     </div>
@@ -81,21 +99,43 @@
         <div class="col-lg-4 col-md-12 mb-4">
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Ações Rápidas</h5>
+                    <h5 class="card-title mb-0">Sentimento de Mercado</h5>
+                    <a href="/market_sentiment" class="btn btn-sm btn-outline-primary">Detalhes</a>
                 </div>
                 <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="/trade" class="btn btn-primary">
-                            <i class="bi bi-currency-exchange"></i> Registrar Operação
-                        </a>
-                        <a href="/portfolio" class="btn btn-outline-primary">
-                            <i class="bi bi-plus-circle"></i> Adicionar Ativo
-                        </a>
-                        <a href="/watchlist" class="btn btn-outline-primary">
-                            <i class="bi bi-eye"></i> Gerenciar Watchlist
-                        </a>
+                    <div class="text-center mb-4">
+                        <div class="display-4 
+                            {% if summary.market_sentiment.sentiment == 'muito bullish' or summary.market_sentiment.sentiment == 'bullish' %}positive
+                            {% elif summary.market_sentiment.sentiment == 'muito bearish' or summary.market_sentiment.sentiment == 'bearish' %}negative
+                            {% endif %}">
+                            {{ summary.market_sentiment.sentiment|title }}
+                        </div>
+                        <div class="mt-2 mb-4">
+                            <strong>Tendência:</strong> {{ summary.market_sentiment.trend|title }}
+                        </div>
+                    </div>
+                    
+                    <div class="progress mb-2">
+                        <div class="progress-bar 
+                            {% if summary.market_sentiment.market_bias_score < -20 %}bg-danger
+                            {% elif summary.market_sentiment.market_bias_score > 20 %}bg-success
+                            {% else %}bg-warning{% endif %}" 
+                            role="progressbar" 
+                            style="width: {{ (summary.market_sentiment.market_bias_score + 100) / 2 }}%">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <small>Bearish</small>
+                        <small>Neutro</small>
+                        <small>Bullish</small>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-3">
                         <a href="/analyze?risk=medium" class="btn btn-success">
                             <i class="bi bi-graph-up"></i> Analisar Carteira
+                        </a>
+                        <a href="/optimize" class="btn btn-outline-primary">
+                            <i class="bi bi-sliders"></i> Otimizar Carteira
                         </a>
                     </div>
                 </div>
@@ -106,8 +146,9 @@
     <div class="row">
         <div class="col-lg-6 mb-4">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Ativos na Carteira</h5>
+                    <a href="/portfolio" class="btn btn-sm btn-outline-primary">Gerenciar</a>
                 </div>
                 <div class="card-body">
                     {% if portfolio %}
@@ -121,6 +162,7 @@
                                     <th>Preço Atual</th>
                                     <th>Valor</th>
                                     <th>Variação</th>
+                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -133,6 +175,19 @@
                                     <td>${{ "%.2f"|format(details.current_position) }}</td>
                                     <td class="{% if details.current_price >= details.avg_price %}positive{% else %}negative{% endif %}">
                                         {{ "%.2f"|format((details.current_price / details.avg_price - 1) * 100) }}%
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="/indicators?ticker={{ ticker }}" class="btn btn-sm btn-outline-primary" title="Análise Técnica">
+                                                <i class="bi bi-activity"></i>
+                                            </a>
+                                            <a href="/fundamentals?ticker={{ ticker }}" class="btn btn-sm btn-outline-info" title="Fundamentos">
+                                                <i class="bi bi-file-text"></i>
+                                            </a>
+                                            <a href="/trade?ticker={{ ticker }}" class="btn btn-sm btn-outline-success" title="Operar">
+                                                <i class="bi bi-currency-exchange"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -151,8 +206,9 @@
         
         <div class="col-lg-6 mb-4">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Watchlist</h5>
+                    <a href="/watchlist" class="btn btn-sm btn-outline-primary">Gerenciar</a>
                 </div>
                 <div class="card-body">
                     {% if watchlist %}
@@ -177,9 +233,20 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="/trade?ticker={{ ticker }}" class="btn btn-sm btn-primary">
-                                            <i class="bi bi-plus-circle"></i>
-                                        </a>
+                                        <div class="btn-group">
+                                            <a href="/indicators?ticker={{ ticker }}" class="btn btn-sm btn-outline-primary" title="Análise Técnica">
+                                                <i class="bi bi-activity"></i>
+                                            </a>
+                                            <a href="/fundamentals?ticker={{ ticker }}" class="btn btn-sm btn-outline-info" title="Fundamentos">
+                                                <i class="bi bi-file-text"></i>
+                                            </a>
+                                            <a href="/news?ticker={{ ticker }}" class="btn btn-sm btn-outline-warning" title="Notícias">
+                                                <i class="bi bi-newspaper"></i>
+                                            </a>
+                                            <a href="/trade?ticker={{ ticker }}" class="btn btn-sm btn-outline-success" title="Comprar">
+                                                <i class="bi bi-plus-circle"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}

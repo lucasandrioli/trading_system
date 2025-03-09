@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Análise de Indicadores - Sistema de Trading{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Análise de Indicadores Técnicos</h1>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Parâmetros de Análise</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/indicators">
+                        {{ form.csrf_token }}
+                        <div class="mb-3">
+                            <label for="ticker" class="form-label">Ticker</label>
+                            {{ form.ticker(class="form-control", placeholder="Ex: AAPL") }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="days" class="form-label">Período (dias)</label>
+                            {{ form.days(class="form-control", type="number") }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="interval" class="form-label">Intervalo</label>
+                            {{ form.interval(class="form-select") }}
+                        </div>
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% if results %}
+        <div class="col-md-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Resumo para {{ results.ticker }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Preço</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Preço Atual:</span>
+                                <span>${{ "%.2f"|format(results.stats.current_price) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Var. 1 dia:</span>
+                                <span class="{% if results.stats.change_1d >= 0 %}positive{% else %}negative{% endif %}">
+                                    {{ "%.2f"|format(results.stats.change_1d * 100) }}%
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Var. 5 dias:</span>
+                                <span class="{% if results.stats.change_5d >= 0 %}positive{% else %}negative{% endif %}">
+                                    {{ "%.2f"|format(results.stats.change_5d * 100) }}%
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Var. 30 dias:</span>
+                                <span class="{% if results.stats.change_30d >= 0 %}positive{% else %}negative{% endif %}">
+                                    {{ "%.2f"|format(results.stats.change_30d * 100) }}%
+                                </span>
+                            </div>
+                            {% if results.ml_forecast %}
+                            <h6 class="mt-3">Previsão ML</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Preço Previsto:</span>
+                                <span>${{ "%.2f"|format(results.ml_forecast.predicted_price) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Variação:</span>
+                                <span class="{% if results.ml_forecast.change_pct >= 0 %}positive{% else %}negative{% endif %}">
+                                    {{ "%.2f"|format(results.ml_forecast.change_pct) }}%
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Confiança:</span>
+                                <span>{{ "%.2f"|format(results.ml_forecast.confidence * 100) }}%</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Indicadores</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>RSI:</span>
+                                <span class="{% if results.indicators.rsi < 30 %}positive{% elif results.indicators.rsi > 70 %}negative{% endif %}">
+                                    {{ "%.2f"|format(results.indicators.rsi) }}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>MACD Hist:</span>
+                                <span class="{% if results.indicators.macd_hist >= 0 %}positive{% else %}negative{% endif %}">
+                                    {{ "%.4f"|format(results.indicators.macd_hist) }}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>ADX:</span>
+                                <span>{{ "%.2f"|format(results.indicators.adx) if results.indicators.adx else "N/A" }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Estocástico %K:</span>
+                                <span>{{ "%.2f"|format(results.indicators.stoch_k) if results.indicators.stoch_k else "N/A" }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Estocástico %D:</span>
+                                <span>{{ "%.2f"|format(results.indicators.stoch_d) if results.indicators.stoch_d else "N/A" }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Posição nas Bandas:</span>
+                                <span>{{ "%.2f"|format(results.stats.bb_position * 100) }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Gráficos</h5>
+                </div>
+                <div class="card-body">
+                    {% if charts.price %}
+                    <div class="mb-4">
+                        <h6>Preço com SMA e Bandas de Bollinger</h6>
+                        <img src="data:image/png;base64,{{ charts.price }}" class="img-fluid" alt="Price Chart">
+                    </div>
+                    {% endif %}
+                    
+                    {% if charts.rsi %}
+                    <div class="mb-4">
+                        <h6>RSI</h6>
+                        <img src="data:image/png;base64,{{ charts.rsi }}" class="img-fluid" alt="RSI Chart">
+                    </div>
+                    {% endif %}
+                    
+                    {% if charts.macd %}
+                    <div class="mb-4">
+                        <h6>MACD</h6>
+                        <img src="data:image/png;base64,{{ charts.macd }}" class="img-fluid" alt="MACD Chart">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

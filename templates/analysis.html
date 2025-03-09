@@ -1,11 +1,10 @@
-# /templates/analysis.html
 {% extends "base.html" %}
 
 {% block title %}Análise - Sistema de Trading{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    <h1 class="mb-4">Análise da Carteira (Perfil: {{ risk_profile }})</h1>
+    <h1 class="mb-4">Análise da Carteira (Perfil: {{ risk_profile|title }})</h1>
     
     <div class="row">
         <div class="col-12 mb-4">
@@ -15,7 +14,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <h6>Resumo da Carteira</h6>
                             <div class="table-responsive">
                                 <table class="table table-sm">
@@ -47,7 +46,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <h6>Sentimento de Mercado</h6>
                             <div class="table-responsive">
                                 <table class="table table-sm">
@@ -64,7 +63,18 @@
                                             <td>Score de Viés:</td>
                                             <td>{{ "%.2f"|format(portfolio_analysis.resumo.market_sentiment.market_bias_score) }}</td>
                                         </tr>
-                                        {% if portfolio_analysis.resumo.meta_recuperação > 0 %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <a href="/market_sentiment" class="btn btn-sm btn-outline-primary mt-2">Ver Detalhes</a>
+                        </div>
+                        <div class="col-md-4">
+                            {% if portfolio_analysis.resumo.meta_recuperação > 0 %}
+                            <h6>Meta de Recuperação</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
                                         <tr>
                                             <td>Meta Recuperação:</td>
                                             <td>${{ "%.2f"|format(portfolio_analysis.resumo.meta_recuperação) }}</td>
@@ -77,9 +87,31 @@
                                             <td>Dias Restantes:</td>
                                             <td>{{ portfolio_analysis.resumo.dias_restantes }}</td>
                                         </tr>
-                                        {% endif %}
+                                        <tr>
+                                            <td>Urgência:</td>
+                                            <td><div class="progress">
+                                                <div class="progress-bar 
+                                                    {% if portfolio_analysis.resumo.dias_restantes < 5 %}bg-danger
+                                                    {% elif portfolio_analysis.resumo.dias_restantes < 10 %}bg-warning
+                                                    {% else %}bg-success{% endif %}" 
+                                                    role="progressbar" 
+                                                    style="width: {{ 100 - (portfolio_analysis.resumo.dias_restantes / portfolio_analysis.resumo.dias_totais * 100) if portfolio_analysis.resumo.dias_totais else 0 }}%">
+                                                </div>
+                                            </div></td>
+                                        </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="d-grid gap-2 mt-3">
+                                <a href="/execute_rebalance" class="btn btn-success" 
+                                   onclick="return confirm('Tem certeza que deseja executar o rebalanceamento recomendado? Esta operação modificará sua carteira.')">
+                                    <i class="bi bi-shuffle"></i> Executar Rebalanceamento
+                                </a>
+                                <a href="/optimize" class="btn btn-outline-primary">
+                                    <i class="bi bi-sliders"></i> Otimizar Carteira
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -194,7 +226,7 @@
                                         </tr>
                                         {% endfor %}
                                     </tbody>
- </table>
+                                </table>
                             </div>
                             {% endif %}
                         </div>
@@ -252,6 +284,7 @@
                         <a href="/analyze?risk=medium" class="btn btn-sm btn-outline-primary {% if risk_profile == 'medium' %}active{% endif %}">Médio</a>
                         <a href="/analyze?risk=high" class="btn btn-sm btn-outline-primary {% if risk_profile == 'high' %}active{% endif %}">Alto</a>
                         <a href="/analyze?risk=ultra" class="btn btn-sm btn-outline-primary {% if risk_profile == 'ultra' %}active{% endif %}">Ultra</a>
+                        <a href="/analyze?risk={{ risk_profile }}&extended=true" class="btn btn-sm btn-outline-primary {% if extended_hours %}active{% endif %}">Extended Hours</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -266,6 +299,7 @@
                                     <th>P/L</th>
                                     <th>Decisão</th>
                                     <th>Justificativa</th>
+                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -284,6 +318,19 @@
                                         </span>
                                     </td>
                                     <td>{{ details.justificativa }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="/indicators?ticker={{ ticker }}" class="btn btn-sm btn-outline-primary" title="Técnica">
+                                                <i class="bi bi-activity"></i>
+                                            </a>
+                                            <a href="/fundamentals?ticker={{ ticker }}" class="btn btn-sm btn-outline-info" title="Fundamentos">
+                                                <i class="bi bi-file-text"></i>
+                                            </a>
+                                            <a href="/news?ticker={{ ticker }}" class="btn btn-sm btn-outline-warning" title="Notícias">
+                                                <i class="bi bi-newspaper"></i>
+                                            </a>
+                                        </div>
+                                    </td>
                                 </tr>
                                 {% endif %}
                                 {% endfor %}
@@ -314,7 +361,7 @@
                                     <th>Score</th>
                                     <th>Decisão</th>
                                     <th>Justificativa</th>
-                                    <th>Ação</th>
+                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -331,11 +378,19 @@
                                     </td>
                                     <td>{{ details.justificativa }}</td>
                                     <td>
-                                        {% if details.decision in ['COMPRAR', 'COMPRAR PARCIAL'] and details.position_sizing and details.position_sizing.suggested_shares > 0 %}
-                                        <a href="/trade?ticker={{ ticker }}&quantity={{ details.position_sizing.suggested_shares }}&price={{ '%.2f'|format(details.current_price) }}&trade_type=COMPRA" class="btn btn-sm btn-outline-success">
-                                            Comprar {{ details.position_sizing.suggested_shares }}
-                                        </a>
-                                        {% endif %}
+                                        <div class="btn-group">
+                                            <a href="/indicators?ticker={{ ticker }}" class="btn btn-sm btn-outline-primary" title="Técnica">
+                                                <i class="bi bi-activity"></i>
+                                            </a>
+                                            <a href="/fundamentals?ticker={{ ticker }}" class="btn btn-sm btn-outline-info" title="Fundamentos">
+                                                <i class="bi bi-file-text"></i>
+                                            </a>
+                                            {% if details.decision in ['COMPRAR', 'COMPRAR PARCIAL'] and details.position_sizing and details.position_sizing.suggested_shares > 0 %}
+                                            <a href="/trade?ticker={{ ticker }}&quantity={{ details.position_sizing.suggested_shares }}&price={{ '%.2f'|format(details.current_price) }}&trade_type=COMPRA" class="btn btn-sm btn-outline-success" title="Comprar">
+                                                <i class="bi bi-cart-plus"></i> {{ details.position_sizing.suggested_shares }}
+                                            </a>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endif %}
@@ -357,7 +412,15 @@
 <script>
     // Scripts adicionais para a página de análise
     document.addEventListener('DOMContentLoaded', function() {
-        // Você pode adicionar gráficos ou outros elementos interativos aqui
+        // Configuração para links de execução de rebalanceamento
+        const executeRebalanceForm = document.getElementById('execute-rebalance-form');
+        if (executeRebalanceForm) {
+            executeRebalanceForm.addEventListener('submit', function(event) {
+                if (!confirm('Tem certeza que deseja executar o rebalanceamento recomendado? Esta operação modificará sua carteira.')) {
+                    event.preventDefault();
+                }
+            });
+        }
     });
 </script>
 {% endblock %}

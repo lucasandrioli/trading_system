@@ -1,0 +1,126 @@
+[
+  {
+    "date": "2025-03-09",
+    "timestamp": "2025-03-09T18:38:01.859029",
+    "portfolio_value": 5019.03,
+    "cash_balance": 22.28,
+    "total_value": 5041.3099999999995,
+    "positions": {
+      "TECS": {
+        "quantity": 3,
+        "price": 59.42,
+        "value": 178.26
+      },
+      "IAK": {
+        "quantity": 2,
+        "price": 134.47,
+        "value": 268.94
+      },
+      "ASAN": {
+        "quantity": 7,
+        "price": 18.31,
+        "value": 128.17
+      },
+      "FBTC": {
+        "quantity": 1,
+        "price": 77.53,
+        "value": 77.53
+      },
+      "BERZ": {
+        "quantity": 7,
+        "price": 16.24,
+        "value": 113.67999999999999
+      },
+      "CWEB": {
+        "quantity": 2,
+        "price": 48.92,
+        "value": 97.84
+      },
+      "TQQQ": {
+        "quantity": 2,
+        "price": 67.23,
+        "value": 134.46
+      },
+      "KWEB": {
+        "quantity": 3,
+        "price": 36.82,
+        "value": 110.46000000000001
+      },
+      "STVN": {
+        "quantity": 8,
+        "price": 21.02,
+        "value": 168.16
+      },
+      "VKTX": {
+        "quantity": 2,
+        "price": 27.7,
+        "value": 55.4
+      },
+      "BBAI": {
+        "quantity": 50,
+        "price": 3.29,
+        "value": 164.5
+      },
+      "KC": {
+        "quantity": 4,
+        "price": 17.74,
+        "value": 70.96
+      },
+      "EPI": {
+        "quantity": 2,
+        "price": 41.58,
+        "value": 83.16
+      },
+      "FILL": {
+        "quantity": 3,
+        "price": 23.1,
+        "value": 69.30000000000001
+      },
+      "DGRS": {
+        "quantity": 3,
+        "price": 48.03,
+        "value": 144.09
+      },
+      "SMIN": {
+        "quantity": 15,
+        "price": 65.47,
+        "value": 982.05
+      },
+      "GSPY": {
+        "quantity": 7,
+        "price": 31.34,
+        "value": 219.38
+      },
+      "VAMO": {
+        "quantity": 20,
+        "price": 28.64,
+        "value": 572.8
+      },
+      "BJ": {
+        "quantity": 2,
+        "price": 111.68,
+        "value": 223.36
+      },
+      "ITM": {
+        "quantity": 2,
+        "price": 46.09,
+        "value": 92.18
+      },
+      "XHB": {
+        "quantity": 2,
+        "price": 100.25,
+        "value": 200.5
+      },
+      "PTIR": {
+        "quantity": 5,
+        "price": 133.21,
+        "value": 666.0500000000001
+      },
+      "ITB": {
+        "quantity": 2,
+        "price": 98.9,
+        "value": 197.8
+      }
+    }
+  }
+]
