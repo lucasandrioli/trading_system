@@ -1,0 +1,52 @@
+# /templates/goals.html
+{% extends "base.html" %}
+
+{% block title %}Metas - Sistema de Trading{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Metas de Recuperação</h1>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Definir Metas</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/goals">
+                        {{ form.csrf_token }}
+                        <div class="mb-3">
+                            <label for="target_recovery" class="form-label">Meta de Recuperação ($)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.target_recovery(class="form-control", type="number", step="0.01", min=0) }}
+                            </div>
+                            <div class="form-text">Valor que deseja recuperar no período</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="days" class="form-label">Prazo (dias)</label>
+                            {{ form.days(class="form-control", type="number", min=1) }}
+                            <div class="form-text">Quantidade de dias para atingir a meta</div>
+                        </div>
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+                {% if goals %}
+                <div class="card-footer">
+                    <h5>Metas Atuais</h5>
+                    <p>Meta de Recuperação: <strong>${{ "%.2f"|format(goals.target_recovery) }}</strong></p>
+                    <p>Prazo: <strong>{{ goals.days }} dias</strong></p>
+                    <p>Meta Diária: <strong>${{ "%.2f"|format(goals.target_recovery / goals.days) }}</strong></p>
+                    {% if goals.start_date %}
+                    <p>Data de Início: <strong>{{ goals.start_date }}</strong></p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
