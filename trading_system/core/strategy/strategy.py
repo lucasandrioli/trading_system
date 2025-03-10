@@ -3,11 +3,7 @@ import pandas as pd
 import logging
 from typing import Dict, Any, Optional
 
-# Imports relativos (INCORRETO)
-# from trading_system.core.analysis.technical_indicators import TechnicalIndicators
-# from trading_system.core.strategy.position_sizing import PositionSizing
 
-# Imports absolutos (CORRETO)
 from trading_system.core.analysis.technical_indicators import TechnicalIndicators
 from trading_system.core.strategy.position_sizing import PositionSizing
 

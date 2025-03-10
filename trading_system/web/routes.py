@@ -9,14 +9,22 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
+# Importações absolutas
 from trading_system.core.analysis.technical_indicators import TechnicalIndicators
 from trading_system.core.analysis.fundamental_analysis import FundamentalAnalysis
 from trading_system.core.analysis.qualitative_analysis import QualitativeAnalysis
 from trading_system.core.analysis.market_analysis import MarketAnalysis
+from trading_system.core.strategy.strategy import Strategy
+from trading_system.core.strategy.position_sizing import PositionSizing
+from trading_system.core.data.data_loader import DataLoader
 from trading_system.services.portfolio_service import PortfolioService
 from trading_system.services.market_service import MarketService
 from trading_system.services.form_service import FormService
+from trading_system.services.trading_service import TradingService
+from trading_system.services.system_service import SystemService
+from trading_system.services.history_service import HistoryService
 from trading_system.utils.cache_manager import CacheManager
+from trading_system.models.portfolio import Portfolio, Position, TradeHistory, RecoveryGoal
 
 # Create blueprint
 web_bp = Blueprint('web', __name__)
@@ -194,7 +202,6 @@ def add_asset():
                 portfolio.account_balance -= investment_amount
                 
                 # Create new position
-                from models.portfolio import Position
                 portfolio.positions[ticker] = Position(
                     symbol=ticker,
                     quantity=form.quantity.data,
@@ -614,9 +621,6 @@ def indicators():
                 ax.plot(df_indicators.index, df_indicators['MACD_signal'], label='Signal')
                 ax.bar(df_indicators.index, df_indicators['MACD_hist'], color=[('g' if x > 0 else 'r') for x in df_indicators['MACD_hist']])
                 ax.set_title(f'{ticker} MACD Chart')
-                # Continuação do arquivo web/routes.py após a linha:
-# ax.set_title(f'{ticker} MACD Chart')
-
                 ax.set_xlabel('Date')
                 ax.set_ylabel('Value')
                 ax.legend()
@@ -716,8 +720,6 @@ def goals():
     if request.method == 'POST':
         form = form_service.create_goals_form()
         if form.validate_on_submit():
-            from models.portfolio import RecoveryGoal
-            
             target = form.target_recovery.data
             days = form.days.data
             
@@ -783,9 +785,6 @@ def goals():
 @web_bp.route('/parameters', methods=['GET', 'POST'])
 def parameters():
     """Trading parameters management page."""
-    from services.trading_service import TradingService
-    
-    # Get trading service
     trading_service = TradingService(
         {'DATA_FOLDER': os.environ.get('DATA_FOLDER', 'data')},
         cache_manager
@@ -901,8 +900,6 @@ def clear_cache():
 @web_bp.route('/diagnostics')
 def diagnostics():
     """System diagnostics page."""
-    from services.system_service import SystemService
-    
     # Create system service
     system_service = SystemService({'DATA_FOLDER': os.environ.get('DATA_FOLDER', 'data')})
     

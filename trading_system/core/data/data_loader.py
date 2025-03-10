@@ -183,7 +183,3 @@ class DataLoader:
         """Verifica se um ticker é válido e tem dados disponíveis."""
         try:
             ticker_obj = yf.Ticker(ticker)
-            hist = ticker_obj.history(period="5d")
-            return not hist.empty
-        except Exception:
-            return False

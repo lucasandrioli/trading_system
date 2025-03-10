@@ -4,15 +4,15 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 
-from core.analysis.fundamental_analysis import FundamentalAnalysis
-from core.analysis.technical_indicators import TechnicalIndicators
-from core.analysis.market_analysis import MarketAnalysis
-from core.analysis.qualitative_analysis import QualitativeAnalysis
-from core.strategy.strategy import Strategy
-from core.strategy.position_sizing import PositionSizing
-from data.data_loader import DataLoader
-from utils.cache_manager import CacheManager
-from models.portfolio import Portfolio, Position, TradeHistory, RecoveryGoal
+from trading_system.core.analysis.fundamental_analysis import FundamentalAnalysis
+from trading_system.core.analysis.technical_indicators import TechnicalIndicators
+from trading_system.core.analysis.market_analysis import MarketAnalysis
+from trading_system.core.analysis.qualitative_analysis import QualitativeAnalysis
+from trading_system.core.strategy.strategy import Strategy
+from trading_system.core.strategy.position_sizing import PositionSizing
+from trading_system.core.data.data_loader import DataLoader
+from trading_system.utils.cache_manager import CacheManager
+from trading_system.models.portfolio import Portfolio, Position, TradeHistory, RecoveryGoal
 
 logger = logging.getLogger(__name__)
 
