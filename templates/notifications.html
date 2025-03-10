@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Configuração de Notificações - Sistema de Trading{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Configuração de Notificações</h1>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Configurações de Notificação</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/notifications">
+                        {{ form.csrf_token }}
+                        
+                        <div class="form-check form-switch mb-3">
+                            {{ form.enabled(class="form-check-input") }}
+                            <label class="form-check-label" for="enabled">Ativar Notificações</label>
+                        </div>
+                        
+                        <h6 class="mt-4">Métodos de Notificação</h6>
+                        
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3">
+                                    {{ form.email_enabled(class="form-check-input") }}
+                                    <label class="form-check-label" for="email_enabled">Email</label>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email_address" class="form-label">Endereço de Email</label>
+                                    {{ form.email_address(class="form-control", placeholder="seu@email.com") }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3">
+                                    {{ form.webhook_enabled(class="form-check-input") }}
+                                    <label class="form-check-label" for="webhook_enabled">Webhook (Discord/Slack)</label>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="webhook_url" class="form-label">URL do Webhook</label>
+                                    {{ form.webhook_url(class="form-control", placeholder="https://...") }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mt-4">Tipos de Notificação</h6>
+                        
+                        <div class="form-check form-switch mb-3">
+                            {{ form.notify_trades(class="form-check-input") }}
+                            <label class="form-check-label" for="notify_trades">Operações de Trading</label>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            {{ form.notify_thresholds(class="form-check-input") }}
+                            <label class="form-check-label" for="notify_thresholds">Alertas de Preço</label>
+                        </div>
+                        
+                        <div class="d-grid mt-4">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

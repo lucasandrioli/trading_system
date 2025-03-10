@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Otimização de Carteira - Sistema de Trading{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Otimização de Carteira</h1>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Parâmetros de Otimização</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/optimize">
+                        {{ form.csrf_token }}
+                        <div class="mb-3">
+                            <label for="max_positions" class="form-label">Máximo de Posições</label>
+                            {{ form.max_positions(class="form-control", type="number") }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="cash_reserve_pct" class="form-label">Reserva de Caixa (%)</label>
+                            {{ form.cash_reserve_pct(class="form-control", type="number") }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="max_position_size_pct" class="form-label">Tamanho Máximo de Posição (%)</label>
+                            {{ form.max_position_size_pct(class="form-control", type="number") }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="min_score" class="form-label">Score Mínimo para Inclusão</label>
+                            {{ form.min_score(class="form-control", type="number") }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="risk_profile" class="form-label">Perfil de Risco</label>
+                            {{ form.risk_profile(class="form-select") }}
+                        </div>
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        {% if results %}
+        <div class="col-md-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Carteira Otimizada</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Resumo</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>Total Valor da Carteira:</td>
+                                            <td>${{ "%.2f"|format(results.total_portfolio_value) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Saldo Atual:</td>
+                                            <td>${{ "%.2f"|format(results.current_cash) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Reserva de Caixa Alvo:</td>
+                                            <td>${{ "%.2f"|format(results.target_cash_reserve) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Total Investido (Atual):</td>
+                                            <td>${{ "%.2f"|format(results.total_current_invested) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Total Investido (Alvo):</td>
+                                            <td>${{ "%.2f"|format(results.total_target_invested) }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Estatísticas</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>Valor das Vendas:</td>
+                                            <td>${{ "%.2f"|format(results.sell_value) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Valor das Compras:</td>
+                                            <td>${{ "%.2f"|format(results.buy_value) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Posições Total:</td>
+                                            <td>{{ results.positions_count }} / {{ results.max_positions }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <form method="post" action="/execute_optimization" class="mt-3">
+                                <input type="hidden" name="max_positions" value="{{ results.max_positions }}">
+                                <input type="hidden" name="cash_reserve_pct" value="{{ results.target_cash_reserve_pct * 100 }}">
+                                <input type="hidden" name="risk_profile" value="{{ request.form.get('risk_profile', 'medium') }}">
+                                <button type="submit" class="btn btn-success w-100" onclick="return confirm('Tem certeza que deseja executar a otimização? Esta operação irá modificar sua carteira.')">
+                                    Executar Otimização
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <h6>Ativos a Manter</h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Ticker</th>
+                                    <th>Quantidade</th>
+                                    <th>Preço</th>
+                                    <th>Valor Atual</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for asset in results.assets_to_hold %}
+                                <tr>
+                                    <td>{{ asset.ticker }}</td>
+                                    <td>{{ asset.qty }}</td>
+                                    <td>${{ "%.2f"|format(asset.price) }}</td>
+                                    <td>${{ "%.2f"|format(asset.current_value) }}</td>
+                                    <td>{{ "%.2f"|format(asset.score) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Ativos a Vender</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Ticker</th>
+                                            <th>Vender</th>
+                                            <th>Preço</th>
+                                            <th>Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for asset in results.assets_to_sell %}
+                                        <tr>
+                                            <td>{{ asset.ticker }}</td>
+                                            <td>{{ asset.sell_qty }}</td>
+                                            <td>${{ "%.2f"|format(asset.price) }}</td>
+                                            <td>${{ "%.2f"|format(asset.sell_qty * asset.price) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Ativos a Comprar</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Ticker</th>
+                                            <th>Comprar</th>
+                                            <th>Preço</th>
+                                            <th>Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for asset in results.assets_to_buy %}
+                                        <tr>
+                                            <td>{{ asset.ticker }}</td>
+                                            <td>{{ asset.buy_qty }}</td>
+                                            <td>${{ "%.2f"|format(asset.price) }}</td>
+                                            <td>${{ "%.2f"|format(asset.buy_qty * asset.price) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,11 +1,53 @@
-/* Estilos personalizados para complementar o Bootstrap */
-.sidebar {
-    height: 100vh;
-    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-    z-index: 100;
-    padding-top: 90px;
+/* Custom styles to complement Bootstrap */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
+/* Menu horizontal no topo */
+.top-nav {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    position: fixed;
+    top: 56px; /* Altura da navbar */
+    left: 0;
+    right: 0;
+    z-index: 1020;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.top-nav .nav {
+    display: flex;
+    padding-bottom: 0.5rem;
+}
+
+.top-nav .nav-item {
+    margin-right: 1rem;
+}
+
+.top-nav .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+}
+
+.top-nav .nav-link.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* Conteúdo principal para o novo layout */
+.content-wrapper {
+    margin-left: 0;
+    padding-top: 120px; /* Espaço para navbar + top-nav */
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 100%;
+}
+
+/* Estilos positivos e negativos */
 .positive {
     color: #198754;
     font-weight: bold;
@@ -38,6 +80,7 @@
 
 .progress-bar {
     background-color: #0d6efd;
+    transition: width 0.6s ease;
 }
 
 .nav-link {
@@ -48,17 +91,34 @@
     color: #0d6efd;
 }
 
-.nav-link.active {
-    color: #fff;
-    background-color: #0d6efd;
-}
-
 .navbar {
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
-.content-wrapper {
-    padding-top: 90px;
+.container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.card {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* Tabelas responsivas */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+}
+
+/* Ajustar row para evitar margens negativas que causam overflow */
+.row {
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .btn-group-sm > .btn, .btn-sm {
@@ -66,13 +126,73 @@
     font-size: 0.75rem;
 }
 
+.chart-container {
+    position: relative;
+    height: 40vh;
+    width: 100%;
+}
+
+/* Dashboard specific styles */
+.metric-card {
+    border-left: 4px solid #0d6efd;
+}
+
+.metric-card.positive {
+    border-left-color: #198754;
+}
+
+.metric-card.negative {
+    border-left-color: #dc3545;
+}
+
+.metric-card h3 {
+    margin-bottom: 0;
+}
+
+.market-sentiment-display {
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.market-sentiment-display.bullish {
+    background-color: rgba(25, 135, 84, 0.1);
+    border: 1px solid rgba(25, 135, 84, 0.2);
+}
+
+.market-sentiment-display.bearish {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.market-sentiment-display.neutral {
+    background-color: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+/* Responsive adjustments */
 @media (max-width: 767.98px) {
-    .sidebar {
-        height: auto;
-        padding-top: 0;
+    .top-nav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     .content-wrapper {
-        padding-top: 20px;
+        padding-top: 140px; /* Maior espaço em dispositivos móveis */
+        padding-left: 5px;
+        padding-right: 5px;
     }
+    
+    .chart-container {
+        height: 60vh;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+}
+
+.card, .table, .alert {
+    position: relative;
+    z-index: 25;
 }

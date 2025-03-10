@@ -1779,21 +1779,23 @@ def analyze_portfolio(portfolio: dict, account_balance: float, risk_profile: str
             logger.error(f"Erro ao analisar {ticker}: {e}")
             results[ticker] = {"ticker": ticker, "error": str(e)}
     
-    # Criar resumo do portfólio
+    # Criar resumo do portfólio - Using web-safe field names (no accents)
     portfolio_summary = {
         "total_invested": total_invested,
         "valor_atual": total_current,
-        "lucro_prejuízo": total_current - total_invested,
-        "lucro_prejuízo_pct": ((total_current / total_invested - 1) * 100) if total_invested > 0 else 0.0,
-        "saldo_disponível": account_balance,
-        "patrimônio_total": account_balance + total_current,
+        "lucro_prejuizo": total_current - total_invested,  # Web-safe naming
+        "lucro_prejuizo_pct": ((total_current / total_invested - 1) * 100) if total_invested > 0 else 0.0,  # Web-safe naming
+        "saldo_disponivel": account_balance,  # Web-safe naming
+        "patrimonio_total": account_balance + total_current,  # Web-safe naming
         "market_sentiment": market_sent,
-        "meta_recuperação": goals.get('target_recovery', 0),
+        "meta_recuperacao": goals.get('target_recovery', 0),  # Web-safe naming
         "dias_restantes": remaining_days,
-        "meta_diária": daily_goal
+        "dias_totais": goals.get('days', 30),  # Added for progress bar calculation
+        "meta_diaria": daily_goal  # Web-safe naming
     }
     
     return {"ativos": results, "resumo": portfolio_summary}
+
 
 def analyze_watchlist(watchlist: dict, account_balance: float, risk_profile: str = "medium", 
                       extended_hours: bool = False, goals: dict = None) -> dict:

@@ -6,67 +6,7 @@
     <title>{% block title %}Sistema de Trading{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style>
-        .sidebar {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 100;
-            padding: 90px 0 0;
-            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-            background-color: #f8f9fa;
-        }
-        
-        .sidebar-sticky {
-            position: relative;
-            top: 0;
-            height: calc(100vh - 90px);
-            padding-top: .5rem;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-        
-        .navbar {
-            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
-        }
-        
-        .content-wrapper {
-            margin-left: 240px;
-            padding: 90px 15px 15px;
-        }
-        
-        @media (max-width: 767.98px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                padding: 15px;
-            }
-            
-            .content-wrapper {
-                margin-left: 0;
-                padding: 15px;
-            }
-        }
-        
-        .card {
-            margin-bottom: 20px;
-        }
-        
-        .positive {
-            color: #198754;
-        }
-        
-        .negative {
-            color: #dc3545;
-        }
-        
-        .nav-link.active {
-            background-color: #0d6efd;
-            color: white !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
@@ -91,6 +31,22 @@
                             <li><a class="dropdown-item" href="/analyze?risk=medium">Perfil de Risco: Médio</a></li>
                             <li><a class="dropdown-item" href="/analyze?risk=high">Perfil de Risco: Alto</a></li>
                             <li><a class="dropdown-item" href="/analyze?risk=ultra">Perfil de Risco: Ultra</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/optimize">Otimizar Carteira</a></li>
+                            <li><a class="dropdown-item" href="/backtest">Backtest</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-tools"></i> Ferramentas
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
+                            <li><a class="dropdown-item" href="/parameters">Parâmetros de Trading</a></li>
+                            <li><a class="dropdown-item" href="/notifications">Configurar Notificações</a></li>
+                            <li><a class="dropdown-item" href="/download_portfolio">Exportar Portfólio</a></li>
+                            <li><a class="dropdown-item" href="/upload-json">Importar Portfólio</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/diagnostics">Diagnósticos</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -98,61 +54,97 @@
         </div>
     </nav>
 
-    <div class="container-fluid">
-        <div class="row">
-            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
-                <div class="position-sticky sidebar-sticky">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
-                                <i class="bi bi-house-door"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/portfolio' %}active{% endif %}" href="/portfolio">
-                                <i class="bi bi-bar-chart-fill"></i> Carteira
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/watchlist' %}active{% endif %}" href="/watchlist">
-                                <i class="bi bi-eye"></i> Watchlist
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/trade' %}active{% endif %}" href="/trade">
-                                <i class="bi bi-currency-exchange"></i> Operações
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/account' %}active{% endif %}" href="/account">
-                                <i class="bi bi-wallet2"></i> Saldo da Conta
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/goals' %}active{% endif %}" href="/goals">
-                                <i class="bi bi-trophy"></i> Metas
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <main class="content-wrapper">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                  {% if messages %}
-                    {% for category, message in messages %}
-                      <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                  {% endif %}
-                {% endwith %}
-                
-                {% block content %}{% endblock %}
-            </main>
-        </div>
+    <!-- Novo Menu Horizontal -->
+    <div class="top-nav">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/portfolio' %}active{% endif %}" href="/portfolio">
+                    <i class="bi bi-bar-chart-fill"></i> Carteira
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/watchlist' %}active{% endif %}" href="/watchlist">
+                    <i class="bi bi-eye"></i> Watchlist
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/analyze' %}active{% endif %}" href="/analyze?risk=medium">
+                    <i class="bi bi-graph-up"></i> Análise
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/indicators' %}active{% endif %}" href="/indicators">
+                    <i class="bi bi-activity"></i> Indicadores
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/fundamentals' %}active{% endif %}" href="/fundamentals">
+                    <i class="bi bi-file-earmark-text"></i> Fundamentos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/news' %}active{% endif %}" href="/news">
+                    <i class="bi bi-newspaper"></i> Notícias
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/market_sentiment' %}active{% endif %}" href="/market_sentiment">
+                    <i class="bi bi-thermometer"></i> Mercado
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/backtest' %}active{% endif %}" href="/backtest">
+                    <i class="bi bi-calendar-check"></i> Backtest
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/optimize' %}active{% endif %}" href="/optimize">
+                    <i class="bi bi-sliders"></i> Otimização
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/trade' %}active{% endif %}" href="/trade">
+                    <i class="bi bi-currency-exchange"></i> Operações
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/account' %}active{% endif %}" href="/account">
+                    <i class="bi bi-wallet2"></i> Saldo
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/goals' %}active{% endif %}" href="/goals">
+                    <i class="bi bi-trophy"></i> Metas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.path == '/parameters' %}active{% endif %}" href="/parameters">
+                    <i class="bi bi-gear"></i> Parâmetros
+                </a>
+            </li>
+        </ul>
     </div>
+
+    <main class="content-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

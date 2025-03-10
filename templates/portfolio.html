@@ -1,4 +1,3 @@
-# /templates/portfolio.html
 {% extends "base.html" %}
 
 {% block title %}Carteira - Sistema de Trading{% endblock %}
@@ -36,6 +35,23 @@
                         </div>
                     </form>
                 </div>
+                
+                <div class="card-footer">
+                    <div class="d-grid gap-2">
+                        <a href="/analyze?risk=medium" class="btn btn-success">
+                            <i class="bi bi-graph-up"></i> Analisar Carteira
+                        </a>
+                        <a href="/optimize" class="btn btn-outline-primary">
+                            <i class="bi bi-sliders"></i> Otimizar Carteira
+                        </a>
+                        <a href="/backtest" class="btn btn-outline-secondary">
+                            <i class="bi bi-calendar-check"></i> Backtest
+                        </a>
+                        <a href="/download_portfolio" class="btn btn-outline-info">
+                            <i class="bi bi-download"></i> Exportar Portfólio
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -72,10 +88,22 @@
                                     </td>
                                     <td>
                                         <div class="btn-group">
-                                            <a href="/trade?ticker={{ ticker }}" class="btn btn-sm btn-outline-primary">
+                                            <a href="/portfolio/edit/{{ ticker }}" class="btn btn-sm btn-outline-secondary" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="/indicators?ticker={{ ticker }}" class="btn btn-sm btn-outline-primary" title="Análise Técnica">
+                                                <i class="bi bi-activity"></i>
+                                            </a>
+                                            <a href="/fundamentals?ticker={{ ticker }}" class="btn btn-sm btn-outline-info" title="Fundamentos">
+                                                <i class="bi bi-file-text"></i>
+                                            </a>
+                                            <a href="/news?ticker={{ ticker }}" class="btn btn-sm btn-outline-warning" title="Notícias">
+                                                <i class="bi bi-newspaper"></i>
+                                            </a>
+                                            <a href="/trade?ticker={{ ticker }}" class="btn btn-sm btn-outline-success" title="Operar">
                                                 <i class="bi bi-currency-exchange"></i>
                                             </a>
-                                            <a href="/portfolio/delete/{{ ticker }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tem certeza que deseja remover {{ ticker }}?')">
+                                            <a href="/portfolio/delete/{{ ticker }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tem certeza que deseja remover {{ ticker }}?')" title="Remover">
                                                 <i class="bi bi-trash"></i>
                                             </a>
                                         </div>
