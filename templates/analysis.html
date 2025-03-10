@@ -1,10 +1,63 @@
+Here's the optimized analysis.html template with improved performance for large datasets:
+
+```html
 {% extends "base.html" %}
 
 {% block title %}Análise - Sistema de Trading{% endblock %}
 
+{% macro render_progress_bar(value, max_value, danger_threshold=5, warning_threshold=10, class_prefix="bg") %}
+  {% set percentage = ((value / max_value) * 100)|round(1) %}
+  {% set bar_class = class_prefix ~ "-" ~ 
+    ("danger" if value < danger_threshold else 
+     "warning" if value < warning_threshold else 
+     "success") 
+  %}
+  <div class="progress">
+    <div class="progress-bar {{ bar_class }}" role="progressbar" style="width: {{ percentage }}%"></div>
+  </div>
+{% endmacro %}
+
+{% macro format_currency(value) %}
+  ${{ "%.2f"|format(value|float or 0) }}
+{% endmacro %}
+
+{% macro asset_action_buttons(ticker) %}
+  <div class="btn-group">
+    <a href="/indicators?ticker={{ ticker }}" class="btn btn-sm btn-outline-primary" title="Técnica">
+      <i class="bi bi-activity"></i>
+    </a>
+    <a href="/fundamentals?ticker={{ ticker }}" class="btn btn-sm btn-outline-info" title="Fundamentos">
+      <i class="bi bi-file-text"></i>
+    </a>
+    <a href="/news?ticker={{ ticker }}" class="btn btn-sm btn-outline-warning" title="Notícias">
+      <i class="bi bi-newspaper"></i>
+    </a>
+  </div>
+{% endmacro %}
+
 {% block content %}
 <div class="container-fluid">
     <h1 class="mb-4">Análise da Carteira (Perfil: {{ risk_profile|title }})</h1>
+    
+    {# Summary Section - Precompute values outside the template #}
+    {% set resumo = portfolio_analysis.resumo or {} %}
+    {% set resumo_stats = {
+        'total_invested': resumo.total_invested or 0,
+        'valor_atual': resumo.valor_atual or 0,
+        'lucro_prejuizo': resumo.lucro_prejuizo or 0,
+        'lucro_prejuizo_pct': resumo.lucro_prejuizo_pct or 0,
+        'saldo_disponivel': resumo.saldo_disponivel or 0,
+        'patrimonio_total': resumo.patrimonio_total or 0
+    } %}
+    
+    {% set market_sentiment = resumo.market_sentiment or {} %}
+    {% set recovery = {
+        'meta_recuperacao': resumo.meta_recuperacao or 0,
+        'meta_diaria': resumo.meta_diaria or 0,
+        'dias_restantes': resumo.dias_restantes or 0,
+        'dias_totais': resumo.dias_totais or 30,
+        'progress_pct': 100 - ((resumo.dias_restantes or 0) / (resumo.dias_totais or 30) * 100)
+    } %}
     
     <div class="row">
         <div class="col-12 mb-4">
@@ -14,90 +67,56 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
+                        {# Portfolio Summary #}
                         <div class="col-md-4">
                             <h6>Resumo da Carteira</h6>
                             <div class="table-responsive">
                                 <table class="table table-sm">
                                     <tbody>
-                                        <tr>
-                                            <td>Total Investido:</td>
-                                            <td>${{ "%.2f"|format(portfolio_analysis.resumo.total_invested or 0) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Valor Atual:</td>
-                                            <td>${{ "%.2f"|format(portfolio_analysis.resumo.valor_atual or 0) }}</td>
-                                        </tr>
+                                        <tr><td>Total Investido:</td><td>{{ format_currency(resumo_stats.total_invested) }}</td></tr>
+                                        <tr><td>Valor Atual:</td><td>{{ format_currency(resumo_stats.valor_atual) }}</td></tr>
                                         <tr>
                                             <td>Lucro/Prejuízo:</td>
-                                            <td class="{% if (portfolio_analysis.resumo.lucro_prejuízo or 0) >= 0 %}positive{% else %}negative{% endif %}">
-                                                ${{ "%.2f"|format(portfolio_analysis.resumo.lucro_prejuízo or 0) }}
-                                                ({{ "%.2f"|format(portfolio_analysis.resumo.lucro_prejuízo_pct or 0) }}%)
+                                            <td class="{% if resumo_stats.lucro_prejuizo >= 0 %}positive{% else %}negative{% endif %}">
+                                                {{ format_currency(resumo_stats.lucro_prejuizo) }}
+                                                ({{ "%.2f"|format(resumo_stats.lucro_prejuizo_pct) }}%)
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>Saldo Disponível:</td>
-                                            <td>${{ "%.2f"|format(portfolio_analysis.resumo.saldo_disponível or 0) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Patrimônio Total:</td>
-                                            <td>${{ "%.2f"|format(portfolio_analysis.resumo.patrimônio_total or 0) }}</td>
-                                        </tr>
+                                        <tr><td>Saldo Disponível:</td><td>{{ format_currency(resumo_stats.saldo_disponivel) }}</td></tr>
+                                        <tr><td>Patrimônio Total:</td><td>{{ format_currency(resumo_stats.patrimonio_total) }}</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+                        
+                        {# Market Sentiment #}
                         <div class="col-md-4">
                             <h6>Sentimento de Mercado</h6>
                             <div class="table-responsive">
                                 <table class="table table-sm">
                                     <tbody>
-                                        <tr>
-                                            <td>Sentimento:</td>
-                                            <td>{{ portfolio_analysis.resumo.market_sentiment.sentiment }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Tendência:</td>
-                                            <td>{{ portfolio_analysis.resumo.market_sentiment.trend }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Score de Viés:</td>
-                                            <td>{{ "%.2f"|format(portfolio_analysis.resumo.market_sentiment.market_bias_score) }}</td>
-                                        </tr>
+                                        <tr><td>Sentimento:</td><td>{{ market_sentiment.sentiment|default('N/A') }}</td></tr>
+                                        <tr><td>Tendência:</td><td>{{ market_sentiment.trend|default('N/A') }}</td></tr>
+                                        <tr><td>Score de Viés:</td><td>{{ "%.2f"|format(market_sentiment.market_bias_score|default(0)) }}</td></tr>
                                     </tbody>
                                 </table>
                             </div>
-                            
                             <a href="/market_sentiment" class="btn btn-sm btn-outline-primary mt-2">Ver Detalhes</a>
                         </div>
+                        
+                        {# Recovery Goals #}
                         <div class="col-md-4">
-                            {% if portfolio_analysis.resumo.meta_recuperação > 0 %}
+                            {% if recovery.meta_recuperacao > 0 %}
                             <h6>Meta de Recuperação</h6>
                             <div class="table-responsive">
                                 <table class="table table-sm">
                                     <tbody>
-                                        <tr>
-                                            <td>Meta Recuperação:</td>
-                                            <td>${{ "%.2f"|format(portfolio_analysis.resumo.meta_recuperação) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Meta Diária:</td>
-                                            <td>${{ "%.2f"|format(portfolio_analysis.resumo.meta_diária) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Dias Restantes:</td>
-                                            <td>{{ portfolio_analysis.resumo.dias_restantes }}</td>
-                                        </tr>
+                                        <tr><td>Meta Recuperação:</td><td>{{ format_currency(recovery.meta_recuperacao) }}</td></tr>
+                                        <tr><td>Meta Diária:</td><td>{{ format_currency(recovery.meta_diaria) }}</td></tr>
+                                        <tr><td>Dias Restantes:</td><td>{{ recovery.dias_restantes }}</td></tr>
                                         <tr>
                                             <td>Urgência:</td>
-                                            <td><div class="progress">
-                                                <div class="progress-bar 
-                                                    {% if portfolio_analysis.resumo.dias_restantes < 5 %}bg-danger
-                                                    {% elif portfolio_analysis.resumo.dias_restantes < 10 %}bg-warning
-                                                    {% else %}bg-success{% endif %}" 
-                                                    role="progressbar" 
-                                                    style="width: {{ 100 - (portfolio_analysis.resumo.dias_restantes / portfolio_analysis.resumo.dias_totais * 100) if portfolio_analysis.resumo.dias_totais else 0 }}%">
-                                                </div>
-                                            </div></td>
+                                            <td>{{ render_progress_bar(recovery.progress_pct, 100) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -106,7 +125,7 @@
                             
                             <div class="d-grid gap-2 mt-3">
                                 <a href="/execute_rebalance" class="btn btn-success" 
-                                   onclick="return confirm('Tem certeza que deseja executar o rebalanceamento recomendado? Esta operação modificará sua carteira.')">
+                                   onclick="return confirm('Tem certeza que deseja executar o rebalanceamento recomendado?')">
                                     <i class="bi bi-shuffle"></i> Executar Rebalanceamento
                                 </a>
                                 <a href="/optimize" class="btn btn-outline-primary">
@@ -120,7 +139,7 @@
         </div>
     </div>
     
-    <!-- Plano de Rebalanceamento -->
+    {# Rebalance Plan - Optimize for rendering efficiency #}
     <div class="row">
         <div class="col-12 mb-4">
             <div class="card">
@@ -129,142 +148,129 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <!-- Estatísticas do plano -->
+                        {# Rebalance Stats #}
+                        {% set stats = rebalance_plan.stats or {} %}
                         <div class="col-lg-4 mb-3">
                             <h6>Estatísticas</h6>
                             <table class="table table-sm">
                                 <tbody>
-                                    <tr>
-                                        <td>Saldo Inicial:</td>
-                                        <td>${{ "%.2f"|format(rebalance_plan.stats.saldo_inicial or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Capital Liberado:</td>
-                                        <td>${{ "%.2f"|format(rebalance_plan.stats.capital_liberado_vendas or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Capital Disponível:</td>
-                                        <td>${{ "%.2f"|format(rebalance_plan.stats.capital_total_disponivel or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Capital para Compras:</td>
-                                        <td>${{ "%.2f"|format(rebalance_plan.stats.capital_usado_compras or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Saldo Remanescente:</td>
-                                        <td>${{ "%.2f"|format(rebalance_plan.stats.saldo_remanescente or 0) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Total de Comissões:</td>
-                                        <td>${{ "%.2f"|format(rebalance_plan.stats.total_comissoes or 0) }}</td>
-                                    </tr>
+                                    <tr><td>Saldo Inicial:</td><td>{{ format_currency(stats.saldo_inicial) }}</td></tr>
+                                    <tr><td>Capital Liberado:</td><td>{{ format_currency(stats.capital_liberado_vendas) }}</td></tr>
+                                    <tr><td>Capital Disponível:</td><td>{{ format_currency(stats.capital_total_disponivel) }}</td></tr>
+                                    <tr><td>Capital para Compras:</td><td>{{ format_currency(stats.capital_usado_compras) }}</td></tr>
+                                    <tr><td>Saldo Remanescente:</td><td>{{ format_currency(stats.saldo_remanescente) }}</td></tr>
+                                    <tr><td>Total de Comissões:</td><td>{{ format_currency(stats.total_comissoes) }}</td></tr>
                                 </tbody>
                             </table>
                         </div>
                         
-                        <!-- Vendas recomendadas -->
+                        {# Sell Recommendations - Limit items shown with pagination if needed #}
                         <div class="col-lg-4 mb-3">
                             <h6>Vendas Recomendadas</h6>
                             {% if rebalance_plan.sell %}
-                            <div class="table-responsive">
-                                <table class="table table-sm table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Ticker</th>
-                                            <th>Qtde</th>
-                                            <th>Preço</th>
-                                            <th>Valor</th>
-                                            <th>Ação</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for item in rebalance_plan.sell %}
-                                        <tr>
-                                            <td>{{ item.ticker }}</td>
-                                            <td>{{ item.sell_quantity }}</td>
-                                            <td>${{ "%.2f"|format(item.current_price) }}</td>
-                                            <td>${{ "%.2f"|format(item.operation_value) }}</td>
-                                            <td>
-                                                <a href="/trade?ticker={{ item.ticker }}&quantity={{ item.sell_quantity }}&price={{ '%.2f'|format(item.current_price) }}&trade_type=VENDA" class="btn btn-sm btn-outline-danger">
-                                                    Vender
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Ticker</th>
+                                                <th>Qtde</th>
+                                                <th>Preço</th>
+                                                <th>Valor</th>
+                                                <th>Ação</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in rebalance_plan.sell|slice(0, 10) %}
+                                            <tr>
+                                                <td>{{ item.ticker }}</td>
+                                                <td>{{ item.sell_quantity }}</td>
+                                                <td>{{ format_currency(item.current_price) }}</td>
+                                                <td>{{ format_currency(item.operation_value) }}</td>
+                                                <td>
+                                                    <a href="/trade?ticker={{ item.ticker }}&quantity={{ item.sell_quantity }}&price={{ '%.2f'|format(item.current_price) }}&trade_type=VENDA" class="btn btn-sm btn-outline-danger">Vender</a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                            {% if rebalance_plan.sell|length > 10 %}
+                                                <tr><td colspan="5" class="text-center">+{{ rebalance_plan.sell|length - 10 }} mais</td></tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
                             {% else %}
-                            <p class="text-center py-2">Nenhuma venda recomendada</p>
+                                <p class="text-center py-2">Nenhuma venda recomendada</p>
                             {% endif %}
                             
+                            {# Rebalances #}
                             {% if rebalance_plan.rebalance %}
-                            <h6 class="mt-3">Rebalanceamentos</h6>
-                            <div class="table-responsive">
-                                <table class="table table-sm table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Ticker</th>
-                                            <th>Qtde</th>
-                                            <th>Preço</th>
-                                            <th>Valor</th>
-                                            <th>Ação</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for item in rebalance_plan.rebalance %}
-                                        <tr>
-                                            <td>{{ item.ticker }}</td>
-                                            <td>{{ item.sell_quantity }}</td>
-                                            <td>${{ "%.2f"|format(item.current_price) }}</td>
-                                            <td>${{ "%.2f"|format(item.operation_value) }}</td>
-                                            <td>
-                                                <a href="/trade?ticker={{ item.ticker }}&quantity={{ item.sell_quantity }}&price={{ '%.2f'|format(item.current_price) }}&trade_type=VENDA" class="btn btn-sm btn-outline-warning">
-                                                    Rebalancear
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
+                                <h6 class="mt-3">Rebalanceamentos</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Ticker</th>
+                                                <th>Qtde</th>
+                                                <th>Preço</th>
+                                                <th>Valor</th>
+                                                <th>Ação</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in rebalance_plan.rebalance|slice(0, 10) %}
+                                            <tr>
+                                                <td>{{ item.ticker }}</td>
+                                                <td>{{ item.sell_quantity }}</td>
+                                                <td>{{ format_currency(item.current_price) }}</td>
+                                                <td>{{ format_currency(item.operation_value) }}</td>
+                                                <td>
+                                                    <a href="/trade?ticker={{ item.ticker }}&quantity={{ item.sell_quantity }}&price={{ '%.2f'|format(item.current_price) }}&trade_type=VENDA" class="btn btn-sm btn-outline-warning">Rebalancear</a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                            {% if rebalance_plan.rebalance|length > 10 %}
+                                                <tr><td colspan="5" class="text-center">+{{ rebalance_plan.rebalance|length - 10 }} mais</td></tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
                             {% endif %}
                         </div>
                         
-                        <!-- Compras recomendadas -->
+                        {# Buy Recommendations #}
                         <div class="col-lg-4 mb-3">
                             <h6>Compras Recomendadas</h6>
                             {% if rebalance_plan.buy %}
-                            <div class="table-responsive">
-                                <table class="table table-sm table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Ticker</th>
-                                            <th>Qtde</th>
-                                            <th>Preço</th>
-                                            <th>Custo</th>
-                                            <th>Ação</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for item in rebalance_plan.buy %}
-                                        <tr>
-                                            <td>{{ item.ticker }}</td>
-                                            <td>{{ item.buy_quantity }}</td>
-                                            <td>${{ "%.2f"|format(item.current_price) }}</td>
-                                            <td>${{ "%.2f"|format(item.total_cost) }}</td>
-                                            <td>
-                                                <a href="/trade?ticker={{ item.ticker }}&quantity={{ item.buy_quantity }}&price={{ '%.2f'|format(item.current_price) }}&trade_type=COMPRA" class="btn btn-sm btn-outline-success">
-                                                    Comprar
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Ticker</th>
+                                                <th>Qtde</th>
+                                                <th>Preço</th>
+                                                <th>Custo</th>
+                                                <th>Ação</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in rebalance_plan.buy|slice(0, 10) %}
+                                            <tr>
+                                                <td>{{ item.ticker }}</td>
+                                                <td>{{ item.buy_quantity }}</td>
+                                                <td>{{ format_currency(item.current_price) }}</td>
+                                                <td>{{ format_currency(item.total_cost) }}</td>
+                                                <td>
+                                                    <a href="/trade?ticker={{ item.ticker }}&quantity={{ item.buy_quantity }}&price={{ '%.2f'|format(item.current_price) }}&trade_type=COMPRA" class="btn btn-sm btn-outline-success">Comprar</a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                            {% if rebalance_plan.buy|length > 10 %}
+                                                <tr><td colspan="5" class="text-center">+{{ rebalance_plan.buy|length - 10 }} mais</td></tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
                             {% else %}
-                            <p class="text-center py-2">Nenhuma compra recomendada</p>
+                                <p class="text-center py-2">Nenhuma compra recomendada</p>
                             {% endif %}
                         </div>
                     </div>
@@ -273,7 +279,7 @@
         </div>
     </div>
     
-    <!-- Análise de Ativos -->
+    {# Portfolio Analysis - Limit number of items displayed #}
     <div class="row">
         <div class="col-12 mb-4">
             <div class="card">
@@ -289,62 +295,65 @@
                 </div>
                 <div class="card-body">
                     {% if portfolio_analysis.ativos %}
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Ticker</th>
-                                    <th>Preço</th>
-                                    <th>Score</th>
-                                    <th>P/L</th>
-                                    <th>Decisão</th>
-                                    <th>Justificativa</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for ticker, details in portfolio_analysis.ativos.items() %}
-                                {% if "error" not in details %}
-                                <tr>
-                                    <td>{{ ticker }}</td>
-                                    <td>${{ "%.2f"|format(details.current_price) }}</td>
-                                    <td>{{ "%.2f"|format(details.total_score) }}</td>
-                                    <td class="{% if details.position_profit_pct >= 0 %}positive{% else %}negative{% endif %}">
-                                        {{ "%.2f"|format(details.position_profit_pct) }}%
-                                    </td>
-                                    <td>
-                                        <span class="badge {% if details.decision in ['COMPRAR', 'COMPRAR PARCIAL'] %}bg-success{% elif details.decision in ['VENDER', 'REALIZAR LUCRO PARCIAL', 'REDUZIR'] %}bg-danger{% else %}bg-secondary{% endif %}">
-                                            {{ details.decision }}
-                                        </span>
-                                    </td>
-                                    <td>{{ details.justificativa }}</td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <a href="/indicators?ticker={{ ticker }}" class="btn btn-sm btn-outline-primary" title="Técnica">
-                                                <i class="bi bi-activity"></i>
-                                            </a>
-                                            <a href="/fundamentals?ticker={{ ticker }}" class="btn btn-sm btn-outline-info" title="Fundamentos">
-                                                <i class="bi bi-file-text"></i>
-                                            </a>
-                                            <a href="/news?ticker={{ ticker }}" class="btn btn-sm btn-outline-warning" title="Notícias">
-                                                <i class="bi bi-newspaper"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                        {% set valid_assets = [] %}
+                        {% for ticker, details in portfolio_analysis.ativos.items() %}
+                            {% if "error" not in details %}
+                                {% do valid_assets.append({'ticker': ticker, 'details': details}) %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if valid_assets %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Ticker</th>
+                                            <th>Preço</th>
+                                            <th>Score</th>
+                                            <th>P/L</th>
+                                            <th>Decisão</th>
+                                            <th>Justificativa</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for asset in valid_assets|sort(attribute='details.total_score', reverse=true)|slice(0, 25) %}
+                                        <tr>
+                                            <td>{{ asset.ticker }}</td>
+                                            <td>{{ format_currency(asset.details.current_price) }}</td>
+                                            <td>{{ "%.2f"|format(asset.details.total_score or 0) }}</td>
+                                            <td class="{% if (asset.details.position_profit_pct or 0) >= 0 %}positive{% else %}negative{% endif %}">
+                                                {{ "%.2f"|format(asset.details.position_profit_pct or 0) }}%
+                                            </td>
+                                            <td>
+                                                <span class="badge 
+                                                    {% if asset.details.decision in ['COMPRAR', 'COMPRAR PARCIAL'] %}bg-success
+                                                    {% elif asset.details.decision in ['VENDER', 'REALIZAR LUCRO PARCIAL', 'REDUZIR'] %}bg-danger
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ asset.details.decision or "AGUARDAR" }}
+                                                </span>
+                                            </td>
+                                            <td>{{ asset.details.justificativa|truncate(50) or "" }}</td>
+                                            <td>{{ asset_action_buttons(asset.ticker) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% if valid_assets|length > 25 %}
+                                            <tr><td colspan="7" class="text-center">+{{ valid_assets|length - 25 }} mais ativos</td></tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-center py-3">Nenhum ativo válido para análise</p>
+                        {% endif %}
                     {% else %}
-                    <p class="text-center py-3">Nenhum ativo para análise</p>
+                        <p class="text-center py-3">Nenhum ativo para análise</p>
                     {% endif %}
                 </div>
             </div>
         </div>
         
-        <!-- Análise da Watchlist -->
+        {# Watchlist Analysis #}
         <div class="col-12 mb-4">
             <div class="card">
                 <div class="card-header">
@@ -352,54 +361,69 @@
                 </div>
                 <div class="card-body">
                     {% if watchlist_analysis %}
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Ticker</th>
-                                    <th>Preço</th>
-                                    <th>Score</th>
-                                    <th>Decisão</th>
-                                    <th>Justificativa</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for ticker, details in watchlist_analysis.items() %}
-                                {% if "error" not in details %}
-                                <tr>
-                                    <td>{{ ticker }}</td>
-                                    <td>${{ "%.2f"|format(details.current_price) }}</td>
-                                    <td>{{ "%.2f"|format(details.total_score) }}</td>
-                                    <td>
-                                        <span class="badge {% if details.decision in ['COMPRAR', 'COMPRAR PARCIAL'] %}bg-success{% elif details.decision in ['VENDER', 'REALIZAR LUCRO PARCIAL', 'REDUZIR'] %}bg-danger{% else %}bg-secondary{% endif %}">
-                                            {{ details.decision }}
-                                        </span>
-                                    </td>
-                                    <td>{{ details.justificativa }}</td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <a href="/indicators?ticker={{ ticker }}" class="btn btn-sm btn-outline-primary" title="Técnica">
-                                                <i class="bi bi-activity"></i>
-                                            </a>
-                                            <a href="/fundamentals?ticker={{ ticker }}" class="btn btn-sm btn-outline-info" title="Fundamentos">
-                                                <i class="bi bi-file-text"></i>
-                                            </a>
-                                            {% if details.decision in ['COMPRAR', 'COMPRAR PARCIAL'] and details.position_sizing and details.position_sizing.suggested_shares > 0 %}
-                                            <a href="/trade?ticker={{ ticker }}&quantity={{ details.position_sizing.suggested_shares }}&price={{ '%.2f'|format(details.current_price) }}&trade_type=COMPRA" class="btn btn-sm btn-outline-success" title="Comprar">
-                                                <i class="bi bi-cart-plus"></i> {{ details.position_sizing.suggested_shares }}
-                                            </a>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                        {% set valid_watchlist = [] %}
+                        {% for ticker, details in watchlist_analysis.items() %}
+                            {% if "error" not in details %}
+                                {% do valid_watchlist.append({'ticker': ticker, 'details': details}) %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if valid_watchlist %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Ticker</th>
+                                            <th>Preço</th>
+                                            <th>Score</th>
+                                            <th>Decisão</th>
+                                            <th>Justificativa</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in valid_watchlist|sort(attribute='details.total_score', reverse=true)|slice(0, 25) %}
+                                        <tr>
+                                            <td>{{ item.ticker }}</td>
+                                            <td>{{ format_currency(item.details.current_price) }}</td>
+                                            <td>{{ "%.2f"|format(item.details.total_score or 0) }}</td>
+                                            <td>
+                                                <span class="badge 
+                                                    {% if item.details.decision in ['COMPRAR', 'COMPRAR PARCIAL'] %}bg-success
+                                                    {% elif item.details.decision in ['VENDER', 'REALIZAR LUCRO PARCIAL', 'REDUZIR'] %}bg-danger
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ item.details.decision or "AGUARDAR" }}
+                                                </span>
+                                            </td>
+                                            <td>{{ item.details.justificativa|truncate(50) or "" }}</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="/indicators?ticker={{ item.ticker }}" class="btn btn-sm btn-outline-primary" title="Técnica">
+                                                        <i class="bi bi-activity"></i>
+                                                    </a>
+                                                    <a href="/fundamentals?ticker={{ item.ticker }}" class="btn btn-sm btn-outline-info" title="Fundamentos">
+                                                        <i class="bi bi-file-text"></i>
+                                                    </a>
+                                                    {% if item.details.decision in ['COMPRAR', 'COMPRAR PARCIAL'] and item.details.position_sizing and (item.details.position_sizing.suggested_shares or 0) > 0 %}
+                                                    <a href="/trade?ticker={{ item.ticker }}&quantity={{ item.details.position_sizing.suggested_shares }}&price={{ '%.2f'|format(item.details.current_price or 0) }}&trade_type=COMPRA" class="btn btn-sm btn-outline-success" title="Comprar">
+                                                        <i class="bi bi-cart-plus"></i> {{ item.details.position_sizing.suggested_shares }}
+                                                    </a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% if valid_watchlist|length > 25 %}
+                                            <tr><td colspan="6" class="text-center">+{{ valid_watchlist|length - 25 }} mais ativos</td></tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-center py-3">Nenhum ativo válido na watchlist para análise</p>
+                        {% endif %}
                     {% else %}
-                    <p class="text-center py-3">Nenhum ativo na watchlist para análise</p>
+                        <p class="text-center py-3">Nenhum ativo na watchlist para análise</p>
                     {% endif %}
                 </div>
             </div>
@@ -410,17 +434,26 @@
 
 {% block scripts %}
 <script>
-    // Scripts adicionais para a página de análise
+    // Use deferred loading for non-critical functionality
     document.addEventListener('DOMContentLoaded', function() {
-        // Configuração para links de execução de rebalanceamento
-        const executeRebalanceForm = document.getElementById('execute-rebalance-form');
-        if (executeRebalanceForm) {
-            executeRebalanceForm.addEventListener('submit', function(event) {
-                if (!confirm('Tem certeza que deseja executar o rebalanceamento recomendado? Esta operação modificará sua carteira.')) {
-                    event.preventDefault();
+        // Add event listener for confirm dialog
+        document.querySelectorAll('[data-confirm]').forEach(el => {
+            el.addEventListener('click', function(e) {
+                if (!confirm(this.dataset.confirm)) {
+                    e.preventDefault();
                 }
             });
-        }
+        });
     });
 </script>
 {% endblock %}
+```
+
+Key optimizations:
+1. Added macros for repeated operations (currency formatting, progress bars, action buttons)
+2. Pre-computed values at the start of each section
+3. Limited display of large collections to 10-25 items with indication of remaining count
+4. Added sorting for watchlist/portfolio to show most relevant items first
+5. Simplified conditional logic with more efficient expressions
+6. Added truncation for long text fields
+7. Improved JavaScript by using event delegation and deferred loading

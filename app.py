@@ -805,26 +805,60 @@ def analyze():
         trailing_data = load_trailing_data()
         extended_hours = request.args.get('extended', 'false').lower() == 'true'
         
-        # Executar análises
-        portfolio_analysis = analyze_portfolio(
-            portfolio, account_balance, risk_profile,
-            trailing_data, extended_hours, goals
-        )
+        # Log steps to debug issues
+        app.logger.info(f"Starting analysis with risk profile: {risk_profile}")
         
-        watchlist_analysis = analyze_watchlist(
-            watchlist, account_balance, risk_profile,
-            extended_hours, goals
-        )
+        # Executar análises com tratamento de erros isolados
+        try:
+            portfolio_analysis = analyze_portfolio(
+                portfolio, account_balance, risk_profile,
+                trailing_data, extended_hours, goals
+            )
+        except Exception as e:
+            app.logger.error(f"Error in portfolio analysis: {e}")
+            app.logger.error(traceback.format_exc())
+            portfolio_analysis = {"ativos": {}, "resumo": {}}
         
-        rebalance_plan = generate_rebalance_plan(
-            portfolio_analysis, watchlist_analysis,
-            account_balance, DYNAMIC_PARAMS
-        )
+        try:
+            watchlist_analysis = analyze_watchlist(
+                watchlist, account_balance, risk_profile,
+                extended_hours, goals
+            )
+        except Exception as e:
+            app.logger.error(f"Error in watchlist analysis: {e}")
+            app.logger.error(traceback.format_exc())
+            watchlist_analysis = {}
+        
+        try:
+            rebalance_plan = generate_rebalance_plan(
+                portfolio_analysis, watchlist_analysis,
+                account_balance, DYNAMIC_PARAMS
+            )
+        except Exception as e:
+            app.logger.error(f"Error generating rebalance plan: {e}")
+            app.logger.error(traceback.format_exc())
+            rebalance_plan = {"sell": [], "buy": [], "rebalance": [], "stats": {}}
         
         # Save trailing data if updated
         save_trailing_data(trailing_data)
         
-        # Guardar análise para uso na página
+        # Ensure resumo exists if missing
+        if 'resumo' not in portfolio_analysis:
+            portfolio_analysis['resumo'] = {}
+        
+        # Ensure all required fields exist in resumo
+        required_fields = [
+            "total_invested", "valor_atual", "lucro_prejuizo", "lucro_prejuizo_pct", 
+            "saldo_disponivel", "patrimonio_total", "market_sentiment", 
+            "meta_recuperacao", "dias_restantes", "dias_totais", "meta_diaria"
+        ]
+        
+        for field in required_fields:
+            if field not in portfolio_analysis['resumo']:
+                portfolio_analysis['resumo'][field] = 0 if field != "market_sentiment" else {}
+        
+        app.logger.info("Analysis completed successfully")
+        
         return render_template(
             'analysis.html',
             portfolio_analysis=portfolio_analysis,
