@@ -4,71 +4,50 @@ html, body {
     overflow-x: hidden;
 }
 
-
-
-/* Menu colapsável */
-.sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: -240px; /* Começa escondido */
-    width: 240px;
-    z-index: 1030; /* Valor alto para ficar por cima */
-    padding-top: 56px; /* Altura da navbar */
+/* Menu horizontal no topo */
+.top-nav {
     background-color: #f8f9fa;
-    transition: left 0.3s ease;
-    overflow-y: auto;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    position: fixed;
+    top: 56px; /* Altura da navbar */
+    left: 0;
+    right: 0;
+    z-index: 1020;
+    overflow-x: auto;
+    white-space: nowrap;
 }
 
-.sidebar.show {
-    left: 0; /* Quando visível */
+.top-nav .nav {
+    display: flex;
+    padding-bottom: 0.5rem;
 }
 
-/* Conteúdo principal sem margem lateral */
+.top-nav .nav-item {
+    margin-right: 1rem;
+}
+
+.top-nav .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+}
+
+.top-nav .nav-link.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* Conteúdo principal para o novo layout */
 .content-wrapper {
     margin-left: 0;
-    padding: 70px 15px 15px;
-    transition: margin-left 0.3s ease;
+    padding-top: 120px; /* Espaço para navbar + top-nav */
+    padding-left: 15px;
+    padding-right: 15px;
     width: 100%;
 }
 
-/* Estilo para o botão toggle */
-.sidebar-toggle {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 1040;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    color: #fff;
-}
-
-/* Quando o menu está aberto */
-body.sidebar-open .content-wrapper {
-    opacity: 0.8; /* Opcional: escurece um pouco o conteúdo */
-}
-
-/* Responsividade */
-@media (min-width: 992px) {
-    /* Em telas grandes, podemos deixar o menu sempre visível */
-    .sidebar {
-        left: 0;
-    }
-    
-    .content-wrapper {
-        margin-left: 240px;
-    }
-    
-    /* Esconde o botão toggle em telas grandes se quiser o menu sempre visível */
-    /* .sidebar-toggle {
-        display: none;
-    } */
-}
-
-
+/* Estilos positivos e negativos */
 .positive {
     color: #198754;
     font-weight: bold;
@@ -112,20 +91,8 @@ body.sidebar-open .content-wrapper {
     color: #0d6efd;
 }
 
-.nav-link.active {
-    color: #fff;
-    background-color: #0d6efd;
-}
-
 .navbar {
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-}
-
-.content-wrapper {
-    margin-left: 240px; /* Corresponder à largura da sidebar */
-    padding: 90px 15px 15px;
-    z-index: 20; /* Maior que a sidebar */
-    position: relative; /* Necessário para o z-index funcionar */
 }
 
 .container-fluid {
@@ -140,7 +107,8 @@ body.sidebar-open .content-wrapper {
     width: 100%;
     overflow-x: hidden;
 }
-/* Tabelas responsivas - evitar que ultrapassem seus containers */
+
+/* Tabelas responsivas */
 .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -152,7 +120,6 @@ body.sidebar-open .content-wrapper {
     margin-left: 0;
     margin-right: 0;
 }
-
 
 .btn-group-sm > .btn, .btn-sm {
     padding: 0.25rem 0.5rem;
@@ -205,16 +172,13 @@ body.sidebar-open .content-wrapper {
 
 /* Responsive adjustments */
 @media (max-width: 767.98px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        padding: 15px;
-        z-index: 10;
+    .top-nav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     .content-wrapper {
-        margin-left: 0;
+        padding-top: 140px; /* Maior espaço em dispositivos móveis */
         padding-left: 5px;
         padding-right: 5px;
     }
@@ -222,10 +186,12 @@ body.sidebar-open .content-wrapper {
     .chart-container {
         height: 60vh;
     }
+    
     .table {
         font-size: 0.85rem;
     }
 }
+
 .card, .table, .alert {
     position: relative;
     z-index: 25;
