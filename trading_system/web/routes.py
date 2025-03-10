@@ -1,414 +1,400 @@
-import logging
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_file, jsonify
-from datetime import datetime
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, send_file
+from flask_wtf.csrf import CSRFProtect
 from io import BytesIO
 import json
 import base64
+from datetime import datetime
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
 
-# Configure logging
-logger = logging.getLogger("trading_system.web.routes")
+from core.analysis.technical_indicators import TechnicalIndicators
+from core.analysis.fundamental_analysis import FundamentalAnalysis
+from core.analysis.qualitative_analysis import QualitativeAnalysis
+from core.analysis.market_analysis import MarketAnalysis
+from services.portfolio_service import PortfolioService
+from services.market_service import MarketService
+from services.form_service import FormService
+from utils.cache_manager import CacheManager
 
-# Create web blueprint
-web_blueprint = Blueprint('web', __name__)
+# Create blueprint
+web_bp = Blueprint('web', __name__)
 
-@web_blueprint.route('/')
+# Services
+portfolio_service = None
+market_service = None
+form_service = None
+cache_manager = None
+
+def init_services(data_dir, cache_file):
+    """Initialize services needed by routes."""
+    global portfolio_service, market_service, form_service, cache_manager
+    
+    cache_manager = CacheManager(cache_file)
+    portfolio_service = PortfolioService(data_dir, cache_manager)
+    market_service = MarketService(cache_manager)
+    form_service = FormService()
+
+# Dashboard route
+@web_bp.route('/')
 def index():
-    """Homepage with portfolio dashboard."""
-    try:
-        # Get portfolio data
-        portfolio_service = current_app.portfolio_service
-        data = portfolio_service.load_portfolio()
-        
-        # Calculate portfolio totals
-        portfolio = data.get('portfolio', {})
-        account_balance = data.get('account_balance', 0)
-        goals = data.get('goals', {})
-        
-        # Get market sentiment
-        market_service = current_app.market_service
-        market_sentiment = market_service.get_market_sentiment()
-        
-        # Get portfolio summary
-        summary = portfolio_service.get_portfolio_summary(portfolio, account_balance, market_sentiment, goals)
-        
-        # Check for updates
-        system_service = current_app.system_service
-        update_info = system_service.check_for_updates()
-        
-        # Take a daily snapshot if we don't have one for today
-        history_service = current_app.history_service
-        last_history = history_service.load_portfolio_history()
-        if not last_history or last_history[-1]['date'] != datetime.now().strftime("%Y-%m-%d"):
-            history_service.add_portfolio_snapshot(portfolio, account_balance)
-        
-        return render_template(
-            'index.html', 
-            portfolio=portfolio, 
-            watchlist=data.get('watchlist', {}),
-            summary=summary,
-            goals=goals,
-            update_info=update_info,
-            version=system_service.VERSION
-        )
-    except Exception as e:
-        logger.error(f"Error in index route: {e}", exc_info=True)
-        flash("An error occurred while loading the dashboard. Please try again.", "danger")
-        return render_template('error.html', error=str(e))
+    """Dashboard/home page."""
+    portfolio = portfolio_service.load_portfolio()
+    
+    # Calculate portfolio totals
+    total_invested = portfolio.total_invested
+    portfolio_value = portfolio.portfolio_value
+    account_balance = portfolio.account_balance
+    total_value = portfolio.total_value
+    profit_loss = portfolio.profit_loss
+    profit_loss_pct = portfolio.profit_loss_pct
+    
+    # Get market sentiment 
+    market_sentiment = market_service.get_market_sentiment()
+    
+    # Get recovery tracker status
+    recovery_status = {}
+    if portfolio.goals and portfolio.goals.target_recovery > 0:
+        history = portfolio_service.load_portfolio_history()
+        if history:
+            # Calculate recovery metrics
+            first_value = history[0]['total_value'] if history else total_value
+            current_pnl = total_value - first_value
+            progress_pct = (current_pnl / portfolio.goals.target_recovery) * 100 if portfolio.goals.target_recovery else 0
+            
+            # Get days info
+            days_passed = portfolio.goals.days_passed
+            days_remaining = portfolio.goals.days_remaining
+            days_total = portfolio.goals.days
+            
+            # On track status
+            on_track = progress_pct >= (days_passed / max(1, days_total) * 100) if days_total > 0 else False
+            
+            recovery_status = {
+                'current_pnl': current_pnl,
+                'progress_pct': progress_pct,
+                'days_passed': days_passed,
+                'days_remaining': days_remaining,
+                'daily_target': portfolio.goals.daily_target,
+                'on_track': on_track
+            }
+    
+    # Prepare summary data
+    summary = {
+        'total_invested': total_invested,
+        'portfolio_value': portfolio_value,
+        'account_balance': account_balance,
+        'total_value': total_value,
+        'profit_loss': profit_loss,
+        'profit_loss_pct': profit_loss_pct,
+        'position_count': len(portfolio.positions),
+        'market_sentiment': market_sentiment,
+        'recovery_status': recovery_status
+    }
+    
+    # Take a daily snapshot if needed
+    history = portfolio_service.load_portfolio_history()
+    if not history or history[-1]['date'] != datetime.now().strftime("%Y-%m-%d"):
+        portfolio_service.add_portfolio_snapshot(portfolio)
+    
+    # Check for updates
+    update_info = {"current_version": "2.0.0", "update_available": False}
+    
+    return render_template(
+        'index.html', 
+        portfolio=portfolio.positions, 
+        watchlist=portfolio.watchlist,
+        summary=summary,
+        goals=portfolio.goals,
+        update_info=update_info,
+    )
 
-@web_blueprint.route('/portfolio')
+@web_bp.route('/portfolio')
 def portfolio():
     """Portfolio management page."""
-    try:
-        portfolio_service = current_app.portfolio_service
-        data = portfolio_service.load_portfolio()
-        form_service = current_app.form_service
-        form = form_service.get_asset_form()
-        return render_template('portfolio.html', portfolio=data.get('portfolio', {}), form=form)
-    except Exception as e:
-        logger.error(f"Error in portfolio route: {e}", exc_info=True)
-        flash("An error occurred while loading the portfolio. Please try again.", "danger")
-        return redirect(url_for('web.index'))
+    portfolio_obj = portfolio_service.load_portfolio()
+    form = form_service.create_asset_form()
+    return render_template('portfolio.html', portfolio=portfolio_obj.positions, form=form)
 
-@web_blueprint.route('/portfolio/add', methods=['POST'])
+@web_bp.route('/portfolio/add', methods=['POST'])
 def add_asset():
-    """Add or update an asset in the portfolio."""
-    form_service = current_app.form_service
-    form = form_service.get_asset_form()
+    """Add asset to portfolio."""
+    form = form_service.create_asset_form()
     
     if form.validate_on_submit():
-        portfolio_service = current_app.portfolio_service
+        portfolio = portfolio_service.load_portfolio()
         ticker = form.ticker.data.upper()
         
-        result = portfolio_service.add_asset_to_portfolio(
-            ticker,
-            form.quantity.data,
-            form.avg_price.data
-        )
+        # Validate ticker
+        ticker_valid = market_service.validate_ticker(ticker)
         
-        if result.get('success'):
-            flash(result.get('message', 'Asset added/updated successfully!'), 'success')
+        if ticker_valid:
+            # Get current price
+            df = market_service.get_ticker_data(ticker, days=1)
+            current_price = float(df[0]['Close']) if df else form.avg_price.data
             
-            # Take a snapshot after portfolio change
-            history_service = current_app.history_service
-            history_service.add_portfolio_snapshot()
+            # Check if ticker already exists in portfolio
+            is_update = ticker in portfolio.positions
             
-            # Send notification
-            notification_service = current_app.notification_service
-            notification_service.notify_trade(
-                ticker, 
-                "COMPRA" if result.get('is_new') else "ATUALIZAÇÃO", 
-                form.quantity.data, 
-                form.avg_price.data, 
-                "Adicionado/atualizado manualmente à carteira"
-            )
+            if is_update:
+                # Update existing position
+                position = portfolio.positions[ticker]
+                old_qty = position.quantity
+                old_price = position.avg_price
+                new_qty = form.quantity.data
+                
+                # Calculate additional investment
+                additional_investment = 0
+                if new_qty > old_qty:
+                    additional_qty = new_qty - old_qty
+                    additional_investment = additional_qty * form.avg_price.data
+                    
+                    # Check if sufficient balance
+                    if additional_investment > portfolio.account_balance:
+                        flash(f'Saldo insuficiente para adicionar {additional_qty} ações. Necessário: ${additional_investment:.2f}, Disponível: ${portfolio.account_balance:.2f}', 'warning')
+                
+                # Calculate new average price
+                total_qty = new_qty
+                if total_qty > 0:
+                    avg_price = ((old_qty * old_price) + ((new_qty - old_qty) * form.avg_price.data)) / total_qty
+                else:
+                    avg_price = 0
+                
+                # Adjust account balance
+                if new_qty < old_qty:
+                    returned_funds = (old_qty - new_qty) * old_price
+                    portfolio.account_balance += returned_funds
+                elif new_qty > old_qty:
+                    portfolio.account_balance -= additional_investment
+                
+                # Update position
+                position.quantity = total_qty
+                position.avg_price = avg_price
+                position.current_price = current_price
+                position.current_position = total_qty * current_price
+                position.last_buy = {
+                    'price': form.avg_price.data,
+                    'quantity': form.quantity.data,
+                    'date': datetime.now().isoformat()
+                }
+                
+                flash(f'Ativo {ticker} atualizado com sucesso!', 'success')
+                
+            else:
+                # Add new position
+                investment_amount = form.quantity.data * form.avg_price.data
+                
+                # Check if sufficient balance
+                if investment_amount > portfolio.account_balance:
+                    flash(f'Saldo insuficiente para comprar {form.quantity.data} ações. Necessário: ${investment_amount:.2f}, Disponível: ${portfolio.account_balance:.2f}', 'danger')
+                    return redirect(url_for('web.portfolio'))
+                
+                # Deduct from account balance
+                portfolio.account_balance -= investment_amount
+                
+                # Create new position
+                from models.portfolio import Position
+                portfolio.positions[ticker] = Position(
+                    symbol=ticker,
+                    quantity=form.quantity.data,
+                    avg_price=form.avg_price.data,
+                    current_price=current_price,
+                    current_position=form.quantity.data * current_price,
+                    last_buy={
+                        'price': form.avg_price.data,
+                        'quantity': form.quantity.data,
+                        'date': datetime.now().isoformat()
+                    }
+                )
+                
+                flash(f'Ativo {ticker} adicionado com sucesso!', 'success')
+            
+            # Save portfolio
+            portfolio_service.save_portfolio(portfolio)
+            
+            # Clear cache for this asset
+            cache_manager.delete(f"asset_analysis:{ticker}")
+            cache_manager.delete(f"portfolio_analysis:{hash(str(portfolio))}")
+            
+            # Take a snapshot
+            portfolio_service.add_portfolio_snapshot(portfolio)
+            
         else:
-            flash(result.get('message', 'Error adding asset to portfolio.'), 'danger')
-    else:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(f"{getattr(form, field).label.text}: {error}", "danger")
+            flash(f'Ticker {ticker} inválido ou não encontrado!', 'danger')
     
     return redirect(url_for('web.portfolio'))
 
-@web_blueprint.route('/portfolio/edit/<ticker>', methods=['GET', 'POST'])
+@web_bp.route('/portfolio/edit/<ticker>', methods=['GET', 'POST'])
 def edit_asset(ticker):
-    """Edit an existing asset in the portfolio."""
-    portfolio_service = current_app.portfolio_service
-    form_service = current_app.form_service
-    data = portfolio_service.load_portfolio()
+    """Edit a portfolio asset."""
+    portfolio = portfolio_service.load_portfolio()
     
-    if ticker not in data['portfolio']:
-        flash(f'Asset {ticker} not found in portfolio!', 'danger')
+    if ticker not in portfolio.positions:
+        flash(f'Ativo {ticker} não encontrado na carteira!', 'danger')
         return redirect(url_for('web.portfolio'))
     
-    form = form_service.get_asset_form()
+    position = portfolio.positions[ticker]
     
-    if request.method == 'POST' and form.validate_on_submit():
-        result = portfolio_service.update_asset(
-            ticker,
-            form.quantity.data,
-            form.avg_price.data
-        )
-        
-        if result.get('success'):
-            flash(result.get('message', f'Asset {ticker} updated successfully!'), 'success')
+    if request.method == 'POST':
+        form = form_service.create_asset_form()
+        if form.validate_on_submit():
+            # Update position
+            new_qty = form.quantity.data
+            new_price = form.avg_price.data
             
-            # Take portfolio snapshot
-            history_service = current_app.history_service
-            history_service.add_portfolio_snapshot()
+            # Get current price
+            current_price = market_service.get_current_prices([ticker]).get(ticker, new_price)
             
+            # Update position
+            position.quantity = new_qty
+            position.avg_price = new_price
+            position.current_price = current_price
+            position.current_position = new_qty * current_price
+            
+            # Save portfolio
+            portfolio_service.save_portfolio(portfolio)
+            
+            # Clear cache
+            cache_manager.delete(f"asset_analysis:{ticker}")
+            cache_manager.delete(f"portfolio_analysis:{hash(str(portfolio))}")
+            
+            # Take snapshot
+            portfolio_service.add_portfolio_snapshot(portfolio)
+            
+            flash(f'Ativo {ticker} atualizado com sucesso!', 'success')
             return redirect(url_for('web.portfolio'))
-        else:
-            flash(result.get('message', f'Error updating asset {ticker}.'), 'danger')
+    else:
+        # Create form with existing data
+        form = form_service.create_asset_form(
+            ticker=ticker,
+            quantity=position.quantity,
+            avg_price=position.avg_price
+        )
     
-    # Populate form with existing data
-    if request.method == 'GET':
-        position = data['portfolio'][ticker]
-        form.ticker.data = ticker
-        form.quantity.data = position.get('quantity', 0)
-        form.avg_price.data = position.get('avg_price', 0)
-    
-    return render_template('edit_asset.html', form=form, ticker=ticker, asset=data['portfolio'][ticker])
+    return render_template('edit_asset.html', form=form, ticker=ticker, asset=position)
 
-@web_blueprint.route('/portfolio/delete/<ticker>')
+@web_bp.route('/portfolio/delete/<ticker>')
 def delete_asset(ticker):
-    """Remove an asset from the portfolio."""
-    try:
-        portfolio_service = current_app.portfolio_service
-        result = portfolio_service.delete_asset(ticker)
+    """Delete an asset from portfolio."""
+    portfolio = portfolio_service.load_portfolio()
+    
+    if ticker in portfolio.positions:
+        del portfolio.positions[ticker]
+        portfolio_service.save_portfolio(portfolio)
         
-        if result.get('success'):
-            flash(result.get('message', f'Asset {ticker} removed successfully!'), 'success')
-        else:
-            flash(result.get('message', f'Asset {ticker} not found!'), 'danger')
+        # Clear cache
+        cache_manager.delete(f"asset_analysis:{ticker}")
+        cache_manager.delete(f"portfolio_analysis:{hash(str(portfolio))}")
         
-        return redirect(url_for('web.portfolio'))
-    except Exception as e:
-        logger.error(f"Error deleting asset {ticker}: {e}", exc_info=True)
-        flash(f"An error occurred while removing the asset: {str(e)}", "danger")
-        return redirect(url_for('web.portfolio'))
+        flash(f'Ativo {ticker} removido com sucesso!', 'success')
+    else:
+        flash(f'Ativo {ticker} não encontrado!', 'danger')
+    
+    return redirect(url_for('web.portfolio'))
 
-@web_blueprint.route('/watchlist')
+@web_bp.route('/watchlist')
 def watchlist():
     """Watchlist management page."""
-    try:
-        portfolio_service = current_app.portfolio_service
-        data = portfolio_service.load_portfolio()
-        form_service = current_app.form_service
-        form = form_service.get_watchlist_form()
-        return render_template('watchlist.html', watchlist=data.get('watchlist', {}), form=form)
-    except Exception as e:
-        logger.error(f"Error in watchlist route: {e}", exc_info=True)
-        flash("An error occurred while loading the watchlist. Please try again.", "danger")
-        return redirect(url_for('web.index'))
+    portfolio = portfolio_service.load_portfolio()
+    form = form_service.create_watchlist_form()
+    return render_template('watchlist.html', watchlist=portfolio.watchlist, form=form)
 
-@web_blueprint.route('/watchlist/add', methods=['POST'])
+@web_bp.route('/watchlist/add', methods=['POST'])
 def add_to_watchlist():
-    """Add a ticker to the watchlist."""
-    form_service = current_app.form_service
-    form = form_service.get_watchlist_form()
+    """Add ticker to watchlist."""
+    form = form_service.create_watchlist_form()
     
     if form.validate_on_submit():
-        portfolio_service = current_app.portfolio_service
+        portfolio = portfolio_service.load_portfolio()
         ticker = form.ticker.data.upper()
         
-        result = portfolio_service.add_to_watchlist(ticker, form.monitor.data)
+        # Validate ticker
+        ticker_valid = market_service.validate_ticker(ticker)
         
-        if result.get('success'):
-            flash(result.get('message', f'Ticker {ticker} added to watchlist!'), 'success')
+        if ticker_valid:
+            portfolio.watchlist[ticker] = {
+                'symbol': ticker,
+                'monitor': form.monitor.data
+            }
+            portfolio_service.save_portfolio(portfolio)
+            
+            # Clear watchlist cache
+            cache_manager.delete(f"watchlist_analysis:{hash(str(portfolio.watchlist))}")
+            
+            flash(f'Ticker {ticker} adicionado à watchlist!', 'success')
         else:
-            flash(result.get('message', f'Ticker {ticker} invalid or not found!'), 'danger')
-    else:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(f"{getattr(form, field).label.text}: {error}", "danger")
+            flash(f'Ticker {ticker} inválido ou não encontrado!', 'danger')
     
     return redirect(url_for('web.watchlist'))
 
-@web_blueprint.route('/watchlist/delete/<ticker>')
+@web_bp.route('/watchlist/delete/<ticker>')
 def delete_from_watchlist(ticker):
-    """Remove a ticker from the watchlist."""
-    try:
-        portfolio_service = current_app.portfolio_service
-        result = portfolio_service.delete_from_watchlist(ticker)
+    """Delete ticker from watchlist."""
+    portfolio = portfolio_service.load_portfolio()
+    
+    if ticker in portfolio.watchlist:
+        del portfolio.watchlist[ticker]
+        portfolio_service.save_portfolio(portfolio)
         
-        if result.get('success'):
-            flash(result.get('message', f'Ticker {ticker} removed from watchlist!'), 'success')
-        else:
-            flash(result.get('message', f'Ticker {ticker} not found in watchlist!'), 'danger')
+        # Clear watchlist cache
+        cache_manager.delete(f"watchlist_analysis:{hash(str(portfolio.watchlist))}")
         
-        return redirect(url_for('web.watchlist'))
-    except Exception as e:
-        logger.error(f"Error removing from watchlist {ticker}: {e}", exc_info=True)
-        flash(f"An error occurred while removing from watchlist: {str(e)}", "danger")
-        return redirect(url_for('web.watchlist'))
+        flash(f'Ticker {ticker} removido da watchlist!', 'success')
+    else:
+        flash(f'Ticker {ticker} não encontrado na watchlist!', 'danger')
+    
+    return redirect(url_for('web.watchlist'))
 
-@web_blueprint.route('/account', methods=['GET', 'POST'])
+@web_bp.route('/account', methods=['GET', 'POST'])
 def account():
-    """Account balance management page."""
-    portfolio_service = current_app.portfolio_service
-    form_service = current_app.form_service
-    data = portfolio_service.load_portfolio()
-    form = form_service.get_account_form()
+    """Account balance management."""
+    portfolio = portfolio_service.load_portfolio()
     
-    if request.method == 'POST' and form.validate_on_submit():
-        result = portfolio_service.update_account_balance(form.balance.data)
-        
-        if result.get('success'):
-            # If significant change, log it in history
-            if abs(form.balance.data - result.get('old_balance', 0)) > 1:
-                history_service = current_app.history_service
-                history_service.add_portfolio_snapshot()
+    if request.method == 'POST':
+        form = form_service.create_account_form()
+        if form.validate_on_submit():
+            old_balance = portfolio.account_balance
+            portfolio.account_balance = form.balance.data
+            portfolio_service.save_portfolio(portfolio)
             
-            flash('Account balance updated successfully!', 'success')
+            # Take snapshot if significant change
+            if abs(form.balance.data - old_balance) > 1:
+                portfolio_service.add_portfolio_snapshot(portfolio)
+            
+            flash('Saldo da conta atualizado com sucesso!', 'success')
             return redirect(url_for('web.account'))
-        else:
-            flash(result.get('message', 'Error updating account balance.'), 'danger')
+    else:
+        form = form_service.create_account_form(balance=portfolio.account_balance)
     
-    form.balance.data = data.get('account_balance', 0)
-    return render_template('account.html', form=form, account_balance=data.get('account_balance', 0))
+    return render_template('account.html', form=form, account_balance=portfolio.account_balance)
 
-@web_blueprint.route('/goals', methods=['GET', 'POST'])
-def goals():
-    """Recovery goals management page."""
-    portfolio_service = current_app.portfolio_service
-    form_service = current_app.form_service
-    history_service = current_app.history_service
-    data = portfolio_service.load_portfolio()
-    form = form_service.get_goals_form()
-    
-    if request.method == 'POST' and form.validate_on_submit():
-        result = portfolio_service.update_goals(
-            form.target_recovery.data,
-            form.days.data
-        )
-        
-        if result.get('success'):
-            # Take a snapshot when goals are set
-            history_service.add_portfolio_snapshot()
-            flash('Goals updated successfully!', 'success')
-            return redirect(url_for('web.goals'))
-        else:
-            flash(result.get('message', 'Error updating goals.'), 'danger')
-    
-    if data.get('goals'):
-        form.target_recovery.data = data['goals'].get('target_recovery', 0)
-        form.days.data = data['goals'].get('days', 0)
-    
-    # Get recovery tracker data
-    recovery_data = portfolio_service.get_recovery_data(data)
-    
-    return render_template('goals.html', form=form, goals=data.get('goals', {}), recovery_data=recovery_data)
-
-@web_blueprint.route('/trade', methods=['GET', 'POST'])
-def trade():
-    """Trade execution page."""
-    portfolio_service = current_app.portfolio_service
-    form_service = current_app.form_service
-    notification_service = current_app.notification_service
-    history_service = current_app.history_service
-    data = portfolio_service.load_portfolio()
-    form = form_service.get_trade_form()
-    
-    if request.method == 'POST' and form.validate_on_submit():
-        ticker = form.ticker.data.upper()
-        quantity = form.quantity.data
-        price = form.price.data
-        trade_type = form.trade_type.data.upper()
-        
-        if trade_type not in ["COMPRA", "VENDA"]:
-            flash('Invalid operation type. Use COMPRA or VENDA.', 'danger')
-            return redirect(url_for('web.trade'))
-        
-        # Execute trade
-        result = portfolio_service.execute_trade(ticker, quantity, price, trade_type)
-        
-        if result.get('success'):
-            flash(result.get('message', f'Trade for {quantity} {ticker} at ${price:.2f} registered successfully!'), 'success')
-            
-            # Send notification
-            notification_service.notify_trade_execution({
-                "action": trade_type,
-                "ticker": ticker,
-                "quantity": quantity,
-                "price": price,
-                "gross_value": result.get('operation_value', 0),
-                "commission": result.get('commission', 0)
-            })
-            
-            # Take a snapshot after trade
-            history_service.add_portfolio_snapshot()
-            
-            return redirect(url_for('web.index'))
-        else:
-            flash(result.get('message', 'Error executing trade.'), 'danger')
-    
-    # Pre-fill form from query parameters
-    if request.method == 'GET':
-        form.ticker.data = request.args.get('ticker', '')
-        form.quantity.data = request.args.get('quantity', None)
-        form.price.data = request.args.get('price', None)
-        form.trade_type.data = request.args.get('trade_type', '')
-    
-    return render_template('trade.html', form=form)
-
-@web_blueprint.route('/refresh_prices')
-def refresh_prices():
-    """Update current prices for all portfolio assets."""
-    try:
-        portfolio_service = current_app.portfolio_service
-        result = portfolio_service.refresh_prices()
-        
-        if result.get('success'):
-            for update in result.get('updates', []):
-                flash(update, 'info')
-            flash('Prices updated successfully!', 'success')
-        else:
-            flash(result.get('message', 'Error updating prices.'), 'danger')
-        
-        return redirect(url_for('web.index'))
-    except Exception as e:
-        logger.error(f"Error refreshing prices: {e}", exc_info=True)
-        flash(f"An error occurred while updating prices: {str(e)}", "danger")
-        return redirect(url_for('web.index'))
-
-@web_blueprint.route('/analyze')
+@web_bp.route('/analyze')
 def analyze():
-    """Portfolio and watchlist analysis page."""
+    """Portfolio analysis page."""
     try:
-        # Get portfolio data
-        portfolio_service = current_app.portfolio_service
-        analysis_service = current_app.analysis_service
-        data = portfolio_service.load_portfolio()
-        portfolio = data.get('portfolio', {})
-        watchlist = data.get('watchlist', {})
-        account_balance = data.get('account_balance', 0)
-        goals = data.get('goals', {})
+        portfolio = portfolio_service.load_portfolio()
         
-        if not portfolio:
-            flash('Add assets to your portfolio for analysis.', 'warning')
+        if not portfolio.positions:
+            flash('Adicione ativos à sua carteira para análise.', 'warning')
             return redirect(url_for('web.index'))
         
         # Get analysis settings
         risk_profile = request.args.get('risk', 'medium')
         extended_hours = request.args.get('extended', 'false').lower() == 'true'
-        quick_mode = request.args.get('quick', 'true').lower() == 'true'
         
-        logger.info(f"Starting analysis with risk profile: {risk_profile}, quick mode: {quick_mode}")
+        # Execute analyses
+        portfolio_analysis = portfolio_service.analyze_portfolio(
+            portfolio, risk_profile, extended_hours
+        )
         
-        # Execute optimized analyses with error handling
-        try:
-            portfolio_analysis = analysis_service.analyze_portfolio(
-                portfolio, account_balance, risk_profile,
-                extended_hours, goals, quick_mode
-            )
-        except Exception as e:
-            logger.error(f"Error in portfolio analysis: {e}", exc_info=True)
-            portfolio_analysis = {"ativos": {}, "resumo": {}}
-            flash("Error analyzing portfolio. Using partial results.", "warning")
+        watchlist_analysis = portfolio_service.analyze_watchlist(
+            portfolio, risk_profile, extended_hours
+        )
         
-        try:
-            watchlist_analysis = analysis_service.analyze_watchlist(
-                watchlist, account_balance, risk_profile,
-                extended_hours, goals, quick_mode
-            )
-        except Exception as e:
-            logger.error(f"Error in watchlist analysis: {e}", exc_info=True)
-            watchlist_analysis = {}
-            flash("Error analyzing watchlist. Using partial results.", "warning")
-        
-        try:
-            rebalance_plan = analysis_service.generate_rebalance_plan(
-                portfolio_analysis, watchlist_analysis,
-                account_balance
-            )
-        except Exception as e:
-            logger.error(f"Error generating rebalance plan: {e}", exc_info=True)
-            rebalance_plan = {"sell": [], "buy": [], "rebalance": [], "stats": {}}
-            flash("Error generating rebalance plan. Using partial results.", "warning")
-        
-        # Ensure resumo exists if missing and has all required fields
-        analysis_service.ensure_complete_analysis_results(portfolio_analysis)
+        rebalance_plan = portfolio_service.generate_rebalance_plan(
+            portfolio_analysis, watchlist_analysis, portfolio
+        )
         
         return render_template(
             'analysis.html',
@@ -416,204 +402,117 @@ def analyze():
             watchlist_analysis=watchlist_analysis,
             rebalance_plan=rebalance_plan,
             risk_profile=risk_profile,
-            extended_hours=extended_hours,
-            quick_mode=quick_mode
+            extended_hours=extended_hours
         )
     
     except Exception as e:
-        logger.error(f"Error in analysis: {e}", exc_info=True)
-        flash(f'Error performing analysis: {str(e)}', 'danger')
+        flash(f'Erro ao realizar análise: {str(e)}', 'danger')
         return redirect(url_for('web.index'))
 
-@web_blueprint.route('/execute_rebalance', methods=['POST'])
+@web_bp.route('/execute_rebalance', methods=['POST'])
 def execute_rebalance():
-    """Execute the recommended rebalancing plan."""
+    """Execute rebalance plan."""
     try:
-        portfolio_service = current_app.portfolio_service
-        analysis_service = current_app.analysis_service
-        history_service = current_app.history_service
+        # Load portfolio
+        portfolio = portfolio_service.load_portfolio()
         
         # Get risk profile
         risk_profile = request.form.get('risk_profile', 'medium')
         
-        # Execute rebalance
-        result = analysis_service.execute_rebalance_plan(risk_profile)
+        # Generate analysis and rebalance plan
+        portfolio_analysis = portfolio_service.analyze_portfolio(
+            portfolio, risk_profile, False
+        )
         
-        if result.get('success'):
-            # Take a snapshot after rebalancing
-            history_service.add_portfolio_snapshot()
-            
-            # Flash results
-            flash(result.get('message', "Rebalancing executed successfully"), 'success')
-            
-            if result.get('errors'):
-                for error in result.get('errors'):
-                    flash(f"Error: {error.get('ticker', '')} - {error.get('error', '')}", 'warning')
-        else:
-            flash(result.get('message', 'Error executing rebalance plan.'), 'danger')
+        watchlist_analysis = portfolio_service.analyze_watchlist(
+            portfolio, risk_profile, False
+        )
+        
+        rebalance_plan = portfolio_service.generate_rebalance_plan(
+            portfolio_analysis, watchlist_analysis, portfolio
+        )
+        
+        # Execute rebalance plan
+        updated_portfolio, result = portfolio_service.execute_rebalance_plan(
+            portfolio, rebalance_plan
+        )
+        
+        # Save updated portfolio
+        portfolio_service.save_portfolio(updated_portfolio)
+        
+        # Take a snapshot
+        portfolio_service.add_portfolio_snapshot(updated_portfolio)
+        
+        # Clear cache
+        cache_manager.clear()
+        
+        # Flash results
+        flash(f"Rebalanceamento executado: {len(result['sells_executed'])} vendas, {len(result['buys_executed'])} compras", 'success')
+        
+        if result['errors']:
+            for error in result['errors']:
+                flash(f"Erro: {error.get('ticker', '')} - {error.get('error', '')}", 'warning')
         
         return redirect(url_for('web.index'))
-    
     except Exception as e:
-        logger.error(f"Error executing rebalance: {e}", exc_info=True)
-        flash(f'Error executing rebalance plan: {str(e)}', 'danger')
+        flash(f'Erro ao executar rebalanceamento: {str(e)}', 'danger')
         return redirect(url_for('web.analyze'))
 
-@web_blueprint.route('/backtest', methods=['GET', 'POST'])
-def backtest():
-    """Portfolio backtest page."""
-    form_service = current_app.form_service
-    form = form_service.get_backtest_form()
-    results = None
-    chart_data = None
+@web_bp.route('/refresh_prices')
+def refresh_prices():
+    """Refresh current prices for all assets."""
+    portfolio = portfolio_service.load_portfolio()
     
-    if request.method == 'POST' and form.validate_on_submit():
-        try:
-            history_service = current_app.history_service
-            analysis_service = current_app.analysis_service
-            
-            # Load portfolio history for backtest
-            history = history_service.load_portfolio_history()
-            
-            if len(history) < 2:
-                flash('Insufficient portfolio history for backtest. Add more data.', 'warning')
-            else:
-                # Run backtest
-                backtest_results = analysis_service.create_backtest(
-                    history, form.benchmark.data, form.days.data
-                )
-                
-                if 'error' in backtest_results:
-                    flash(f"Error in backtest: {backtest_results['error']}", 'danger')
-                else:
-                    results = backtest_results
-                    chart_data = analysis_service.prepare_backtest_chart_data(
-                        history, form.benchmark.data, form.days.data
-                    )
-        
-        except Exception as e:
-            logger.error(f"Error in backtest: {e}", exc_info=True)
-            flash(f'Error executing backtest: {str(e)}', 'danger')
-    
-    return render_template('backtest.html', form=form, results=results, chart_data=chart_data)
-
-@web_blueprint.route('/optimize', methods=['GET', 'POST'])
-def optimize():
-    """Portfolio optimization page."""
-    form_service = current_app.form_service
-    form = form_service.get_optimization_form()
-    results = None
-    
-    if request.method == 'POST' and form.validate_on_submit():
-        try:
-            analysis_service = current_app.analysis_service
-            
-            # Run optimization
-            results = analysis_service.optimize_portfolio(
-                max_positions=form.max_positions.data,
-                cash_reserve_pct=form.cash_reserve_pct.data / 100,
-                max_position_size_pct=form.max_position_size_pct.data / 100,
-                min_score=form.min_score.data,
-                risk_profile=form.risk_profile.data
-            )
-            
-        except Exception as e:
-            logger.error(f"Error in optimization: {e}", exc_info=True)
-            flash(f'Error in optimization: {str(e)}', 'danger')
-    
-    return render_template('optimize.html', form=form, results=results)
-
-@web_blueprint.route('/execute_optimization', methods=['POST'])
-def execute_optimization():
-    """Execute the recommended portfolio optimization."""
-    try:
-        # Get optimization parameters
-        max_positions = int(request.form.get('max_positions', 15))
-        cash_reserve_pct = float(request.form.get('cash_reserve_pct', 10)) / 100
-        risk_profile = request.form.get('risk_profile', 'medium')
-        
-        analysis_service = current_app.analysis_service
-        history_service = current_app.history_service
-        
-        # Execute optimization
-        result = analysis_service.execute_optimization(
-            max_positions=max_positions,
-            cash_reserve_pct=cash_reserve_pct,
-            risk_profile=risk_profile
-        )
-        
-        if result.get('success'):
-            # Take a snapshot after optimization
-            history_service.add_portfolio_snapshot()
-            
-            # Flash results
-            flash(result.get('message', "Optimization executed successfully"), 'success')
-            
-            if result.get('errors'):
-                for error in result.get('errors'):
-                    flash(f"Error: {error.get('ticker', '')} - {error.get('error', '')}", 'warning')
-        else:
-            flash(result.get('message', 'Error executing optimization.'), 'danger')
-        
+    if not portfolio.positions:
+        flash('Nenhum ativo na carteira para atualizar.', 'warning')
         return redirect(url_for('web.index'))
+    
+    # Get tickers
+    tickers = list(portfolio.positions.keys())
+    
+    # Get current prices
+    try:
+        prices = market_service.get_current_prices(tickers)
         
+        # Update prices in portfolio
+        for ticker, price in prices.items():
+            if ticker in portfolio.positions:
+                old_price = portfolio.positions[ticker].current_price
+                portfolio.positions[ticker].current_price = price
+                portfolio.positions[ticker].current_position = portfolio.positions[ticker].quantity * price
+                
+                # Calculate change
+                change = (price / old_price - 1) * 100 if old_price > 0 else 0
+                flash(f'{ticker}: ${old_price:.2f} → ${price:.2f} ({change:.2f}%)', 'info')
+        
+        portfolio_service.save_portfolio(portfolio)
+        
+        # Clear price cache
+        for ticker in tickers:
+            cache_manager.delete(f"current_price:{ticker}")
+        
+        flash('Preços atualizados com sucesso!', 'success')
     except Exception as e:
-        logger.error(f"Error executing optimization: {e}", exc_info=True)
-        flash(f'Error executing optimization: {str(e)}', 'danger')
-        return redirect(url_for('web.optimize'))
+        flash(f'Erro ao atualizar preços: {str(e)}', 'danger')
+    
+    return redirect(url_for('web.index'))
 
-@web_blueprint.route('/notifications', methods=['GET', 'POST'])
-def notifications():
-    """Notification settings page."""
-    form_service = current_app.form_service
-    notification_service = current_app.notification_service
-    form = form_service.get_notification_form()
-    
-    # Load notification config
-    config = notification_service.get_notification_config()
-    
-    if request.method == 'POST' and form.validate_on_submit():
-        # Update notification config
-        result = notification_service.update_notification_config(
-            enabled=form.enabled.data,
-            email_enabled=form.email_enabled.data,
-            email_address=form.email_address.data,
-            webhook_enabled=form.webhook_enabled.data,
-            webhook_url=form.webhook_url.data,
-            notify_trades=form.notify_trades.data,
-            notify_thresholds=form.notify_thresholds.data
-        )
-        
-        if result.get('success'):
-            flash('Notification settings updated.', 'success')
-        else:
-            flash(result.get('message', 'Error saving notification settings.'), 'danger')
-        
-        return redirect(url_for('web.notifications'))
-    
-    # Fill form with current values
-    if request.method == 'GET':
-        form.enabled.data = config.get('enabled', False)
-        
-        email_config = config.get('methods', {}).get('email', {})
-        form.email_enabled.data = email_config.get('enabled', False)
-        form.email_address.data = email_config.get('address', '')
-        
-        webhook_config = config.get('methods', {}).get('webhook', {})
-        form.webhook_enabled.data = webhook_config.get('enabled', False)
-        form.webhook_url.data = webhook_config.get('url', '')
-        
-        form.notify_trades.data = config.get('notify_trades', True)
-        form.notify_thresholds.data = config.get('notify_thresholds', True)
-    
-    return render_template('notifications.html', form=form, config=config)
+@web_bp.route('/market_sentiment')
+def market_sentiment():
+    """Market sentiment page."""
+    try:
+        # Force refresh if requested
+        force_refresh = request.args.get('refresh', 'false').lower() == 'true'
+        sentiment = market_service.get_market_sentiment(force_refresh=force_refresh)
+        return render_template('market_sentiment.html', sentiment=sentiment)
+    except Exception as e:
+        flash(f'Erro ao obter sentimento de mercado: {str(e)}', 'danger')
+        return redirect(url_for('web.index'))
 
-@web_blueprint.route('/indicators', methods=['GET', 'POST'])
+@web_bp.route('/indicators', methods=['GET', 'POST'])
 def indicators():
     """Technical indicators analysis page."""
-    form_service = current_app.form_service
-    analysis_service = current_app.analysis_service
-    form = form_service.get_indicator_analysis_form()
+    form = form_service.create_indicator_analysis_form()
     analysis_results = None
     charts = {}
     
@@ -622,284 +521,96 @@ def indicators():
         days = form.days.data
         interval = form.interval.data
         
-        try:
-            # Analyze indicator data
-            result = analysis_service.analyze_indicators(ticker, days, interval)
-            
-            if result.get('success'):
-                analysis_results = result.get('results')
-                charts = result.get('charts', {})
-            else:
-                flash(result.get('message', f'Error analyzing indicators for {ticker}.'), 'warning')
+        # Check cache first
+        cache_key = f"indicator_analysis:{ticker}:{days}:{interval}"
+        cached_result = cache_manager.get(cache_key)
+        if cached_result:
+            return render_template('indicators.html', form=form, 
+                                results=cached_result.get('results'), 
+                                charts=cached_result.get('charts', {}))
         
-        except Exception as e:
-            logger.error(f"Error analyzing indicators: {e}", exc_info=True)
-            flash(f'Error in indicator analysis: {str(e)}', 'danger')
-    
-    return render_template('indicators.html', form=form, results=analysis_results, charts=charts)
-
-@web_blueprint.route('/fundamentals', methods=['GET', 'POST'])
-def fundamentals():
-    """Fundamental analysis page."""
-    form_service = current_app.form_service
-    analysis_service = current_app.analysis_service
-    form = form_service.get_fundamental_analysis_form()
-    results = None
-    
-    if request.method == 'POST' and form.validate_on_submit():
-        ticker = form.ticker.data.upper()
+        # Validate ticker
+        ticker_valid = market_service.validate_ticker(ticker)
+        
+        if not ticker_valid:
+            flash(f'Ticker {ticker} inválido ou não encontrado!', 'danger')
+            return render_template('indicators.html', form=form)
         
         try:
-            # Get fundamental analysis
-            result = analysis_service.analyze_fundamentals(ticker)
+            # Get data
+            df_dict = market_service.get_ticker_data(ticker, days, interval)
             
-            if result.get('success'):
-                results = result.get('results')
-            else:
-                flash(result.get('message', f'Unable to get fundamental data for {ticker}.'), 'warning')
+            if not df_dict or len(df_dict) < 5:
+                flash(f'Dados insuficientes para {ticker}.', 'warning')
+                return render_template('indicators.html', form=form)
             
-        except Exception as e:
-            logger.error(f"Error in fundamental analysis: {e}", exc_info=True)
-            flash(f'Error in fundamental analysis: {str(e)}', 'danger')
-    
-    return render_template('fundamentals.html', form=form, results=results)
-
-@web_blueprint.route('/news', methods=['GET', 'POST'])
-def news():
-    """News and sentiment analysis page."""
-    form_service = current_app.form_service
-    analysis_service = current_app.analysis_service
-    form = form_service.get_news_analysis_form()
-    results = None
-    
-    if request.method == 'POST' and form.validate_on_submit():
-        ticker = form.ticker.data.upper()
-        
-        try:
-            # Get news sentiment analysis
-            result = analysis_service.analyze_news(ticker)
+            # Convert to DataFrame
+            df = pd.DataFrame(df_dict)
+            df.set_index('Date', inplace=True)
             
-            if result.get('success'):
-                results = result.get('results')
-            else:
-                flash(result.get('message', f'No news found for {ticker}.'), 'warning')
+            # Add indicators
+            df_indicators = TechnicalIndicators.add_all_indicators(df, {})
             
-        except Exception as e:
-            logger.error(f"Error in news analysis: {e}", exc_info=True)
-            flash(f'Error in news analysis: {str(e)}', 'danger')
-    
-    return render_template('news.html', form=form, results=results)
-
-@web_blueprint.route('/market_sentiment')
-def market_sentiment():
-    """Market sentiment analysis page."""
-    try:
-        market_service = current_app.market_service
-        
-        # Force refresh if requested
-        force_refresh = request.args.get('refresh', 'false').lower() == 'true'
-        sentiment = market_service.get_market_sentiment(force_refresh=force_refresh)
-        
-        return render_template('market_sentiment.html', sentiment=sentiment)
-    except Exception as e:
-        logger.error(f"Error getting market sentiment: {e}", exc_info=True)
-        flash(f'Error getting market sentiment: {str(e)}', 'danger')
-        return redirect(url_for('web.index'))
-
-@web_blueprint.route('/parameters', methods=['GET', 'POST'])
-def parameters():
-    """Trading parameters settings page."""
-    form_service = current_app.form_service
-    trading_service = current_app.trading_service
-    form = form_service.get_trading_params_form()
-    
-    if request.method == 'POST' and form.validate_on_submit():
-        # Update trading parameters
-        params = {
-            'sma_period': form.sma_period.data,
-            'ema_period': form.ema_period.data,
-            'rsi_period': form.rsi_period.data,
-            'macd_fast': form.macd_fast.data,
-            'macd_slow': form.macd_slow.data,
-            'macd_signal': form.macd_signal.data,
-            'bb_window': form.bb_window.data,
-            'bb_std': form.bb_std.data,
-            'decision_buy_threshold': form.decision_buy_threshold.data,
-            'decision_sell_threshold': form.decision_sell_threshold.data,
-            'take_profit_pct': form.take_profit_pct.data,
-            'stop_loss_pct': form.stop_loss_pct.data,
-            'trailing_stop_pct': form.trailing_stop_pct.data,
-        }
-        
-        result = trading_service.update_trading_parameters(params)
-        
-        if result.get('success'):
-            flash('Trading parameters updated successfully!', 'success')
-        else:
-            flash(result.get('message', 'Error saving parameters.'), 'danger')
-        
-        return redirect(url_for('web.parameters'))
-    
-    # Fill form with current values
-    if request.method == 'GET':
-        current_params = trading_service.get_trading_parameters()
-        form.sma_period.data = current_params.get('sma_period', 20)
-        form.ema_period.data = current_params.get('ema_period', 9)
-        form.rsi_period.data = current_params.get('rsi_period', 14)
-        form.macd_fast.data = current_params.get('macd_fast', 12)
-        form.macd_slow.data = current_params.get('macd_slow', 26)
-        form.macd_signal.data = current_params.get('macd_signal', 9)
-        form.bb_window.data = current_params.get('bb_window', 20)
-        form.bb_std.data = current_params.get('bb_std', 2)
-        form.decision_buy_threshold.data = current_params.get('decision_buy_threshold', 60)
-        form.decision_sell_threshold.data = current_params.get('decision_sell_threshold', -60)
-        form.take_profit_pct.data = current_params.get('take_profit_pct', 5.0)
-        form.stop_loss_pct.data = current_params.get('stop_loss_pct', -8.0)
-        form.trailing_stop_pct.data = current_params.get('trailing_stop_pct', 3.0)
-    
-    return render_template('parameters.html', form=form, params=trading_service.get_trading_parameters())
-
-@web_blueprint.route('/diagnostics')
-def diagnostics():
-    """System diagnostics page."""
-    try:
-        system_service = current_app.system_service
-        
-        # Run system diagnostics
-        results = system_service.run_diagnostics()
-        
-        # Check for updates
-        update_info = system_service.check_for_updates()
-        
-        return render_template('diagnostics.html', results=results, update_info=update_info, version=system_service.VERSION)
-    except Exception as e:
-        logger.error(f"Error running diagnostics: {e}", exc_info=True)
-        flash(f'Error running diagnostics: {str(e)}', 'danger')
-        return redirect(url_for('web.index'))
-
-@web_blueprint.route('/download_portfolio')
-def download_portfolio():
-    """Download portfolio as JSON file."""
-    try:
-        portfolio_service = current_app.portfolio_service
-        data = portfolio_service.load_portfolio()
-        
-        # Generate in-memory file
-        memory_file = BytesIO()
-        memory_file.write(json.dumps(data, indent=2).encode('utf-8'))
-        memory_file.seek(0)
-        
-        return send_file(
-            memory_file,
-            as_attachment=True,
-            download_name='portfolio_export.json',
-            mimetype='application/json'
-        )
-    except Exception as e:
-        logger.error(f"Error downloading portfolio: {e}", exc_info=True)
-        flash(f'Error downloading portfolio: {str(e)}', 'danger')
-        return redirect(url_for('web.index'))
-
-@web_blueprint.route('/upload-json', methods=['GET', 'POST'])
-def upload_json():
-    """Upload portfolio from JSON file."""
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            flash('No file selected', 'danger')
-            return redirect(request.url)
-        
-        file = request.files['file']
-        if file.filename == '':
-            flash('No file selected', 'danger')
-            return redirect(request.url)
-        
-        if file:
-            try:
-                portfolio_service = current_app.portfolio_service
-                result = portfolio_service.import_portfolio_from_file(file)
+            # Calculate statistics
+            stats = {
+                'ticker': ticker,
+                'current_price': float(df_indicators['Close'].iloc[-1]),
+                'change_1d': float(df_indicators['Close'].iloc[-1] / df_indicators['Close'].iloc[-2] - 1) if len(df_indicators) > 1 else 0,
+                'change_5d': float(df_indicators['Close'].iloc[-1] / df_indicators['Close'].iloc[-5] - 1) if len(df_indicators) > 4 else 0,
+                'change_30d': float(df_indicators['Close'].iloc[-1] / df_indicators['Close'].iloc[-30] - 1) if len(df_indicators) > 29 else 0,
+                'volume': float(df_indicators['Volume'].iloc[-1]) if 'Volume' in df_indicators.columns else 0,
+                'rsi': float(df_indicators['RSI'].iloc[-1]) if 'RSI' in df_indicators.columns else 0,
+                'macd': float(df_indicators['MACD_hist'].iloc[-1]) if 'MACD_hist' in df_indicators.columns else 0,
+                'bb_position': (float(df_indicators['Close'].iloc[-1]) - float(df_indicators['BB_lower'].iloc[-1])) / (float(df_indicators['BB_upper'].iloc[-1]) - float(df_indicators['BB_lower'].iloc[-1])) if 'BB_lower' in df_indicators.columns and 'BB_upper' in df_indicators.columns else 0.5
+            }
+            
+            # Generate charts using matplotlib
+            # 1. Price with SMA and Bollinger Bands
+            fig, ax = plt.subplots(figsize=(12, 6))
+            ax.plot(df_indicators.index, df_indicators['Close'], label='Close')
+            if 'SMA' in df_indicators.columns:
+                ax.plot(df_indicators.index, df_indicators['SMA'], label='SMA')
+            if 'BB_upper' in df_indicators.columns and 'BB_lower' in df_indicators.columns:
+                ax.plot(df_indicators.index, df_indicators['BB_upper'], 'r--', label='Upper BB')
+                ax.plot(df_indicators.index, df_indicators['BB_lower'], 'r--', label='Lower BB')
+            ax.set_title(f'{ticker} Price Chart')
+            ax.set_xlabel('Date')
+            ax.set_ylabel('Price')
+            ax.legend()
+            ax.grid(True)
+            
+            # Save to buffer
+            buf = BytesIO()
+            plt.tight_layout()
+            plt.savefig(buf, format='png')
+            buf.seek(0)
+            charts['price'] = base64.b64encode(buf.getvalue()).decode('utf-8')
+            plt.close(fig)
+            
+            # 2. RSI Chart
+            if 'RSI' in df_indicators.columns:
+                fig, ax = plt.subplots(figsize=(12, 4))
+                ax.plot(df_indicators.index, df_indicators['RSI'])
+                ax.axhline(y=70, color='r', linestyle='-')
+                ax.axhline(y=30, color='g', linestyle='-')
+                ax.axhline(y=50, color='k', linestyle='--')
+                ax.set_title(f'{ticker} RSI Chart')
+                ax.set_xlabel('Date')
+                ax.set_ylabel('RSI')
+                ax.grid(True)
                 
-                if result.get('success'):
-                    flash('Portfolio loaded successfully!', 'success')
-                    return redirect(url_for('web.index'))
-                else:
-                    flash(result.get('message', 'Error loading file.'), 'danger')
-            except Exception as e:
-                flash(f'Error loading file: {str(e)}', 'danger')
-    
-    return render_template('upload.html')
-
-@web_blueprint.route('/clear_cache')
-def clear_cache():
-    """Admin route to clear all caches."""
-    try:
-        cache_service = current_app.cache_service
-        cache_service.clear_cache()
-        flash('Cache cleared successfully', 'success')
-    except Exception as e:
-        flash(f'Error clearing cache: {str(e)}', 'danger')
-    
-    return redirect(url_for('web.diagnostics'))
-
-# API routes
-@web_blueprint.route('/api/portfolio')
-def api_portfolio():
-    """API endpoint to get portfolio data."""
-    portfolio_service = current_app.portfolio_service
-    data = portfolio_service.load_portfolio()
-    return jsonify(data)
-
-@web_blueprint.route('/api/market_sentiment')
-def api_market_sentiment():
-    """API endpoint to get market sentiment."""
-    try:
-        market_service = current_app.market_service
-        sentiment = market_service.get_market_sentiment()
-        return jsonify(sentiment)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@web_blueprint.route('/api/analyze', methods=['POST'])
-def api_analyze():
-    """API endpoint to analyze portfolio."""
-    try:
-        data = request.json
-        portfolio = data.get('portfolio', {})
-        account_balance = data.get('account_balance', 0)
-        risk_profile = data.get('risk_profile', 'medium')
-        quick_mode = data.get('quick_mode', True)
-        
-        analysis_service = current_app.analysis_service
-        portfolio_analysis = analysis_service.analyze_portfolio(
-            portfolio, account_balance, risk_profile, False, {}, quick_mode
-        )
-        
-        return jsonify(portfolio_analysis)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@web_blueprint.route('/api/ticker_data/<ticker>')
-def api_ticker_data(ticker):
-    """API endpoint to get ticker historical data."""
-    try:
-        days = int(request.args.get('days', 60))
-        interval = request.args.get('interval', '1d')
-        
-        data_service = current_app.data_service
-        result = data_service.get_ticker_data(ticker, days, interval)
-        
-        if result.get('success'):
-            return jsonify(result.get('data'))
-        else:
-            return jsonify({"error": result.get('message', "No data available")}), 404
-        
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@web_blueprint.route('/api/cache/status')
-def api_cache_status():
-    """API endpoint to check cache status."""
-    try:
-        cache_service = current_app.cache_service
-        return jsonify(cache_service.get_cache_status())
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+                # Save to buffer
+                buf = BytesIO()
+                plt.tight_layout()
+                plt.savefig(buf, format='png')
+                buf.seek(0)
+                charts['rsi'] = base64.b64encode(buf.getvalue()).decode('utf-8')
+                plt.close(fig)
+            
+            # 3. MACD Chart
+            if 'MACD_line' in df_indicators.columns and 'MACD_signal' in df_indicators.columns:
+                fig, ax = plt.subplots(figsize=(12, 4))
+                ax.plot(df_indicators.index, df_indicators['MACD_line'], label='MACD')
+                ax.plot(df_indicators.index, df_indicators['MACD_signal'], label='Signal')
+                ax.bar(df_indicators.index, df_indicators['MACD_hist'], color=[('g' if x > 0 else 'r') for x in df_indicators['MACD_hist']])
+                ax.set_title(f'{ticker} MACD Chart')
