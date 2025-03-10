@@ -84,7 +84,7 @@
                     <div class="progress mb-2">
                         <div class="progress-bar {% if recovery_data.progress_pct < 0 %}bg-danger{% endif %}" 
                              role="progressbar" 
-                             style="width: {{ max(0, recovery_data.progress_pct) }}%">
+                             style="width: {{ recovery_data.progress_pct if recovery_data.progress_pct > 0 else 0 }}%">
                             {{ "%.1f"|format(recovery_data.progress_pct) }}%
                         </div>
                     </div>
@@ -155,12 +155,20 @@
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('portfolioHistoryChart').getContext('2d');
         
+        const dates = [];
+        const values = [];
+        
+        {% for h in recovery_data.history %}
+            dates.push("{{ h.date }}");
+            values.push({{ h.total_value }});
+        {% endfor %}
+        
         const chartData = {
-            labels: {{ [h.date for h in recovery_data.history]|tojson }},
+            labels: dates,
             datasets: [
                 {
                     label: 'Valor Total',
-                    data: {{ [h.total_value for h in recovery_data.history]|tojson }},
+                    data: values,
                     borderColor: 'rgba(54, 162, 235, 1)',
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     borderWidth: 2,
