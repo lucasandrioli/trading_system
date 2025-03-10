@@ -140,7 +140,7 @@
       "quantity": 18,
       "avg_price": 65.78,
       "current_price": 65.8499984741211,
-      "current_position": 987.7499771118164,
+      "current_position": 1185.2999725341797,
       "last_sell": null,
       "last_buy": null
     },
@@ -149,7 +149,7 @@
       "quantity": 9,
       "avg_price": 31.44,
       "current_price": 31.707000732421875,
-      "current_position": 221.94900512695312,
+      "current_position": 285.3630065917969,
       "last_sell": null,
       "last_buy": null
     },
@@ -185,7 +185,7 @@
       "quantity": 4,
       "avg_price": 100.88,
       "current_price": 101.87999725341797,
-      "current_position": 203.75999450683594,
+      "current_position": 407.5199890136719,
       "last_sell": null,
       "last_buy": null
     },
@@ -194,7 +194,7 @@
       "quantity": 8,
       "avg_price": 134.14,
       "current_price": 140.9199981689453,
-      "current_position": 704.5999908447266,
+      "current_position": 1127.3599853515625,
       "last_sell": null,
       "last_buy": null
     },
@@ -402,7 +402,7 @@
       "monitor": true
     }
   },
-  "account_balance": 22.28,
+  "account_balance": 12.280000000000001,
   "goals": {
     "target_recovery": 500,
     "days": 10

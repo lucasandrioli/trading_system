@@ -1,10 +1,73 @@
 /* Custom styles to complement Bootstrap */
-.sidebar {
-    height: 100vh;
-    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-    z-index: 100;
-    padding-top: 90px;
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
 }
+
+
+
+/* Menu colapsável */
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -240px; /* Começa escondido */
+    width: 240px;
+    z-index: 1030; /* Valor alto para ficar por cima */
+    padding-top: 56px; /* Altura da navbar */
+    background-color: #f8f9fa;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.sidebar.show {
+    left: 0; /* Quando visível */
+}
+
+/* Conteúdo principal sem margem lateral */
+.content-wrapper {
+    margin-left: 0;
+    padding: 70px 15px 15px;
+    transition: margin-left 0.3s ease;
+    width: 100%;
+}
+
+/* Estilo para o botão toggle */
+.sidebar-toggle {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1040;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+/* Quando o menu está aberto */
+body.sidebar-open .content-wrapper {
+    opacity: 0.8; /* Opcional: escurece um pouco o conteúdo */
+}
+
+/* Responsividade */
+@media (min-width: 992px) {
+    /* Em telas grandes, podemos deixar o menu sempre visível */
+    .sidebar {
+        left: 0;
+    }
+    
+    .content-wrapper {
+        margin-left: 240px;
+    }
+    
+    /* Esconde o botão toggle em telas grandes se quiser o menu sempre visível */
+    /* .sidebar-toggle {
+        display: none;
+    } */
+}
+
 
 .positive {
     color: #198754;
@@ -59,8 +122,37 @@
 }
 
 .content-wrapper {
-    padding-top: 90px;
+    margin-left: 240px; /* Corresponder à largura da sidebar */
+    padding: 90px 15px 15px;
+    z-index: 20; /* Maior que a sidebar */
+    position: relative; /* Necessário para o z-index funcionar */
 }
+
+.container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.card {
+    width: 100%;
+    overflow-x: hidden;
+}
+/* Tabelas responsivas - evitar que ultrapassem seus containers */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+}
+
+/* Ajustar row para evitar margens negativas que causam overflow */
+.row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
 
 .btn-group-sm > .btn, .btn-sm {
     padding: 0.25rem 0.5rem;
@@ -114,15 +206,27 @@
 /* Responsive adjustments */
 @media (max-width: 767.98px) {
     .sidebar {
+        width: 100%;
         height: auto;
-        padding-top: 0;
+        position: relative;
+        padding: 15px;
+        z-index: 10;
     }
     
     .content-wrapper {
-        padding-top: 20px;
+        margin-left: 0;
+        padding-left: 5px;
+        padding-right: 5px;
     }
     
     .chart-container {
         height: 60vh;
     }
+    .table {
+        font-size: 0.85rem;
+    }
+}
+.card, .table, .alert {
+    position: relative;
+    z-index: 25;
 }
