@@ -614,3 +614,312 @@ def indicators():
                 ax.plot(df_indicators.index, df_indicators['MACD_signal'], label='Signal')
                 ax.bar(df_indicators.index, df_indicators['MACD_hist'], color=[('g' if x > 0 else 'r') for x in df_indicators['MACD_hist']])
                 ax.set_title(f'{ticker} MACD Chart')
+                # Continuação do arquivo web/routes.py após a linha:
+# ax.set_title(f'{ticker} MACD Chart')
+
+                ax.set_xlabel('Date')
+                ax.set_ylabel('Value')
+                ax.legend()
+                ax.grid(True)
+                
+                # Save to buffer
+                buf = BytesIO()
+                plt.tight_layout()
+                plt.savefig(buf, format='png')
+                buf.seek(0)
+                charts['macd'] = base64.b64encode(buf.getvalue()).decode('utf-8')
+                plt.close(fig)
+            
+            # Get technical score
+            tech_score = Strategy.technical_score(df_indicators, "medium", {})
+            
+            # Cache results
+            cache_results = {
+                'results': {
+                    'stats': stats,
+                    'tech_score': tech_score
+                },
+                'charts': charts
+            }
+            cache_manager.set(cache_key, cache_results, 3600)  # 1 hour cache
+            
+            analysis_results = cache_results['results']
+            
+        except Exception as e:
+            flash(f'Erro ao analisar indicadores para {ticker}: {str(e)}', 'danger')
+    
+    return render_template('indicators.html', form=form, results=analysis_results, charts=charts)
+
+@web_bp.route('/fundamental/<ticker>')
+def fundamental(ticker):
+    """Fundamental analysis page for a ticker."""
+    ticker = ticker.upper()
+    
+    # Check cache
+    cache_key = f"fundamental_analysis:{ticker}"
+    cached_result = cache_manager.get(cache_key)
+    if cached_result:
+        return render_template('fundamental.html', result=cached_result, ticker=ticker)
+    
+    # Validate ticker
+    ticker_valid = market_service.validate_ticker(ticker)
+    if not ticker_valid:
+        flash(f'Ticker {ticker} inválido ou não encontrado!', 'danger')
+        return redirect(url_for('web.index'))
+    
+    try:
+        # Get fundamental analysis
+        result = FundamentalAnalysis.fundamental_score(ticker)
+        
+        # Cache result
+        cache_manager.set(cache_key, result, 86400)  # 24 hour cache
+        
+        return render_template('fundamental.html', result=result, ticker=ticker)
+    except Exception as e:
+        flash(f'Erro ao analisar dados fundamentais para {ticker}: {str(e)}', 'danger')
+        return redirect(url_for('web.index'))
+
+@web_bp.route('/news/<ticker>')
+def news(ticker):
+    """News analysis page for a ticker."""
+    ticker = ticker.upper()
+    
+    # Check cache
+    cache_key = f"news_analysis:{ticker}"
+    cached_result = cache_manager.get(cache_key)
+    if cached_result:
+        return render_template('news.html', result=cached_result, ticker=ticker)
+    
+    # Validate ticker
+    ticker_valid = market_service.validate_ticker(ticker)
+    if not ticker_valid:
+        flash(f'Ticker {ticker} inválido ou não encontrado!', 'danger')
+        return redirect(url_for('web.index'))
+    
+    try:
+        # Get news analysis
+        result = QualitativeAnalysis.analyze_news_sentiment(ticker)
+        
+        # Cache result
+        cache_manager.set(cache_key, result, 3600)  # 1 hour cache
+        
+        return render_template('news.html', result=result, ticker=ticker)
+    except Exception as e:
+        flash(f'Erro ao analisar notícias para {ticker}: {str(e)}', 'danger')
+        return redirect(url_for('web.index'))
+
+@web_bp.route('/goals', methods=['GET', 'POST'])
+def goals():
+    """Recovery goals management page."""
+    portfolio = portfolio_service.load_portfolio()
+    
+    if request.method == 'POST':
+        form = form_service.create_goals_form()
+        if form.validate_on_submit():
+            from models.portfolio import RecoveryGoal
+            
+            target = form.target_recovery.data
+            days = form.days.data
+            
+            if target and days:
+                portfolio.goals = RecoveryGoal(
+                    target_recovery=target,
+                    days=days,
+                    start_date=datetime.now().strftime("%Y-%m-%d")
+                )
+                
+                portfolio_service.save_portfolio(portfolio)
+                
+                flash('Metas de recuperação definidas com sucesso!', 'success')
+            else:
+                # Clear goals
+                portfolio.goals = None
+                portfolio_service.save_portfolio(portfolio)
+                
+                flash('Metas de recuperação removidas!', 'info')
+            
+            return redirect(url_for('web.index'))
+    else:
+        # Pre-fill form if goals exist
+        if portfolio.goals:
+            form = form_service.create_goals_form(
+                target=portfolio.goals.target_recovery,
+                days=portfolio.goals.days
+            )
+        else:
+            form = form_service.create_goals_form()
+    
+    # Calculate some stats for display
+    history = portfolio_service.load_portfolio_history()
+    stats = {}
+    
+    if history and len(history) > 1:
+        first_entry = history[0]
+        last_entry = history[-1]
+        
+        # Calculate absolute change
+        absolute_change = last_entry.get('total_value', 0) - first_entry.get('total_value', 0)
+        
+        # Calculate percentage change
+        if first_entry.get('total_value', 0) > 0:
+            percentage_change = (absolute_change / first_entry.get('total_value', 0)) * 100
+        else:
+            percentage_change = 0
+        
+        # Days elapsed
+        days_elapsed = (datetime.strptime(last_entry.get('date', datetime.now().strftime("%Y-%m-%d")), "%Y-%m-%d") - 
+                        datetime.strptime(first_entry.get('date', datetime.now().strftime("%Y-%m-%d")), "%Y-%m-%d")).days
+        
+        stats = {
+            'start_value': first_entry.get('total_value', 0),
+            'current_value': last_entry.get('total_value', 0),
+            'absolute_change': absolute_change,
+            'percentage_change': percentage_change,
+            'days_elapsed': days_elapsed
+        }
+    
+    return render_template('goals.html', form=form, goals=portfolio.goals, stats=stats)
+
+@web_bp.route('/parameters', methods=['GET', 'POST'])
+def parameters():
+    """Trading parameters management page."""
+    from services.trading_service import TradingService
+    
+    # Get trading service
+    trading_service = TradingService(
+        {'DATA_FOLDER': os.environ.get('DATA_FOLDER', 'data')},
+        cache_manager
+    )
+    
+    if request.method == 'POST':
+        form = form_service.create_parameters_form()
+        if form.validate_on_submit():
+            params = {
+                'sma_period': form.sma_period.data,
+                'ema_period': form.ema_period.data,
+                'rsi_period': form.rsi_period.data,
+                'macd_fast': form.macd_fast.data,
+                'macd_slow': form.macd_slow.data,
+                'macd_signal': form.macd_signal.data,
+                'bb_window': form.bb_window.data,
+                'bb_std': form.bb_std.data,
+                'decision_buy_threshold': form.decision_buy_threshold.data,
+                'decision_sell_threshold': form.decision_sell_threshold.data,
+                'take_profit_pct': form.take_profit_pct.data,
+                'stop_loss_pct': form.stop_loss_pct.data,
+                'trailing_stop_pct': form.trailing_stop_pct.data
+            }
+            
+            # Update parameters
+            result = trading_service.update_trading_parameters(params)
+            
+            if result.get('success'):
+                flash('Parâmetros de trading atualizados com sucesso!', 'success')
+                
+                # Clear analysis cache
+                cache_manager.delete("portfolio_analysis:")
+                cache_manager.delete("watchlist_analysis:")
+            else:
+                flash(f'Erro ao atualizar parâmetros: {result.get("message")}', 'danger')
+            
+            return redirect(url_for('web.parameters'))
+    else:
+        # Get current parameters
+        params = trading_service.get_trading_parameters()
+        
+        # Create form with current parameters
+        form = form_service.create_parameters_form(params)
+    
+    return render_template('parameters.html', form=form, params=params)
+
+@web_bp.route('/history')
+def history():
+    """Portfolio history page."""
+    # Get history data
+    history_data = portfolio_service.load_portfolio_history()
+    
+    if not history_data:
+        flash('Sem histórico disponível ainda.', 'info')
+        return redirect(url_for('web.index'))
+    
+    # Process history data for plotting
+    dates = []
+    values = []
+    cash_values = []
+    portfolio_values = []
+    
+    for entry in history_data:
+        dates.append(entry.get('date'))
+        values.append(entry.get('total_value', 0))
+        cash_values.append(entry.get('cash_balance', 0))
+        portfolio_values.append(entry.get('portfolio_value', 0))
+    
+    # Generate chart
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(dates, values, label='Total Value')
+    ax.plot(dates, portfolio_values, label='Portfolio Value')
+    ax.plot(dates, cash_values, label='Cash')
+    ax.set_title('Portfolio History')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Value ($)')
+    ax.legend()
+    ax.grid(True)
+    
+    # Save to buffer
+    buf = BytesIO()
+    plt.tight_layout()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    history_chart = base64.b64encode(buf.getvalue()).decode('utf-8')
+    plt.close(fig)
+    
+    return render_template('history.html', history=history_data, chart=history_chart)
+
+@web_bp.route('/cache')
+def cache():
+    """Cache management page."""
+    # Get cache status
+    cache_status = cache_manager.get_cache_status() if hasattr(cache_manager, 'get_cache_status') else {
+        'cache_size': len(cache_manager.keys()),
+        'memory_usage_mb': 'N/A',
+        'items_count': len(cache_manager.keys())
+    }
+    
+    return render_template('cache.html', status=cache_status)
+
+@web_bp.route('/cache/clear')
+def clear_cache():
+    """Clear all cache."""
+    try:
+        cache_manager.clear()
+        flash('Cache limpo com sucesso!', 'success')
+    except Exception as e:
+        flash(f'Erro ao limpar cache: {str(e)}', 'danger')
+    
+    return redirect(url_for('web.cache'))
+
+@web_bp.route('/diagnostics')
+def diagnostics():
+    """System diagnostics page."""
+    from services.system_service import SystemService
+    
+    # Create system service
+    system_service = SystemService({'DATA_FOLDER': os.environ.get('DATA_FOLDER', 'data')})
+    
+    # Run diagnostics
+    diagnostics_result = system_service.run_diagnostics()
+    
+    # Check for updates
+    update_info = system_service.check_for_updates()
+    
+    return render_template('diagnostics.html', 
+                          diagnostics=diagnostics_result, 
+                          update_info=update_info)
+
+@web_bp.route('/help')
+def help():
+    """Help and documentation page."""
+    return render_template('help.html')
+
+# Initialize the blueprint
+web_blueprint = web_bp
