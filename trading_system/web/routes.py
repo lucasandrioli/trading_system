@@ -9,14 +9,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-from core.analysis.technical_indicators import TechnicalIndicators
-from core.analysis.fundamental_analysis import FundamentalAnalysis
-from core.analysis.qualitative_analysis import QualitativeAnalysis
-from core.analysis.market_analysis import MarketAnalysis
-from services.portfolio_service import PortfolioService
-from services.market_service import MarketService
-from services.form_service import FormService
-from utils.cache_manager import CacheManager
+from trading_system.core.analysis.technical_indicators import TechnicalIndicators
+from trading_system.core.analysis.fundamental_analysis import FundamentalAnalysis
+from trading_system.core.analysis.qualitative_analysis import QualitativeAnalysis
+from trading_system.core.analysis.market_analysis import MarketAnalysis
+from trading_system.services.portfolio_service import PortfolioService
+from trading_system.services.market_service import MarketService
+from trading_system.services.form_service import FormService
+from trading_system.utils.cache_manager import CacheManager
 
 # Create blueprint
 web_bp = Blueprint('web', __name__)

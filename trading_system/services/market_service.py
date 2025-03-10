@@ -2,9 +2,9 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-from core.analysis.market_analysis import MarketAnalysis
-from data.data_loader import DataLoader
-from utils.cache_manager import CacheManager
+from trading_system.core.analysis.market_analysis import MarketAnalysis
+from trading_system.core.data.data_loader import DataLoader
+from trading_system.utils.cache_manager import CacheManager
 
 logger = logging.getLogger(__name__)
 
