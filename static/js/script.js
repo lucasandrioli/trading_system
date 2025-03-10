@@ -1,42 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Sidebar Toggle Elements
-    const toggleButton = document.getElementById('sidebar-toggle');
-    const sidebar = document.getElementById('sidebar');
-    const body = document.body;
-    
-    // Função para alternar o menu
-    function toggleSidebar() {
-        sidebar.classList.toggle('show');
-        body.classList.toggle('sidebar-open');
-    }
-    
-    // Event listener para o botão
-    if (toggleButton) {
-        toggleButton.addEventListener('click', toggleSidebar);
-    }
-    
-    // Fechar o menu ao clicar em um link (opcional)
-    const menuLinks = document.querySelectorAll('.sidebar .nav-link');
-    menuLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            // Em dispositivos móveis, fechar o menu após clicar
-            if (window.innerWidth < 992) {
-                sidebar.classList.remove('show');
-                body.classList.remove('sidebar-open');
-            }
-        });
-    });
-    
-    // Fechar o menu ao clicar fora (opcional)
-    document.addEventListener('click', function(event) {
-        const isClickInsideSidebar = sidebar.contains(event.target);
-        const isClickOnToggleButton = toggleButton && toggleButton.contains(event.target);
-        
-        if (!isClickInsideSidebar && !isClickOnToggleButton && sidebar.classList.contains('show') && window.innerWidth < 992) {
-            toggleSidebar();
-        }
-    });
-
     // Validação de formulários
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
