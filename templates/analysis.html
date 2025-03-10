@@ -1,6 +1,3 @@
-Here's the optimized analysis.html template with improved performance for large datasets:
-
-```html
 {% extends "base.html" %}
 
 {% block title %}Análise - Sistema de Trading{% endblock %}
@@ -180,7 +177,7 @@ Here's the optimized analysis.html template with improved performance for large 
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for item in rebalance_plan.sell|slice(0, 10) %}
+                                            {% for item in rebalance_plan.sell[:10] %}
                                             <tr>
                                                 <td>{{ item.ticker }}</td>
                                                 <td>{{ item.sell_quantity }}</td>
@@ -216,7 +213,7 @@ Here's the optimized analysis.html template with improved performance for large 
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for item in rebalance_plan.rebalance|slice(0, 10) %}
+                                            {% for item in rebalance_plan.rebalance[:10] %}
                                             <tr>
                                                 <td>{{ item.ticker }}</td>
                                                 <td>{{ item.sell_quantity }}</td>
@@ -252,7 +249,7 @@ Here's the optimized analysis.html template with improved performance for large 
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for item in rebalance_plan.buy|slice(0, 10) %}
+                                            {% for item in rebalance_plan.buy[:10] %}
                                             <tr>
                                                 <td>{{ item.ticker }}</td>
                                                 <td>{{ item.buy_quantity }}</td>
@@ -298,7 +295,7 @@ Here's the optimized analysis.html template with improved performance for large 
                         {% set valid_assets = [] %}
                         {% for ticker, details in portfolio_analysis.ativos.items() %}
                             {% if "error" not in details %}
-                                {% do valid_assets.append({'ticker': ticker, 'details': details}) %}
+                                {% set _ = valid_assets.append({'ticker': ticker, 'details': details}) %}
                             {% endif %}
                         {% endfor %}
                         
@@ -317,7 +314,8 @@ Here's the optimized analysis.html template with improved performance for large 
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for asset in valid_assets|sort(attribute='details.total_score', reverse=true)|slice(0, 25) %}
+                                        {% set sorted_assets = valid_assets|sort(attribute='details.total_score', reverse=true) %}
+                                        {% for asset in sorted_assets[:25] %}
                                         <tr>
                                             <td>{{ asset.ticker }}</td>
                                             <td>{{ format_currency(asset.details.current_price) }}</td>
@@ -331,10 +329,22 @@ Here's the optimized analysis.html template with improved performance for large 
                                                     {% elif asset.details.decision in ['VENDER', 'REALIZAR LUCRO PARCIAL', 'REDUZIR'] %}bg-danger
                                                     {% else %}bg-secondary{% endif %}">
                                                     {{ asset.details.decision or "AGUARDAR" }}
+                                                    {% if asset.details.decision in ['COMPRAR', 'COMPRAR PARCIAL'] and asset.details.position_sizing and asset.details.position_sizing.suggested_shares > 0 %}
+                                                        ({{ asset.details.position_sizing.suggested_shares }})
+                                                    {% endif %}
                                                 </span>
                                             </td>
-                                            <td>{{ asset.details.justificativa|truncate(50) or "" }}</td>
-                                            <td>{{ asset_action_buttons(asset.ticker) }}</td>
+                                            <td>{{ (asset.details.justificativa or "")|truncate(50) }}</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    {{ asset_action_buttons(asset.ticker)|safe }}
+                                                    {% if asset.details.decision in ['COMPRAR', 'COMPRAR PARCIAL'] and asset.details.position_sizing and asset.details.position_sizing.suggested_shares > 0 %}
+                                                    <a href="/trade?ticker={{ asset.ticker }}&quantity={{ asset.details.position_sizing.suggested_shares }}&price={{ '%.2f'|format(asset.details.current_price or 0) }}&trade_type=COMPRA" class="btn btn-sm btn-outline-success" title="Comprar">
+                                                        <i class="bi bi-cart-plus"></i> {{ asset.details.position_sizing.suggested_shares }}
+                                                    </a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                         {% if valid_assets|length > 25 %}
@@ -364,7 +374,7 @@ Here's the optimized analysis.html template with improved performance for large 
                         {% set valid_watchlist = [] %}
                         {% for ticker, details in watchlist_analysis.items() %}
                             {% if "error" not in details %}
-                                {% do valid_watchlist.append({'ticker': ticker, 'details': details}) %}
+                                {% set _ = valid_watchlist.append({'ticker': ticker, 'details': details}) %}
                             {% endif %}
                         {% endfor %}
                         
@@ -382,7 +392,8 @@ Here's the optimized analysis.html template with improved performance for large 
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for item in valid_watchlist|sort(attribute='details.total_score', reverse=true)|slice(0, 25) %}
+                                        {% set sorted_watchlist = valid_watchlist|sort(attribute='details.total_score', reverse=true) %}
+                                        {% for item in sorted_watchlist[:25] %}
                                         <tr>
                                             <td>{{ item.ticker }}</td>
                                             <td>{{ format_currency(item.details.current_price) }}</td>
@@ -395,7 +406,7 @@ Here's the optimized analysis.html template with improved performance for large 
                                                     {{ item.details.decision or "AGUARDAR" }}
                                                 </span>
                                             </td>
-                                            <td>{{ item.details.justificativa|truncate(50) or "" }}</td>
+                                            <td>{{ (item.details.justificativa or "")|truncate(50) }}</td>
                                             <td>
                                                 <div class="btn-group">
                                                     <a href="/indicators?ticker={{ item.ticker }}" class="btn btn-sm btn-outline-primary" title="Técnica">
@@ -447,13 +458,3 @@ Here's the optimized analysis.html template with improved performance for large 
     });
 </script>
 {% endblock %}
-```
-
-Key optimizations:
-1. Added macros for repeated operations (currency formatting, progress bars, action buttons)
-2. Pre-computed values at the start of each section
-3. Limited display of large collections to 10-25 items with indication of remaining count
-4. Added sorting for watchlist/portfolio to show most relevant items first
-5. Simplified conditional logic with more efficient expressions
-6. Added truncation for long text fields
-7. Improved JavaScript by using event delegation and deferred loading
