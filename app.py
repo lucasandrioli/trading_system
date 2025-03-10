@@ -2,6 +2,8 @@ import os
 import json
 import importlib
 import traceback
+import asyncio
+import concurrent.futures
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, send_file
 from flask_cors import CORS
@@ -16,8 +18,11 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 import base64
+import functools
+import time
+from concurrent.futures import ThreadPoolExecutor
 
-# Importar o sistema de trading existente
+# Import trading system with optimizations
 import trading_system
 from trading_system import (
     DataLoader, TechnicalIndicators, MarketAnalysis, Strategy, APIClient,
@@ -33,15 +38,31 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'trading-system-secret-k
 app.config['DATA_FOLDER'] = os.environ.get('DATA_FOLDER', 'data')
 app.config['POLYGON_API_KEY'] = os.environ.get('POLYGON_API_KEY', '')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
+app.config['CACHE_EXPIRY'] = int(os.environ.get('CACHE_EXPIRY', '3600'))  # Default 1 hour
 csrf = CSRFProtect(app)
 CORS(app)
 
-# Garantir que o diretório de dados existe
+# Ensure data directory exists
 os.makedirs(app.config['DATA_FOLDER'], exist_ok=True)
 PORTFOLIO_FILE = os.path.join(app.config['DATA_FOLDER'], 'portfolio.json')
 HISTORY_FILE = os.path.join(app.config['DATA_FOLDER'], 'portfolio_history.json')
 NOTIFICATION_CONFIG = os.path.join(app.config['DATA_FOLDER'], 'notification_config.json')
 TRAILING_DATA_FILE = os.path.join(app.config['DATA_FOLDER'], 'trailing_data.json')
+CACHE_FILE = os.path.join(app.config['DATA_FOLDER'], 'analysis_cache.json')
+
+# Global in-memory cache for faster lookups
+_ANALYSIS_CACHE = {}
+_ANALYSIS_TIMESTAMPS = {}
+_MARKET_SENTIMENT_CACHE = None
+_MARKET_SENTIMENT_TIMESTAMP = None
+_DATA_CACHE = {}
+_LAST_PORTFOLIO_ANALYSIS = None
+_LAST_WATCHLIST_ANALYSIS = None
+_LAST_REBALANCE_PLAN = None
+_API_RATE_LIMITER = {"last_call": 0, "min_interval": 0.1}  # 100ms minimum between API calls
+
+# Thread pool for parallel operations
+_THREAD_POOL = ThreadPoolExecutor(max_workers=10)
 
 # Initialize notification system
 def get_notification_config():
@@ -54,6 +75,108 @@ def get_notification_config():
     return {"enabled": False, "methods": {"email": {"enabled": False}, "webhook": {"enabled": False}}}
 
 notification_system = NotificationSystem(get_notification_config())
+
+# Cache management functions
+def load_cache():
+    """Load analysis cache from disk"""
+    global _ANALYSIS_CACHE, _ANALYSIS_TIMESTAMPS
+    try:
+        if os.path.exists(CACHE_FILE):
+            with open(CACHE_FILE, 'r') as f:
+                cache_data = json.load(f)
+                _ANALYSIS_CACHE = cache_data.get('cache', {})
+                _ANALYSIS_TIMESTAMPS = cache_data.get('timestamps', {})
+            app.logger.info(f"Loaded {len(_ANALYSIS_CACHE)} cached items")
+    except Exception as e:
+        app.logger.error(f"Error loading cache: {e}")
+        _ANALYSIS_CACHE = {}
+        _ANALYSIS_TIMESTAMPS = {}
+
+def save_cache():
+    """Save analysis cache to disk"""
+    try:
+        # Limit cache size to prevent excessive memory usage
+        if len(_ANALYSIS_CACHE) > 500:
+            # Keep only the most recent 300 entries
+            sorted_keys = sorted(_ANALYSIS_TIMESTAMPS.items(), key=lambda x: x[1], reverse=True)
+            keep_keys = [k for k, _ in sorted_keys[:300]]
+            
+            new_cache = {k: _ANALYSIS_CACHE[k] for k in keep_keys if k in _ANALYSIS_CACHE}
+            new_timestamps = {k: _ANALYSIS_TIMESTAMPS[k] for k in keep_keys if k in _ANALYSIS_TIMESTAMPS}
+            
+            _ANALYSIS_CACHE.clear()
+            _ANALYSIS_TIMESTAMPS.clear()
+            _ANALYSIS_CACHE.update(new_cache)
+            _ANALYSIS_TIMESTAMPS.update(new_timestamps)
+        
+        cache_data = {
+            'cache': _ANALYSIS_CACHE,
+            'timestamps': _ANALYSIS_TIMESTAMPS
+        }
+        
+        with open(CACHE_FILE, 'w') as f:
+            json.dump(cache_data, f)
+        app.logger.info(f"Saved {len(_ANALYSIS_CACHE)} items to cache")
+    except Exception as e:
+        app.logger.error(f"Error saving cache: {e}")
+
+def clear_cache():
+    """Clear the analysis cache"""
+    global _ANALYSIS_CACHE, _ANALYSIS_TIMESTAMPS, _DATA_CACHE, _MARKET_SENTIMENT_CACHE
+    _ANALYSIS_CACHE.clear()
+    _ANALYSIS_TIMESTAMPS.clear()
+    _DATA_CACHE.clear()
+    _MARKET_SENTIMENT_CACHE = None
+    if os.path.exists(CACHE_FILE):
+        try:
+            os.remove(CACHE_FILE)
+        except:
+            pass
+    app.logger.info("Cache cleared")
+
+def get_cached_item(key, expiry=None):
+    """Get an item from cache, return None if expired or not found"""
+    if expiry is None:
+        expiry = app.config['CACHE_EXPIRY']
+    
+    if key not in _ANALYSIS_CACHE or key not in _ANALYSIS_TIMESTAMPS:
+        return None
+    
+    timestamp = _ANALYSIS_TIMESTAMPS[key]
+    now = time.time()
+    
+    if now - timestamp > expiry:
+        # Cache expired
+        return None
+    
+    return _ANALYSIS_CACHE[key]
+
+def set_cached_item(key, value):
+    """Store an item in the cache"""
+    _ANALYSIS_CACHE[key] = value
+    _ANALYSIS_TIMESTAMPS[key] = time.time()
+
+# Optimized data loading with caching
+def get_market_sentiment(force_refresh=False):
+    """Get market sentiment with caching"""
+    global _MARKET_SENTIMENT_CACHE, _MARKET_SENTIMENT_TIMESTAMP
+    
+    now = time.time()
+    if not force_refresh and _MARKET_SENTIMENT_CACHE is not None and _MARKET_SENTIMENT_TIMESTAMP is not None:
+        # Use cached market sentiment if less than 30 minutes old
+        if now - _MARKET_SENTIMENT_TIMESTAMP < 1800:  # 30 minutes
+            return _MARKET_SENTIMENT_CACHE
+    
+    try:
+        sentiment = MarketAnalysis.get_market_sentiment()
+        _MARKET_SENTIMENT_CACHE = sentiment
+        _MARKET_SENTIMENT_TIMESTAMP = now
+        return sentiment
+    except Exception as e:
+        app.logger.error(f"Error getting market sentiment: {e}")
+        if _MARKET_SENTIMENT_CACHE is not None:
+            return _MARKET_SENTIMENT_CACHE
+        return {"sentiment": "unknown", "trend": "unknown", "market_bias_score": 0}
 
 # Load trailing stop data
 def load_trailing_data():
@@ -74,19 +197,18 @@ def save_trailing_data(data):
         app.logger.error(f"Error saving trailing data: {e}")
         return False
 
-# Carregar dados do portfólio
+# Load portfolio data with caching
 def load_portfolio():
     if os.path.exists(PORTFOLIO_FILE):
         try:
             with open(PORTFOLIO_FILE, 'r') as f:
                 return json.load(f)
         except Exception as e:
-            app.logger.error(f"Erro ao carregar portfólio: {e}")
+            app.logger.error(f"Error loading portfolio: {e}")
             return {"portfolio": {}, "watchlist": {}, "account_balance": 0.0, "goals": {}}
     else:
         return {"portfolio": {}, "watchlist": {}, "account_balance": 0.0, "goals": {}}
 
-# Salvar dados do portfólio
 def save_portfolio(data):
     try:
         os.makedirs(os.path.dirname(PORTFOLIO_FILE), exist_ok=True)
@@ -94,7 +216,7 @@ def save_portfolio(data):
             json.dump(data, f, indent=2)
         return True
     except Exception as e:
-        app.logger.error(f"Erro ao salvar portfólio: {e}")
+        app.logger.error(f"Error saving portfolio: {e}")
         return False
 
 # Load portfolio history
@@ -151,7 +273,7 @@ def add_portfolio_snapshot():
     save_portfolio_history(history)
     return snapshot
 
-# Formulários
+# Forms
 class AssetForm(FlaskForm):
     ticker = StringField('Ticker', validators=[DataRequired()])
     quantity = IntegerField('Quantidade', validators=[DataRequired(), NumberRange(min=1)])
@@ -247,12 +369,313 @@ class TradingParamsForm(FlaskForm):
     trailing_stop_pct = FloatField('Trailing Stop %', validators=[NumberRange(min=0.5, max=20)], default=3.0)
     submit = SubmitField('Atualizar Parâmetros')
 
-# Rotas
+# Optimized portfolio analysis functions
+def batch_analyze_portfolio(portfolio, account_balance, risk_profile="medium", 
+                           trailing_data=None, extended_hours=False, goals=None, quick_mode=False):
+    """Optimized portfolio analysis with parallel processing and caching"""
+    global _LAST_PORTFOLIO_ANALYSIS
+    
+    if trailing_data is None:
+        trailing_data = {}
+    if goals is None:
+        goals = {}
+    
+    # Generate cache key
+    cache_parts = [
+        json.dumps(portfolio, sort_keys=True),
+        str(account_balance),
+        risk_profile,
+        json.dumps(trailing_data, sort_keys=True),
+        str(extended_hours),
+        json.dumps(goals, sort_keys=True),
+        str(quick_mode)
+    ]
+    cache_key = f"portfolio_analysis:{hash(''.join(cache_parts))}"
+    
+    # Check cache
+    cached_result = get_cached_item(cache_key)
+    if cached_result:
+        _LAST_PORTFOLIO_ANALYSIS = cached_result
+        return cached_result
+    
+    # Setup variables for analysis
+    results = {}
+    total_invested = 0.0
+    total_current = 0.0
+    
+    # Get market sentiment (shared by all analyses)
+    market_sent = get_market_sentiment()
+    
+    # Calculate days remaining for recovery goal
+    remaining_days = goals.get('days', 1)
+    if goals.get('start_date'):
+        try:
+            start_date = datetime.strptime(goals['start_date'], "%Y-%m-%d")
+            total_days = goals.get('days', 30)
+            days_passed = (datetime.now() - start_date).days
+            remaining_days = max(1, total_days - days_passed)
+        except Exception as e:
+            app.logger.warning(f"Error calculating remaining days: {e}")
+    
+    # Calculate daily recovery goal
+    daily_goal = goals.get('target_recovery', 0) / max(1, remaining_days)
+    
+    # Prefetch all prices in a batch
+    tickers = list(portfolio.keys())
+    price_map = DataLoader.get_realtime_prices_bulk(tickers)
+    
+    # Define function for parallel asset analysis
+    def analyze_asset(ticker_pos):
+        ticker, pos = ticker_pos
+        try:
+            # Check for cached asset analysis first
+            asset_cache_key = f"asset_analysis:{ticker}:{risk_profile}:{extended_hours}:{pos.get('quantity', 0)}:{pos.get('avg_price', 0)}"
+            cached_asset = get_cached_item(asset_cache_key)
+            if cached_asset:
+                return ticker, cached_asset
+            
+            # Get historical data
+            df = DataLoader.get_asset_data(ticker, days=60, extended_hours=extended_hours)
+            
+            if df.empty:
+                return ticker, {"ticker": ticker, "error": "Insufficient historical data"}
+            
+            # Update with current price if available
+            current_price = price_map.get(ticker)
+            if current_price and 'Close' in df.columns:
+                df.iloc[-1, df.columns.get_loc("Close")] = current_price
+            
+            # Extract position details
+            quantity = pos.get("quantity", 0)
+            avg_price = pos.get("avg_price", 0)
+            invested_value = quantity * avg_price
+            current_value = quantity * (current_price if current_price else df['Close'].iloc[-1])
+            pnl = current_value - invested_value
+            
+            # Calculate daily gap for recovery goal
+            daily_gap = max(0, daily_goal - pnl)
+            
+            # Generate decision 
+            decision = Strategy.decision_engine(
+                ticker, df, pos, account_balance, risk_profile,
+                DYNAMIC_PARAMS, daily_gap, daily_goal, market_sent, trailing_data,
+                goals, remaining_days, quick_mode=quick_mode
+            )
+            
+            # Calculate position sizing for buy decisions
+            if decision["decision"].upper() in ["COMPRAR", "COMPRAR PARCIAL"]:
+                pos_size = PositionSizing.calculate_position_size(
+                    ticker, df, account_balance, risk_profile,
+                    daily_gap=daily_gap, daily_goal=daily_goal, params=DYNAMIC_PARAMS
+                )
+                decision["position_sizing"] = pos_size
+            
+            # Add position value to the decision
+            decision["position_value"] = current_value
+            decision["quantity"] = quantity
+            
+            # Cache asset analysis
+            set_cached_item(asset_cache_key, decision)
+            
+            return ticker, decision
+        except Exception as e:
+            app.logger.error(f"Error analyzing {ticker}: {e}")
+            return ticker, {"ticker": ticker, "error": str(e)}
+    
+    # Execute analyses in parallel
+    with ThreadPoolExecutor(max_workers=min(10, len(portfolio) or 1)) as executor:
+        future_results = list(executor.map(analyze_asset, portfolio.items()))
+    
+    # Process results
+    for ticker, decision in future_results:
+        results[ticker] = decision
+        
+        # Update totals
+        if "error" not in decision:
+            quantity = decision.get("quantity", 0)
+            avg_price = portfolio.get(ticker, {}).get("avg_price", 0)
+            current_price = decision.get("current_price", 0)
+            
+            invested_value = quantity * avg_price
+            current_value = quantity * current_price
+            
+            if not np.isnan(current_value) and not np.isnan(invested_value):
+                total_invested += invested_value
+                total_current += current_value
+    
+    # Create portfolio summary
+    portfolio_summary = {
+        "total_invested": total_invested,
+        "valor_atual": total_current, 
+        "lucro_prejuizo": total_current - total_invested,
+        "lucro_prejuizo_pct": ((total_current / total_invested - 1) * 100) if total_invested > 0 else 0.0,
+        "saldo_disponivel": account_balance,
+        "patrimonio_total": account_balance + total_current,
+        "market_sentiment": market_sent,
+        "meta_recuperacao": goals.get('target_recovery', 0),
+        "dias_restantes": remaining_days,
+        "dias_totais": goals.get('days', 30),
+        "meta_diaria": daily_goal
+    }
+    
+    # Final result
+    result = {"ativos": results, "resumo": portfolio_summary}
+    
+    # Cache result
+    set_cached_item(cache_key, result)
+    _LAST_PORTFOLIO_ANALYSIS = result
+    
+    return result
+
+def batch_analyze_watchlist(watchlist, account_balance, risk_profile="medium", 
+                           extended_hours=False, goals=None, quick_mode=False):
+    """Optimized watchlist analysis with parallel processing and caching"""
+    global _LAST_WATCHLIST_ANALYSIS
+    
+    if goals is None:
+        goals = {}
+    
+    # Generate cache key
+    cache_parts = [
+        json.dumps(watchlist, sort_keys=True),
+        str(account_balance),
+        risk_profile,
+        str(extended_hours),
+        json.dumps(goals, sort_keys=True),
+        str(quick_mode)
+    ]
+    cache_key = f"watchlist_analysis:{hash(''.join(cache_parts))}"
+    
+    # Check cache
+    cached_result = get_cached_item(cache_key)
+    if cached_result:
+        _LAST_WATCHLIST_ANALYSIS = cached_result
+        return cached_result
+    
+    # Setup for analysis
+    results = {}
+    
+    # Get market sentiment (shared by all analyses)
+    market_sent = get_market_sentiment()
+    
+    # Calculate days remaining for recovery goal
+    remaining_days = goals.get('days', 1)
+    if goals.get('start_date'):
+        try:
+            start_date = datetime.strptime(goals['start_date'], "%Y-%m-%d")
+            total_days = goals.get('days', 30)
+            days_passed = (datetime.now() - start_date).days
+            remaining_days = max(1, total_days - days_passed)
+        except Exception:
+            pass
+    
+    # Calculate daily recovery goal
+    daily_goal = goals.get('target_recovery', 0) / max(1, remaining_days) if goals else 0
+    
+    # Filter and sort watchlist tickers
+    tickers = [t for t, data in watchlist.items() if data.get("monitor", False)]
+    
+    # Get prices in a batch
+    price_map = DataLoader.get_realtime_prices_bulk(tickers)
+    
+    # Function for parallel analysis
+    def analyze_ticker(ticker):
+        try:
+            # Check ticker cache
+            ticker_cache_key = f"watchlist_ticker:{ticker}:{risk_profile}:{extended_hours}"
+            cached_ticker = get_cached_item(ticker_cache_key)
+            if cached_ticker:
+                return ticker, cached_ticker
+            
+            df = DataLoader.get_asset_data(ticker, days=60, extended_hours=extended_hours)
+            
+            if df.empty:
+                return ticker, {"ticker": ticker, "error": "Insufficient data"}
+            
+            # Update price if available
+            current_price = price_map.get(ticker)
+            if current_price and 'Close' in df.columns:
+                df.iloc[-1, df.columns.get_loc("Close")] = current_price
+            
+            # Create empty position for analysis
+            fake_position = {"quantity": 0, "avg_price": 0}
+            
+            # Daily gap for recovery goal
+            daily_gap = daily_goal if daily_goal > 0 else 0
+            
+            # Generate trading decision
+            decision = Strategy.decision_engine(
+                ticker, df, fake_position, account_balance, risk_profile,
+                DYNAMIC_PARAMS, daily_gap=daily_gap, daily_goal=daily_goal, 
+                market_sentiment=market_sent, goals=goals, remaining_days=remaining_days,
+                quick_mode=quick_mode
+            )
+            
+            # Calculate position sizing for buy decisions
+            if decision.get("decision") in ["COMPRAR", "COMPRAR PARCIAL"]:
+                pos_size = PositionSizing.calculate_position_size(
+                    ticker, df, account_balance, risk_profile, 
+                    daily_gap=daily_gap, daily_goal=daily_goal, params=DYNAMIC_PARAMS
+                )
+                decision["position_sizing"] = pos_size
+            
+            # Cache ticker analysis
+            set_cached_item(ticker_cache_key, decision)
+            
+            return ticker, decision
+        except Exception as e:
+            app.logger.error(f"Error in watchlist analysis for {ticker}: {e}")
+            return ticker, {"ticker": ticker, "error": str(e)}
+    
+    # Execute analyses in parallel
+    if tickers:
+        with ThreadPoolExecutor(max_workers=min(10, len(tickers))) as executor:
+            future_results = list(executor.map(analyze_ticker, tickers))
+        
+        # Process results
+        for ticker, decision in future_results:
+            results[ticker] = decision
+    
+    # Cache and return results
+    set_cached_item(cache_key, results)
+    _LAST_WATCHLIST_ANALYSIS = results
+    
+    return results
+
+def optimized_rebalance_plan(portfolio_analysis, watchlist_analysis, account_balance, params=DYNAMIC_PARAMS):
+    """Optimized rebalance plan generation with caching"""
+    global _LAST_REBALANCE_PLAN
+    
+    # Generate cache key
+    cache_parts = [
+        json.dumps(portfolio_analysis, sort_keys=True),
+        json.dumps(watchlist_analysis, sort_keys=True),
+        str(account_balance),
+        json.dumps(params, sort_keys=True)
+    ]
+    cache_key = f"rebalance_plan:{hash(''.join(cache_parts))}"
+    
+    # Check cache
+    cached_result = get_cached_item(cache_key)
+    if cached_result:
+        _LAST_REBALANCE_PLAN = cached_result
+        return cached_result
+    
+    # Generate rebalance plan
+    result = generate_rebalance_plan(portfolio_analysis, watchlist_analysis, account_balance, params)
+    
+    # Cache result
+    set_cached_item(cache_key, result)
+    _LAST_REBALANCE_PLAN = result
+    
+    return result
+
+# Routes
 @app.route('/')
 def index():
     data = load_portfolio()
     
-    # Calcular valores totais
+    # Calculate portfolio totals
     portfolio = data.get('portfolio', {})
     account_balance = data.get('account_balance', 0)
     
@@ -275,9 +698,9 @@ def index():
     profit_loss = total_current - total_invested
     profit_loss_pct = (profit_loss / total_invested * 100) if total_invested > 0 else 0
     
-    # Get market sentiment
+    # Get market sentiment (using cached version to avoid API calls)
     try:
-        market_sentiment = MarketAnalysis.get_market_sentiment()
+        market_sentiment = get_market_sentiment()
     except Exception as e:
         app.logger.error(f"Error getting market sentiment: {e}")
         market_sentiment = {"sentiment": "unknown", "trend": "unknown", "market_bias_score": 0}
@@ -294,9 +717,9 @@ def index():
             
             # Calculate days passed
             start_date = datetime.strptime(goals.get('start_date', datetime.now().strftime('%Y-%m-%d')), '%Y-%m-%d')
+            total_days = goals.get('days', 30)
             days_passed = (datetime.now() - start_date).days
-            days_total = goals.get('days', 30)
-            days_remaining = max(0, days_total - days_passed)
+            days_remaining = max(0, total_days - days_passed)
             
             recovery_status = {
                 'current_pnl': current_pnl,
@@ -319,12 +742,12 @@ def index():
         'recovery_status': recovery_status
     }
     
-    # Take a daily snapshot
+    # Take a daily snapshot if we don't have one for today
     last_history = load_portfolio_history()
     if not last_history or last_history[-1]['date'] != datetime.now().strftime("%Y-%m-%d"):
         add_portfolio_snapshot()
     
-    # Check for updates
+    # Check for updates (with minimal API usage)
     update_info = check_for_updates(VERSION)
     
     return render_template(
@@ -350,9 +773,14 @@ def add_asset():
         data = load_portfolio()
         ticker = form.ticker.data.upper()
         
-        # Validar ticker
-        if DataLoader.check_ticker_valid(ticker):
-            # Obter preço atual
+        # Validate ticker with caching
+        ticker_valid = get_cached_item(f"ticker_valid:{ticker}")
+        if ticker_valid is None:
+            ticker_valid = DataLoader.check_ticker_valid(ticker)
+            set_cached_item(f"ticker_valid:{ticker}", ticker_valid)
+        
+        if ticker_valid:
+            # Get current price
             df = DataLoader.get_asset_data(ticker, days=1)
             current_price = float(df['Close'].iloc[-1]) if not df.empty and 'Close' in df.columns else form.avg_price.data
             
@@ -434,6 +862,9 @@ def add_asset():
             
             save_portfolio(data)
             
+            # Clear cache to ensure fresh analysis
+            clear_asset_cache(ticker)
+            
             # Take a snapshot after portfolio change
             add_portfolio_snapshot()
             
@@ -446,6 +877,35 @@ def add_asset():
             flash(f'Ticker {ticker} inválido ou não encontrado!', 'danger')
         
     return redirect(url_for('portfolio'))
+
+def clear_asset_cache(ticker):
+    """Clear cache entries for a specific asset"""
+    global _ANALYSIS_CACHE, _ANALYSIS_TIMESTAMPS
+    
+    # Find keys related to this ticker
+    keys_to_remove = []
+    for key in list(_ANALYSIS_CACHE.keys()):
+        if f":{ticker}:" in key or f"_analysis:{hash(ticker)}" in key:
+            keys_to_remove.append(key)
+    
+    # Clear the entries
+    for key in keys_to_remove:
+        if key in _ANALYSIS_CACHE:
+            del _ANALYSIS_CACHE[key]
+        if key in _ANALYSIS_TIMESTAMPS:
+            del _ANALYSIS_TIMESTAMPS[key]
+    
+    # Also clear portfolio analysis which might contain this asset
+    keys_to_remove = []
+    for key in list(_ANALYSIS_CACHE.keys()):
+        if "portfolio_analysis:" in key:
+            keys_to_remove.append(key)
+    
+    for key in keys_to_remove:
+        if key in _ANALYSIS_CACHE:
+            del _ANALYSIS_CACHE[key]
+        if key in _ANALYSIS_TIMESTAMPS:
+            del _ANALYSIS_TIMESTAMPS[key]
 
 @app.route('/portfolio/edit/<ticker>', methods=['GET', 'POST'])
 def edit_asset(ticker):
@@ -461,23 +921,33 @@ def edit_asset(ticker):
         new_qty = form.quantity.data
         new_price = form.avg_price.data
         
-        # Obter preço atual
-        df = DataLoader.get_asset_data(ticker, days=1)
-        current_price = float(df['Close'].iloc[-1]) if not df.empty and 'Close' in df.columns else new_price
+        # Get current price (using cache when possible)
+        current_price_key = f"current_price:{ticker}"
+        current_price = get_cached_item(current_price_key, expiry=300)  # 5 minutes expiry
         
-        # Atualizar posição
+        if current_price is None:
+            df = DataLoader.get_asset_data(ticker, days=1)
+            current_price = float(df['Close'].iloc[-1]) if not df.empty and 'Close' in df.columns else new_price
+            set_cached_item(current_price_key, current_price)
+        
+        # Update position
         data['portfolio'][ticker]['quantity'] = new_qty
         data['portfolio'][ticker]['avg_price'] = new_price
         data['portfolio'][ticker]['current_price'] = current_price
         data['portfolio'][ticker]['current_position'] = new_qty * current_price
         
         save_portfolio(data)
+        
+        # Clear cache for this asset
+        clear_asset_cache(ticker)
+        
+        # Take portfolio snapshot
         add_portfolio_snapshot()
         
         flash(f'Ativo {ticker} atualizado com sucesso!', 'success')
         return redirect(url_for('portfolio'))
     
-    # Preencher formulário com dados existentes
+    # Populate form with existing data
     if request.method == 'GET':
         position = data['portfolio'][ticker]
         form.ticker.data = ticker
@@ -492,6 +962,10 @@ def delete_asset(ticker):
     if ticker in data['portfolio']:
         del data['portfolio'][ticker]
         save_portfolio(data)
+        
+        # Clear cache for this asset
+        clear_asset_cache(ticker)
+        
         flash(f'Ativo {ticker} removido com sucesso!', 'success')
     else:
         flash(f'Ativo {ticker} não encontrado!', 'danger')
@@ -511,13 +985,28 @@ def add_to_watchlist():
         data = load_portfolio()
         ticker = form.ticker.data.upper()
         
-        # Validar ticker
-        if DataLoader.check_ticker_valid(ticker):
+        # Validate ticker with caching
+        ticker_valid = get_cached_item(f"ticker_valid:{ticker}")
+        if ticker_valid is None:
+            ticker_valid = DataLoader.check_ticker_valid(ticker)
+            set_cached_item(f"ticker_valid:{ticker}", ticker_valid)
+        
+        if ticker_valid:
             data['watchlist'][ticker] = {
                 'symbol': ticker,
                 'monitor': form.monitor.data
             }
             save_portfolio(data)
+            
+            # Clear cache for watchlist analysis
+            global _ANALYSIS_CACHE, _ANALYSIS_TIMESTAMPS
+            keys_to_remove = [k for k in _ANALYSIS_CACHE.keys() if "watchlist_analysis:" in k]
+            for key in keys_to_remove:
+                if key in _ANALYSIS_CACHE:
+                    del _ANALYSIS_CACHE[key]
+                if key in _ANALYSIS_TIMESTAMPS:
+                    del _ANALYSIS_TIMESTAMPS[key]
+            
             flash(f'Ticker {ticker} adicionado à watchlist!', 'success')
         else:
             flash(f'Ticker {ticker} inválido ou não encontrado!', 'danger')
@@ -530,6 +1019,16 @@ def delete_from_watchlist(ticker):
     if ticker in data['watchlist']:
         del data['watchlist'][ticker]
         save_portfolio(data)
+        
+        # Clear cache for watchlist analysis
+        global _ANALYSIS_CACHE, _ANALYSIS_TIMESTAMPS
+        keys_to_remove = [k for k in _ANALYSIS_CACHE.keys() if "watchlist_analysis:" in k]
+        for key in keys_to_remove:
+            if key in _ANALYSIS_CACHE:
+                del _ANALYSIS_CACHE[key]
+            if key in _ANALYSIS_TIMESTAMPS:
+                del _ANALYSIS_TIMESTAMPS[key]
+        
         flash(f'Ticker {ticker} removido da watchlist!', 'success')
     else:
         flash(f'Ticker {ticker} não encontrado na watchlist!', 'danger')
@@ -630,24 +1129,34 @@ def trade():
             flash('Tipo de operação inválido. Use COMPRA ou VENDA.', 'danger')
             return redirect(url_for('trade'))
         
-        # Cálculo da comissão
+        # Calculate commission
         operation_value = quantity * price
         commission = trading_system.calculate_xp_commission(operation_value)
         
         if trade_type == "COMPRA":
-            # Verificar se é uma posição existente
+            # Check if ticker is valid
+            ticker_valid = get_cached_item(f"ticker_valid:{ticker}")
+            if ticker_valid is None:
+                ticker_valid = DataLoader.check_ticker_valid(ticker)
+                set_cached_item(f"ticker_valid:{ticker}", ticker_valid)
+            
+            if not ticker_valid:
+                flash(f'Ticker {ticker} inválido ou não encontrado!', 'danger')
+                return redirect(url_for('trade'))
+                
+            # Check if this is an existing position
             is_existing = ticker in data['portfolio']
             
             if is_existing:
-                # Para posições existentes
+                # For existing positions
                 old_qty = data['portfolio'][ticker].get('quantity', 0)
                 old_price = data['portfolio'][ticker].get('avg_price', 0)
                 
-                # Atualizar portfólio
+                # Update portfolio
                 new_qty = old_qty + quantity
                 avg_price = ((old_qty * old_price) + (quantity * price)) / new_qty if new_qty > 0 else 0
                 
-                # Verificar saldo apenas para novas ações
+                # Check balance only for new shares
                 if operation_value + commission > data.get('account_balance', 0):
                     flash('Saldo insuficiente para esta operação!', 'danger')
                     return redirect(url_for('trade'))
@@ -662,7 +1171,7 @@ def trade():
                     'date': datetime.now().isoformat()
                 }
             else:
-                # Para novas posições
+                # For new positions
                 if operation_value + commission > data.get('account_balance', 0):
                     flash('Saldo insuficiente para esta operação!', 'danger')
                     return redirect(url_for('trade'))
@@ -681,7 +1190,7 @@ def trade():
                     'last_sell': None
                 }
             
-            # Atualizar saldo
+            # Update account balance
             data['account_balance'] -= (operation_value + commission)
             flash(f'Compra de {quantity} {ticker} a ${price:.2f} registrada com sucesso!', 'success')
             
@@ -696,20 +1205,19 @@ def trade():
             })
         
         elif trade_type == "VENDA":
-            # Verificar se possui o ativo e a quantidade
+            # Check if we have the asset and quantity
             if ticker not in data['portfolio']:
                 flash(f'Você não possui {ticker} em sua carteira!', 'danger')
                 return redirect(url_for('trade'))
             
             current_qty = data['portfolio'][ticker].get('quantity', 0)
             
-            # Se a quantidade for exatamente igual à existente, considera-se venda completa
-            # Se for menor, considera-se venda parcial
+            # Check if selling exactly the same amount as existing or less
             if quantity > current_qty:
                 flash(f'Quantidade insuficiente. Você possui {current_qty} {ticker}.', 'danger')
                 return redirect(url_for('trade'))
             
-            # Atualizar portfólio
+            # Update portfolio
             new_qty = current_qty - quantity
             data['portfolio'][ticker]['quantity'] = new_qty
             data['portfolio'][ticker]['current_price'] = price
@@ -720,11 +1228,11 @@ def trade():
                 'date': datetime.now().isoformat()
             }
             
-            # Se quantidade = 0, remover ativo
+            # If quantity = 0, remove asset
             if new_qty <= 0:
                 del data['portfolio'][ticker]
             
-            # Atualizar saldo
+            # Update account balance
             data['account_balance'] += (operation_value - commission)
             flash(f'Venda de {quantity} {ticker} a ${price:.2f} registrada com sucesso!', 'success')
             
@@ -739,8 +1247,13 @@ def trade():
             })
         
         save_portfolio(data)
+        
+        # Clear cache for this asset
+        clear_asset_cache(ticker)
+        
         # Take a snapshot after trade
         add_portfolio_snapshot()
+        
         return redirect(url_for('index'))
     
     # Pre-fill form from query parameters
@@ -761,25 +1274,33 @@ def refresh_prices():
         flash('Nenhum ativo na carteira para atualizar.', 'warning')
         return redirect(url_for('index'))
     
-    # Obter todos os tickers
+    # Get all tickers
     tickers = list(portfolio.keys())
     
-    # Obter preços atuais
+    # Get current prices in batch
     try:
         prices = DataLoader.get_realtime_prices_bulk(tickers)
         
-        # Atualizar preços no portfólio
+        # Update prices in portfolio
         for ticker, price in prices.items():
             if ticker in portfolio:
                 old_price = portfolio[ticker].get('current_price', 0)
                 portfolio[ticker]['current_price'] = price
                 portfolio[ticker]['current_position'] = portfolio[ticker]['quantity'] * price
                 
-                # Calcular variação
+                # Calculate change
                 change = (price / old_price - 1) * 100 if old_price > 0 else 0
                 flash(f'{ticker}: ${old_price:.2f} → ${price:.2f} ({change:.2f}%)', 'info')
         
         save_portfolio(data)
+        
+        # Clear price cache
+        global _DATA_CACHE
+        for ticker in tickers:
+            cache_key = f"current_price:{ticker}"
+            if cache_key in _DATA_CACHE:
+                del _DATA_CACHE[cache_key]
+        
         flash('Preços atualizados com sucesso!', 'success')
     except Exception as e:
         app.logger.error(f"Erro ao atualizar preços: {e}")
@@ -790,6 +1311,7 @@ def refresh_prices():
 @app.route('/analyze')
 def analyze():
     try:
+        start_time = time.time()
         data = load_portfolio()
         portfolio = data.get('portfolio', {})
         watchlist = data.get('watchlist', {})
@@ -800,19 +1322,19 @@ def analyze():
             flash('Adicione ativos à sua carteira para análise.', 'warning')
             return redirect(url_for('index'))
         
-        # Configurações para análise
+        # Get analysis settings
         risk_profile = request.args.get('risk', 'medium')
         trailing_data = load_trailing_data()
         extended_hours = request.args.get('extended', 'false').lower() == 'true'
+        quick_mode = request.args.get('quick', 'true').lower() == 'true'
         
-        # Log steps to debug issues
-        app.logger.info(f"Starting analysis with risk profile: {risk_profile}")
+        app.logger.info(f"Starting analysis with risk profile: {risk_profile}, quick mode: {quick_mode}")
         
-        # Executar análises com tratamento de erros isolados
+        # Execute optimized analyses with error handling
         try:
-            portfolio_analysis = analyze_portfolio(
+            portfolio_analysis = batch_analyze_portfolio(
                 portfolio, account_balance, risk_profile,
-                trailing_data, extended_hours, goals
+                trailing_data, extended_hours, goals, quick_mode
             )
         except Exception as e:
             app.logger.error(f"Error in portfolio analysis: {e}")
@@ -820,9 +1342,9 @@ def analyze():
             portfolio_analysis = {"ativos": {}, "resumo": {}}
         
         try:
-            watchlist_analysis = analyze_watchlist(
+            watchlist_analysis = batch_analyze_watchlist(
                 watchlist, account_balance, risk_profile,
-                extended_hours, goals
+                extended_hours, goals, quick_mode
             )
         except Exception as e:
             app.logger.error(f"Error in watchlist analysis: {e}")
@@ -830,7 +1352,7 @@ def analyze():
             watchlist_analysis = {}
         
         try:
-            rebalance_plan = generate_rebalance_plan(
+            rebalance_plan = optimized_rebalance_plan(
                 portfolio_analysis, watchlist_analysis,
                 account_balance, DYNAMIC_PARAMS
             )
@@ -857,7 +1379,14 @@ def analyze():
             if field not in portfolio_analysis['resumo']:
                 portfolio_analysis['resumo'][field] = 0 if field != "market_sentiment" else {}
         
-        app.logger.info("Analysis completed successfully")
+        # Log execution time
+        end_time = time.time()
+        execution_time = end_time - start_time
+        app.logger.info(f"Analysis completed successfully in {execution_time:.2f} seconds")
+        
+        # Save cache periodically
+        if random.random() < 0.1:  # 10% chance to save cache on each request
+            save_cache()
         
         return render_template(
             'analysis.html',
@@ -865,11 +1394,13 @@ def analyze():
             watchlist_analysis=watchlist_analysis,
             rebalance_plan=rebalance_plan,
             risk_profile=risk_profile,
-            extended_hours=extended_hours
+            extended_hours=extended_hours,
+            quick_mode=quick_mode,
+            execution_time=execution_time
         )
     
     except Exception as e:
-        app.logger.error(f"Erro na análise: {e}")
+        app.logger.error(f"Error in analysis: {e}")
         app.logger.error(traceback.format_exc())
         flash(f'Erro ao realizar análise: {str(e)}', 'danger')
         return redirect(url_for('index'))
@@ -884,51 +1415,53 @@ def apply_rebalance():
             flash('Parâmetros inválidos para rebalanceamento.', 'danger')
             return redirect(url_for('analyze'))
         
-        # Here you would implement the logic to automatically apply
-        # the rebalancing transaction based on ID and action
-        data = load_portfolio()
-        portfolio = data.get('portfolio', {})
-        account_balance = data.get('account_balance', 0)
-        
-        # Create PortfolioExecutor instance
-        executor = PortfolioExecutor(portfolio, account_balance)
-        
-        # For now, just redirect to manual trade screen with params
+        # Redirect to manual trade screen with params
         return redirect(url_for('trade', ticker=transaction_id, trade_type=action))
     
     except Exception as e:
-        app.logger.error(f"Erro ao aplicar rebalanceamento: {e}")
+        app.logger.error(f"Error applying rebalance: {e}")
         flash(f'Erro ao aplicar rebalanceamento: {str(e)}', 'danger')
         return redirect(url_for('analyze'))
 
 @app.route('/execute_rebalance', methods=['POST'])
 def execute_rebalance():
     try:
+        # Use cached analysis if available for faster execution
+        if _LAST_PORTFOLIO_ANALYSIS and _LAST_WATCHLIST_ANALYSIS and _LAST_REBALANCE_PLAN:
+            portfolio_analysis = _LAST_PORTFOLIO_ANALYSIS
+            watchlist_analysis = _LAST_WATCHLIST_ANALYSIS
+            rebalance_plan = _LAST_REBALANCE_PLAN
+        else:
+            # Need to compute it
+            data = load_portfolio()
+            portfolio = data.get('portfolio', {})
+            watchlist = data.get('watchlist', {})
+            account_balance = data.get('account_balance', 0)
+            goals = data.get('goals', {})
+            
+            # Get risk profile
+            risk_profile = request.form.get('risk_profile', 'medium')
+            
+            # Generate analysis and rebalance plan
+            trailing_data = load_trailing_data()
+            portfolio_analysis = batch_analyze_portfolio(
+                portfolio, account_balance, risk_profile,
+                trailing_data, False, goals, True  # True for quick mode
+            )
+            
+            watchlist_analysis = batch_analyze_watchlist(
+                watchlist, account_balance, risk_profile,
+                False, goals, True
+            )
+            
+            rebalance_plan = optimized_rebalance_plan(
+                portfolio_analysis, watchlist_analysis,
+                account_balance, DYNAMIC_PARAMS
+            )
+        
+        # Create executor
         data = load_portfolio()
-        portfolio = data.get('portfolio', {})
-        account_balance = data.get('account_balance', 0)
-        
-        # Get risk profile
-        risk_profile = request.form.get('risk_profile', 'medium')
-        
-        # Generate analysis and rebalance plan
-        portfolio_analysis = analyze_portfolio(
-            portfolio, account_balance, risk_profile,
-            load_trailing_data(), False, data.get('goals', {})
-        )
-        
-        watchlist_analysis = analyze_watchlist(
-            data.get('watchlist', {}), account_balance, risk_profile,
-            False, data.get('goals', {})
-        )
-        
-        rebalance_plan = generate_rebalance_plan(
-            portfolio_analysis, watchlist_analysis,
-            account_balance, DYNAMIC_PARAMS
-        )
-        
-        # Create PortfolioExecutor instance
-        executor = PortfolioExecutor(portfolio, account_balance)
+        executor = PortfolioExecutor(data['portfolio'], data['account_balance'])
         
         # Execute rebalance plan
         result = executor.execute_rebalance_plan(rebalance_plan)
@@ -941,6 +1474,9 @@ def execute_rebalance():
         # Take a snapshot after rebalancing
         add_portfolio_snapshot()
         
+        # Clear cache entirely since portfolio has changed significantly
+        clear_cache()
+        
         # Flash results
         flash(f"Rebalanceamento executado: {len(result['sells_executed'])} vendas, {len(result['buys_executed'])} compras", 'success')
         
@@ -951,7 +1487,7 @@ def execute_rebalance():
         return redirect(url_for('index'))
     
     except Exception as e:
-        app.logger.error(f"Erro ao executar rebalanceamento: {e}")
+        app.logger.error(f"Error executing rebalance: {e}")
         app.logger.error(traceback.format_exc())
         flash(f'Erro ao executar rebalanceamento: {str(e)}', 'danger')
         return redirect(url_for('analyze'))
@@ -987,13 +1523,21 @@ def backtest():
                     # Get benchmark data for same period
                     benchmark_data = None
                     try:
-                        benchmark_df = DataLoader.get_asset_data(form.benchmark.data, days=form.days.data + 5)
-                        benchmark_data = benchmark_df['Close'].tolist()
+                        # Use cached data if available
+                        cache_key = f"benchmark_data:{form.benchmark.data}:{form.days.data}"
+                        benchmark_data = get_cached_item(cache_key)
                         
-                        # Normalize to match portfolio starting point
-                        if benchmark_data and portfolio_values:
-                            scale_factor = portfolio_values[0] / benchmark_data[0]
-                            benchmark_data = [price * scale_factor for price in benchmark_data]
+                        if benchmark_data is None:
+                            benchmark_df = DataLoader.get_asset_data(form.benchmark.data, days=form.days.data + 5)
+                            benchmark_data = benchmark_df['Close'].tolist()
+                            
+                            # Normalize to match portfolio starting point
+                            if benchmark_data and portfolio_values:
+                                scale_factor = portfolio_values[0] / benchmark_data[0]
+                                benchmark_data = [price * scale_factor for price in benchmark_data]
+                            
+                            # Cache the result
+                            set_cached_item(cache_key, benchmark_data)
                     except Exception as e:
                         app.logger.error(f"Error fetching benchmark data: {e}")
                     
@@ -1022,8 +1566,8 @@ def optimize():
             watchlist = data.get('watchlist', {})
             account_balance = data.get('account_balance', 0)
             
-            # Get market sentiment
-            market_sentiment = MarketAnalysis.get_market_sentiment()
+            # Get market sentiment (use cached)
+            market_sentiment = get_market_sentiment()
             
             # Create optimizer
             optimizer = PortfolioOptimizer(
@@ -1067,8 +1611,8 @@ def execute_optimization():
         watchlist = data.get('watchlist', {})
         account_balance = data.get('account_balance', 0)
         
-        # Get market sentiment
-        market_sentiment = MarketAnalysis.get_market_sentiment()
+        # Get market sentiment (use cached data)
+        market_sentiment = get_market_sentiment()
         
         # Create optimizer and run optimization
         optimizer = PortfolioOptimizer(
@@ -1096,6 +1640,9 @@ def execute_optimization():
         
         # Take a snapshot after optimization
         add_portfolio_snapshot()
+        
+        # Clear cache since portfolio has changed
+        clear_cache()
         
         # Flash results
         flash(f"Otimização executada: {len(execution_result['sells_executed'])} vendas, {len(execution_result['buys_executed'])} compras", 'success')
@@ -1181,8 +1728,21 @@ def indicators():
         days = form.days.data
         interval = form.interval.data
         
-        # Check if ticker is valid
-        if not DataLoader.check_ticker_valid(ticker):
+        # Check cache first
+        cache_key = f"indicator_analysis:{ticker}:{days}:{interval}"
+        cached_result = get_cached_item(cache_key)
+        if cached_result:
+            return render_template('indicators.html', form=form, 
+                                results=cached_result.get('results'), 
+                                charts=cached_result.get('charts', {}))
+        
+        # Check if ticker is valid (with caching)
+        ticker_valid = get_cached_item(f"ticker_valid:{ticker}")
+        if ticker_valid is None:
+            ticker_valid = DataLoader.check_ticker_valid(ticker)
+            set_cached_item(f"ticker_valid:{ticker}", ticker_valid)
+        
+        if not ticker_valid:
             flash(f'Ticker {ticker} inválido ou não encontrado!', 'danger')
             return render_template('indicators.html', form=form)
         
@@ -1273,8 +1833,14 @@ def indicators():
                 charts['macd'] = base64.b64encode(buf.getvalue()).decode('utf-8')
                 plt.close(fig)
             
-            # Get ML forecast
-            ml_forecast = trading_system.ml_price_forecast(df)
+            # Get ML forecast (optimized)
+            cache_key_ml = f"ml_forecast:{ticker}:{days}:{interval}"
+            ml_forecast = get_cached_item(cache_key_ml)
+            
+            if ml_forecast is None:
+                ml_forecast = trading_system.ml_price_forecast(df)
+                if ml_forecast:
+                    set_cached_item(cache_key_ml, ml_forecast)
             
             analysis_results = {
                 'ticker': ticker,
@@ -1293,6 +1859,9 @@ def indicators():
                 'ml_forecast': ml_forecast
             }
             
+            # Cache the result
+            set_cached_item(cache_key, {'results': analysis_results, 'charts': charts})
+            
         except Exception as e:
             app.logger.error(f"Error analyzing indicators: {e}")
             app.logger.error(traceback.format_exc())
@@ -1308,6 +1877,13 @@ def fundamentals():
     if request.method == 'POST' and form.validate_on_submit():
         ticker = form.ticker.data.upper()
         
+        # Check cache first
+        cache_key = f"fundamental_analysis:{ticker}"
+        cached_result = get_cached_item(cache_key)
+        
+        if cached_result:
+            return render_template('fundamentals.html', form=form, results=cached_result)
+        
         try:
             # Get fundamental analysis
             fundamental_results = FundamentalAnalysis.fundamental_score(ticker)
@@ -1317,6 +1893,9 @@ def fundamentals():
                 return render_template('fundamentals.html', form=form)
             
             results = fundamental_results
+            
+            # Cache result
+            set_cached_item(cache_key, results)
             
         except Exception as e:
             app.logger.error(f"Error in fundamental analysis: {e}")
@@ -1333,6 +1912,13 @@ def news():
     if request.method == 'POST' and form.validate_on_submit():
         ticker = form.ticker.data.upper()
         
+        # Check cache first
+        cache_key = f"news_analysis:{ticker}"
+        cached_result = get_cached_item(cache_key, expiry=1800)  # 30 minutes expiry for news
+        
+        if cached_result:
+            return render_template('news.html', form=form, results=cached_result)
+        
         try:
             # Get news sentiment analysis
             news_results = QualitativeAnalysis.analyze_news_sentiment(ticker)
@@ -1344,13 +1930,21 @@ def news():
             # Get related tickers if API key available
             related_tickers = []
             if app.config['POLYGON_API_KEY']:
-                related_tickers = APIClient.get_polygon_related(ticker)
+                related_key = f"related_tickers:{ticker}"
+                related_tickers = get_cached_item(related_key)
+                
+                if related_tickers is None:
+                    related_tickers = APIClient.get_polygon_related(ticker)
+                    set_cached_item(related_key, related_tickers)
             
             results = {
                 'ticker': ticker,
                 'sentiment': news_results,
                 'related_tickers': related_tickers
             }
+            
+            # Cache result
+            set_cached_item(cache_key, results)
             
         except Exception as e:
             app.logger.error(f"Error in news analysis: {e}")
@@ -1362,7 +1956,9 @@ def news():
 @app.route('/market_sentiment')
 def market_sentiment():
     try:
-        sentiment = MarketAnalysis.get_market_sentiment()
+        # Force refresh if requested
+        force_refresh = request.args.get('refresh', 'false').lower() == 'true'
+        sentiment = get_market_sentiment(force_refresh=force_refresh)
         return render_template('market_sentiment.html', sentiment=sentiment)
     except Exception as e:
         app.logger.error(f"Error getting market sentiment: {e}")
@@ -1394,6 +1990,10 @@ def parameters():
             params_file = os.path.join(app.config['DATA_FOLDER'], 'trading_params.json')
             with open(params_file, 'w') as f:
                 json.dump(DYNAMIC_PARAMS, f, indent=2)
+            
+            # Clear all cache since parameters affect analysis
+            clear_cache()
+            
             flash('Parâmetros de trading atualizados com sucesso!', 'success')
         except Exception as e:
             app.logger.error(f"Error saving trading parameters: {e}")
@@ -1471,6 +2071,10 @@ def upload_json():
             try:
                 data = json.load(file)
                 save_portfolio(data)
+                
+                # Clear all cache since portfolio has changed
+                clear_cache()
+                
                 flash('Portfólio carregado com sucesso!', 'success')
                 return redirect(url_for('index'))
             except Exception as e:
@@ -1487,7 +2091,7 @@ def api_portfolio():
 @app.route('/api/market_sentiment')
 def api_market_sentiment():
     try:
-        sentiment = MarketAnalysis.get_market_sentiment()
+        sentiment = get_market_sentiment()
         return jsonify(sentiment)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -1499,9 +2103,10 @@ def api_analyze():
         portfolio = data.get('portfolio', {})
         account_balance = data.get('account_balance', 0)
         risk_profile = data.get('risk_profile', 'medium')
+        quick_mode = data.get('quick_mode', True)
         
-        portfolio_analysis = analyze_portfolio(
-            portfolio, account_balance, risk_profile, {}, False, {}
+        portfolio_analysis = batch_analyze_portfolio(
+            portfolio, account_balance, risk_profile, {}, False, {}, quick_mode
         )
         
         return jsonify(portfolio_analysis)
@@ -1514,6 +2119,13 @@ def api_ticker_data(ticker):
         days = int(request.args.get('days', 60))
         interval = request.args.get('interval', '1d')
         
+        # Check cache first
+        cache_key = f"ticker_data:{ticker}:{days}:{interval}"
+        cached_data = get_cached_item(cache_key)
+        
+        if cached_data:
+            return jsonify(cached_data)
+        
         df = DataLoader.get_asset_data(ticker, days, interval)
         
         if df.empty:
@@ -1525,7 +2137,37 @@ def api_ticker_data(ticker):
             df_json['Date'] = df_json['Date'].dt.strftime('%Y-%m-%d')
         
         data = df_json.to_dict(orient='records')
+        
+        # Cache the result
+        set_cached_item(cache_key, data)
+        
         return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/clear_cache')
+def clear_cache_route():
+    """Admin route to clear all caches"""
+    try:
+        clear_cache()
+        flash('Cache cleared successfully', 'success')
+    except Exception as e:
+        flash(f'Error clearing cache: {str(e)}', 'danger')
+    
+    return redirect(url_for('diagnostics'))
+
+# Cache API status
+@app.route('/api/cache/status')
+def cache_status():
+    """API to check cache status"""
+    try:
+        return jsonify({
+            "cache_size": len(_ANALYSIS_CACHE),
+            "memory_usage_mb": sys.getsizeof(json.dumps(_ANALYSIS_CACHE)) / (1024 * 1024),
+            "items_count": len(_ANALYSIS_CACHE),
+            "oldest_item_age": min(_ANALYSIS_TIMESTAMPS.values()) if _ANALYSIS_TIMESTAMPS else None,
+            "newest_item_age": max(_ANALYSIS_TIMESTAMPS.values()) if _ANALYSIS_TIMESTAMPS else None,
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -1546,10 +2188,33 @@ def init_app():
     # Set Polygon API key if available
     if app.config['POLYGON_API_KEY']:
         trading_system.POLYGON_API_KEY = app.config['POLYGON_API_KEY']
+    
+    # Load cache from disk
+    load_cache()
+    
+    # Configure thread pool
+    global _THREAD_POOL
+    _THREAD_POOL = ThreadPoolExecutor(max_workers=10)
+    
+    # Add periodic task to save cache (running in separate thread)
+    def periodic_cache_save():
+        while True:
+            time.sleep(300)  # Save cache every 5 minutes
+            save_cache()
+    
+    import threading
+    cache_saver = threading.Thread(target=periodic_cache_save, daemon=True)
+    cache_saver.start()
+
+# Shutdown event to save cache
+@app.teardown_appcontext
+def save_cache_on_shutdown(exception=None):
+    save_cache()
+    _THREAD_POOL.shutdown(wait=False)
 
 # Initialize
 init_app()
 
-# Iniciar o servidor se executado diretamente
+# Start the server if executed directly
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
