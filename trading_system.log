@@ -1,170 +1,177 @@
-2025-03-11 09:17:32,937 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
-2025-03-11 09:17:32,968 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+2025-03-11 09:25:51,214 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 09:25:51,241 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:5001
  * Running on http://192.168.15.135:5001
-2025-03-11 09:17:32,968 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
-2025-03-11 09:17:32,969 - werkzeug - INFO -  * Restarting with stat
-2025-03-11 09:17:33,832 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
-2025-03-11 09:17:33,852 - werkzeug - WARNING -  * Debugger is active!
-2025-03-11 09:17:33,860 - werkzeug - INFO -  * Debugger PIN: 817-908-197
-2025-03-11 09:17:37,151 - trading_system - INFO - Extended hours mode active for SPY (current market: extended)
-2025-03-11 09:17:37,154 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SPY, falling back to default behavior
-2025-03-11 09:17:38,006 - trading_system - INFO - Extended hours mode active for QQQ (current market: extended)
-2025-03-11 09:17:38,006 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for QQQ, falling back to default behavior
-2025-03-11 09:17:38,583 - trading_system - INFO - Extended hours mode active for TLT (current market: extended)
-2025-03-11 09:17:38,583 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for TLT, falling back to default behavior
-2025-03-11 09:17:38,881 - trading_system - INFO - Extended hours mode active for GLD (current market: extended)
-2025-03-11 09:17:38,881 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for GLD, falling back to default behavior
-2025-03-11 09:17:39,149 - trading_system - INFO - Extended hours mode active for ^VIX (current market: extended)
-2025-03-11 09:17:39,151 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for ^VIX, falling back to default behavior
-2025-03-11 09:17:39,410 - trading_system - INFO - Extended hours mode active for EEM (current market: extended)
-2025-03-11 09:17:39,411 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for EEM, falling back to default behavior
-2025-03-11 09:17:39,742 - trading_system - INFO - Extended hours mode active for USO (current market: extended)
-2025-03-11 09:17:39,742 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for USO, falling back to default behavior
-2025-03-11 09:17:39,999 - trading_system - INFO - Extended hours mode active for BTC-USD (current market: extended)
-2025-03-11 09:17:39,999 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for BTC-USD, falling back to default behavior
-2025-03-11 09:17:40,264 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 8.3)
-2025-03-11 09:17:44,440 - trading_system - INFO - Extended hours mode active for IAK (current market: extended)
-2025-03-11 09:17:44,442 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for IAK, falling back to default behavior
-2025-03-11 09:17:44,808 - trading_system - ERROR - Erro ao analisar IAK: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:44,808 - trading_system - INFO - Extended hours mode active for BERZ (current market: extended)
-2025-03-11 09:17:44,808 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for BERZ, falling back to default behavior
-2025-03-11 09:17:45,433 - trading_system - ERROR - Erro ao analisar BERZ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:45,433 - trading_system - INFO - Extended hours mode active for STVN (current market: extended)
-2025-03-11 09:17:45,434 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for STVN, falling back to default behavior
-2025-03-11 09:17:45,770 - trading_system - ERROR - Erro ao analisar STVN: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:45,770 - trading_system - INFO - Extended hours mode active for EPI (current market: extended)
-2025-03-11 09:17:45,771 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for EPI, falling back to default behavior
-2025-03-11 09:17:46,096 - trading_system - ERROR - Erro ao analisar EPI: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:46,096 - trading_system - INFO - Extended hours mode active for FILL (current market: extended)
-2025-03-11 09:17:46,096 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for FILL, falling back to default behavior
-2025-03-11 09:17:46,422 - trading_system - ERROR - Erro ao analisar FILL: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:46,423 - trading_system - INFO - Extended hours mode active for DGRS (current market: extended)
-2025-03-11 09:17:46,423 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for DGRS, falling back to default behavior
-2025-03-11 09:17:46,779 - trading_system - ERROR - Erro ao analisar DGRS: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:46,779 - trading_system - INFO - Extended hours mode active for GSPY (current market: extended)
-2025-03-11 09:17:46,779 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for GSPY, falling back to default behavior
-2025-03-11 09:17:47,122 - trading_system - ERROR - Erro ao analisar GSPY: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:47,123 - trading_system - INFO - Extended hours mode active for VAMO (current market: extended)
-2025-03-11 09:17:47,123 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for VAMO, falling back to default behavior
-2025-03-11 09:17:47,454 - trading_system - ERROR - Erro ao analisar VAMO: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:47,454 - trading_system - INFO - Extended hours mode active for BJ (current market: extended)
-2025-03-11 09:17:47,454 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for BJ, falling back to default behavior
-2025-03-11 09:17:47,765 - trading_system - ERROR - Erro ao analisar BJ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:47,765 - trading_system - INFO - Extended hours mode active for ITM (current market: extended)
-2025-03-11 09:17:47,765 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for ITM, falling back to default behavior
-2025-03-11 09:17:48,103 - trading_system - ERROR - Erro ao analisar ITM: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:48,103 - trading_system - INFO - Extended hours mode active for XHB (current market: extended)
-2025-03-11 09:17:48,104 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for XHB, falling back to default behavior
-2025-03-11 09:17:48,456 - trading_system - ERROR - Erro ao analisar XHB: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:48,456 - trading_system - INFO - Extended hours mode active for ITB (current market: extended)
-2025-03-11 09:17:48,456 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for ITB, falling back to default behavior
-2025-03-11 09:17:48,815 - trading_system - ERROR - Erro ao analisar ITB: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:48,815 - trading_system - INFO - Extended hours mode active for SQQQ (current market: extended)
-2025-03-11 09:17:48,816 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SQQQ, falling back to default behavior
-2025-03-11 09:17:49,139 - trading_system - ERROR - Erro ao analisar SQQQ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:51,345 - trading_system - ERROR - Erro na análise de watchlist para ITB: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:51,393 - trading_system - ERROR - Erro na análise de watchlist para SQQQ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:51,393 - trading_system - INFO - Extended hours mode active for TSLZ (current market: extended)
-2025-03-11 09:17:51,394 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for TSLZ, falling back to default behavior
-2025-03-11 09:17:51,709 - trading_system - ERROR - Erro na análise de watchlist para TSLZ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:51,709 - trading_system - INFO - Extended hours mode active for NVDQ (current market: extended)
-2025-03-11 09:17:51,709 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for NVDQ, falling back to default behavior
-2025-03-11 09:17:52,029 - trading_system - ERROR - Erro na análise de watchlist para NVDQ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:52,029 - trading_system - INFO - Extended hours mode active for FAZ (current market: extended)
-2025-03-11 09:17:52,030 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for FAZ, falling back to default behavior
-2025-03-11 09:17:52,357 - trading_system - ERROR - Erro na análise de watchlist para FAZ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:52,357 - trading_system - INFO - Extended hours mode active for MSTZ (current market: extended)
-2025-03-11 09:17:52,357 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for MSTZ, falling back to default behavior
-2025-03-11 09:17:52,675 - trading_system - ERROR - Erro na análise de watchlist para MSTZ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:52,675 - trading_system - INFO - Extended hours mode active for SPTS (current market: extended)
-2025-03-11 09:17:52,676 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SPTS, falling back to default behavior
-2025-03-11 09:17:53,029 - trading_system - ERROR - Erro na análise de watchlist para SPTS: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:53,029 - trading_system - INFO - Extended hours mode active for SPTI (current market: extended)
-2025-03-11 09:17:53,029 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SPTI, falling back to default behavior
-2025-03-11 09:17:53,373 - trading_system - ERROR - Erro na análise de watchlist para SPTI: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:53,373 - trading_system - INFO - Extended hours mode active for STIP (current market: extended)
-2025-03-11 09:17:53,373 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for STIP, falling back to default behavior
-2025-03-11 09:17:53,730 - trading_system - ERROR - Erro na análise de watchlist para STIP: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:17:53,750 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:17:53] "GET /analyze?risk=medium&extended=true HTTP/1.1" 200 -
-2025-03-11 09:17:53,777 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:17:53] "GET /static/js/script.js HTTP/1.1" 200 -
-2025-03-11 09:17:53,777 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:17:53] "GET /static/css/custom.css HTTP/1.1" 200 -
-2025-03-11 09:17:53,877 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:17:53] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-2025-03-11 09:18:09,309 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
-2025-03-11 09:18:09,320 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:09] "GET / HTTP/1.1" 200 -
-2025-03-11 09:18:09,364 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:09] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
-2025-03-11 09:18:09,380 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:09] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
-2025-03-11 09:18:11,985 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
-2025-03-11 09:18:11,986 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:11] "GET / HTTP/1.1" 200 -
-2025-03-11 09:18:12,011 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:12] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
-2025-03-11 09:18:12,011 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:12] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
-2025-03-11 09:18:13,176 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:13] "GET /portfolio HTTP/1.1" 200 -
-2025-03-11 09:18:13,225 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:13] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
-2025-03-11 09:18:13,227 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:13] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
-2025-03-11 09:18:14,435 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 8.3)
-2025-03-11 09:18:14,487 - trading_system - INFO - Extended hours mode active for IAK (current market: extended)
-2025-03-11 09:18:14,488 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for IAK, falling back to default behavior
-2025-03-11 09:18:14,541 - trading_system - ERROR - Erro ao analisar IAK: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:14,541 - trading_system - INFO - Extended hours mode active for BERZ (current market: extended)
-2025-03-11 09:18:14,541 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for BERZ, falling back to default behavior
-2025-03-11 09:18:14,593 - trading_system - ERROR - Erro ao analisar BERZ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:14,594 - trading_system - INFO - Extended hours mode active for STVN (current market: extended)
-2025-03-11 09:18:14,594 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for STVN, falling back to default behavior
-2025-03-11 09:18:14,646 - trading_system - ERROR - Erro ao analisar STVN: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:14,646 - trading_system - INFO - Extended hours mode active for EPI (current market: extended)
-2025-03-11 09:18:14,646 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for EPI, falling back to default behavior
-2025-03-11 09:18:14,700 - trading_system - ERROR - Erro ao analisar EPI: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:14,700 - trading_system - INFO - Extended hours mode active for FILL (current market: extended)
-2025-03-11 09:18:14,700 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for FILL, falling back to default behavior
-2025-03-11 09:18:14,754 - trading_system - ERROR - Erro ao analisar FILL: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:14,754 - trading_system - INFO - Extended hours mode active for DGRS (current market: extended)
-2025-03-11 09:18:14,755 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for DGRS, falling back to default behavior
-2025-03-11 09:18:14,813 - trading_system - ERROR - Erro ao analisar DGRS: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:14,813 - trading_system - INFO - Extended hours mode active for GSPY (current market: extended)
-2025-03-11 09:18:14,813 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for GSPY, falling back to default behavior
-2025-03-11 09:18:14,873 - trading_system - ERROR - Erro ao analisar GSPY: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:14,874 - trading_system - INFO - Extended hours mode active for VAMO (current market: extended)
-2025-03-11 09:18:14,874 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for VAMO, falling back to default behavior
-2025-03-11 09:18:14,929 - trading_system - ERROR - Erro ao analisar VAMO: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:14,929 - trading_system - INFO - Extended hours mode active for BJ (current market: extended)
-2025-03-11 09:18:14,929 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for BJ, falling back to default behavior
-2025-03-11 09:18:14,983 - trading_system - ERROR - Erro ao analisar BJ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:14,983 - trading_system - INFO - Extended hours mode active for ITM (current market: extended)
-2025-03-11 09:18:14,983 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for ITM, falling back to default behavior
-2025-03-11 09:18:15,036 - trading_system - ERROR - Erro ao analisar ITM: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,036 - trading_system - INFO - Extended hours mode active for XHB (current market: extended)
-2025-03-11 09:18:15,036 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for XHB, falling back to default behavior
-2025-03-11 09:18:15,090 - trading_system - ERROR - Erro ao analisar XHB: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,090 - trading_system - INFO - Extended hours mode active for ITB (current market: extended)
-2025-03-11 09:18:15,090 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for ITB, falling back to default behavior
-2025-03-11 09:18:15,143 - trading_system - ERROR - Erro ao analisar ITB: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,143 - trading_system - INFO - Extended hours mode active for SQQQ (current market: extended)
-2025-03-11 09:18:15,144 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SQQQ, falling back to default behavior
-2025-03-11 09:18:15,196 - trading_system - ERROR - Erro ao analisar SQQQ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,294 - trading_system - ERROR - Erro na análise de watchlist para ITB: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,342 - trading_system - ERROR - Erro na análise de watchlist para SQQQ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,342 - trading_system - INFO - Extended hours mode active for TSLZ (current market: extended)
-2025-03-11 09:18:15,342 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for TSLZ, falling back to default behavior
-2025-03-11 09:18:15,397 - trading_system - ERROR - Erro na análise de watchlist para TSLZ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,397 - trading_system - INFO - Extended hours mode active for NVDQ (current market: extended)
-2025-03-11 09:18:15,398 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for NVDQ, falling back to default behavior
-2025-03-11 09:18:15,450 - trading_system - ERROR - Erro na análise de watchlist para NVDQ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,450 - trading_system - INFO - Extended hours mode active for FAZ (current market: extended)
-2025-03-11 09:18:15,451 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for FAZ, falling back to default behavior
-2025-03-11 09:18:15,504 - trading_system - ERROR - Erro na análise de watchlist para FAZ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,504 - trading_system - INFO - Extended hours mode active for MSTZ (current market: extended)
-2025-03-11 09:18:15,504 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for MSTZ, falling back to default behavior
-2025-03-11 09:18:15,557 - trading_system - ERROR - Erro na análise de watchlist para MSTZ: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,557 - trading_system - INFO - Extended hours mode active for SPTS (current market: extended)
-2025-03-11 09:18:15,557 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SPTS, falling back to default behavior
-2025-03-11 09:18:15,610 - trading_system - ERROR - Erro na análise de watchlist para SPTS: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,610 - trading_system - INFO - Extended hours mode active for SPTI (current market: extended)
-2025-03-11 09:18:15,610 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SPTI, falling back to default behavior
-2025-03-11 09:18:15,663 - trading_system - ERROR - Erro na análise de watchlist para SPTI: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,663 - trading_system - INFO - Extended hours mode active for STIP (current market: extended)
-2025-03-11 09:18:15,663 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for STIP, falling back to default behavior
-2025-03-11 09:18:15,716 - trading_system - ERROR - Erro na análise de watchlist para STIP: type object 'QualitativeAnalysis' has no attribute 'qualitative_score'
-2025-03-11 09:18:15,717 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:15] "GET /analyze?risk=medium HTTP/1.1" 200 -
-2025-03-11 09:18:15,756 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:15] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
-2025-03-11 09:18:15,756 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:18:15] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:25:51,242 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-11 09:25:51,242 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 09:25:52,112 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 09:25:52,129 - werkzeug - WARNING -  * Debugger is active!
+2025-03-11 09:25:52,135 - werkzeug - INFO -  * Debugger PIN: 817-908-197
+2025-03-11 09:25:53,578 - trading_system - INFO - Extended hours mode active for SPY (current market: extended)
+2025-03-11 09:25:53,582 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SPY, falling back to default behavior
+2025-03-11 09:25:54,676 - trading_system - INFO - Extended hours mode active for QQQ (current market: extended)
+2025-03-11 09:25:54,677 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for QQQ, falling back to default behavior
+2025-03-11 09:25:54,958 - trading_system - INFO - Extended hours mode active for TLT (current market: extended)
+2025-03-11 09:25:54,959 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for TLT, falling back to default behavior
+2025-03-11 09:25:55,266 - trading_system - INFO - Extended hours mode active for GLD (current market: extended)
+2025-03-11 09:25:55,266 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for GLD, falling back to default behavior
+2025-03-11 09:25:55,538 - trading_system - INFO - Extended hours mode active for ^VIX (current market: extended)
+2025-03-11 09:25:55,540 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for ^VIX, falling back to default behavior
+2025-03-11 09:25:55,804 - trading_system - INFO - Extended hours mode active for EEM (current market: extended)
+2025-03-11 09:25:55,805 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for EEM, falling back to default behavior
+2025-03-11 09:25:56,089 - trading_system - INFO - Extended hours mode active for USO (current market: extended)
+2025-03-11 09:25:56,090 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for USO, falling back to default behavior
+2025-03-11 09:25:56,356 - trading_system - INFO - Extended hours mode active for BTC-USD (current market: extended)
+2025-03-11 09:25:56,357 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for BTC-USD, falling back to default behavior
+2025-03-11 09:25:56,617 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 7.8)
+2025-03-11 09:25:59,992 - trading_system - INFO - Extended hours mode active for IAK (current market: extended)
+2025-03-11 09:25:59,992 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for IAK, falling back to default behavior
+2025-03-11 09:26:05,046 - trading_system - INFO - Extended hours mode active for BERZ (current market: extended)
+2025-03-11 09:26:05,047 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for BERZ, falling back to default behavior
+2025-03-11 09:26:05,643 - trading_system - INFO - No news found via yfinance for BERZ.
+2025-03-11 09:26:08,402 - trading_system - INFO - Extended hours mode active for STVN (current market: extended)
+2025-03-11 09:26:08,403 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for STVN, falling back to default behavior
+2025-03-11 09:26:12,711 - trading_system - INFO - Atualizando trailing stop de STVN: novo topo $22.60, stop ajustado para $21.92
+2025-03-11 09:26:12,711 - trading_system - INFO - Extended hours mode active for EPI (current market: extended)
+2025-03-11 09:26:12,712 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for EPI, falling back to default behavior
+2025-03-11 09:26:16,688 - trading_system - INFO - Extended hours mode active for FILL (current market: extended)
+2025-03-11 09:26:16,689 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for FILL, falling back to default behavior
+2025-03-11 09:26:17,327 - trading_system - INFO - No news found via yfinance for FILL.
+2025-03-11 09:26:20,532 - trading_system - INFO - Extended hours mode active for DGRS (current market: extended)
+2025-03-11 09:26:20,534 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for DGRS, falling back to default behavior
+2025-03-11 09:26:21,165 - trading_system - INFO - No news found via yfinance for DGRS.
+2025-03-11 09:26:24,099 - trading_system - INFO - Extended hours mode active for GSPY (current market: extended)
+2025-03-11 09:26:24,100 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for GSPY, falling back to default behavior
+2025-03-11 09:26:24,700 - trading_system - INFO - No news found via yfinance for GSPY.
+2025-03-11 09:26:28,049 - trading_system - INFO - Extended hours mode active for VAMO (current market: extended)
+2025-03-11 09:26:28,049 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for VAMO, falling back to default behavior
+2025-03-11 09:26:28,670 - trading_system - INFO - No news found via yfinance for VAMO.
+2025-03-11 09:26:31,655 - trading_system - INFO - Extended hours mode active for BJ (current market: extended)
+2025-03-11 09:26:31,655 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for BJ, falling back to default behavior
+2025-03-11 09:26:35,726 - trading_system - INFO - Extended hours mode active for ITM (current market: extended)
+2025-03-11 09:26:35,727 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for ITM, falling back to default behavior
+2025-03-11 09:26:36,429 - trading_system - INFO - No news found via yfinance for ITM.
+2025-03-11 09:26:40,206 - trading_system - INFO - Atualizando trailing stop de ITM: novo topo $46.27, stop ajustado para $44.88
+2025-03-11 09:26:40,206 - trading_system - INFO - Extended hours mode active for XHB (current market: extended)
+2025-03-11 09:26:40,206 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for XHB, falling back to default behavior
+2025-03-11 09:26:44,572 - trading_system - INFO - Extended hours mode active for ITB (current market: extended)
+2025-03-11 09:26:44,573 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for ITB, falling back to default behavior
+2025-03-11 09:26:49,034 - trading_system - INFO - Extended hours mode active for SQQQ (current market: extended)
+2025-03-11 09:26:49,034 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SQQQ, falling back to default behavior
+2025-03-11 09:26:53,028 - trading_system - INFO - Atualizando trailing stop de SQQQ: novo topo $38.37, stop ajustado para $37.22
+2025-03-11 09:26:58,209 - trading_system - INFO - Extended hours mode active for TSLZ (current market: extended)
+2025-03-11 09:26:58,211 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for TSLZ, falling back to default behavior
+2025-03-11 09:26:58,892 - trading_system - INFO - No news found via yfinance for TSLZ.
+2025-03-11 09:27:01,833 - trading_system - INFO - Extended hours mode active for NVDQ (current market: extended)
+2025-03-11 09:27:01,834 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for NVDQ, falling back to default behavior
+2025-03-11 09:27:02,511 - trading_system - INFO - No news found via yfinance for NVDQ.
+2025-03-11 09:27:05,078 - trading_system - INFO - Extended hours mode active for FAZ (current market: extended)
+2025-03-11 09:27:05,080 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for FAZ, falling back to default behavior
+2025-03-11 09:27:05,783 - trading_system - INFO - No news found via yfinance for FAZ.
+2025-03-11 09:27:09,132 - trading_system - INFO - Extended hours mode active for MSTZ (current market: extended)
+2025-03-11 09:27:09,132 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for MSTZ, falling back to default behavior
+2025-03-11 09:27:10,020 - trading_system - INFO - No news found via yfinance for MSTZ.
+2025-03-11 09:27:12,426 - trading_system - INFO - Extended hours mode active for SPTS (current market: extended)
+2025-03-11 09:27:12,426 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SPTS, falling back to default behavior
+2025-03-11 09:27:16,411 - trading_system - INFO - Extended hours mode active for SPTI (current market: extended)
+2025-03-11 09:27:16,411 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SPTI, falling back to default behavior
+2025-03-11 09:27:17,051 - trading_system - INFO - No news found via yfinance for SPTI.
+2025-03-11 09:27:21,162 - trading_system - INFO - Extended hours mode active for STIP (current market: extended)
+2025-03-11 09:27:21,163 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for STIP, falling back to default behavior
+2025-03-11 09:27:25,356 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:27:25] "GET /analyze?risk=medium HTTP/1.1" 200 -
+2025-03-11 09:27:25,407 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:27:25] "GET /static/css/custom.css HTTP/1.1" 200 -
+2025-03-11 09:27:25,408 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:27:25] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-03-11 09:27:25,597 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:27:25] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-03-11 09:27:34,227 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 7.8)
+2025-03-11 09:27:36,203 - trading_system - INFO - No news found via yfinance for BERZ.
+2025-03-11 09:27:39,902 - trading_system - INFO - No news found via yfinance for FILL.
+2025-03-11 09:27:41,185 - trading_system - INFO - No news found via yfinance for DGRS.
+2025-03-11 09:27:42,511 - trading_system - INFO - No news found via yfinance for GSPY.
+2025-03-11 09:27:43,686 - trading_system - INFO - No news found via yfinance for VAMO.
+2025-03-11 09:27:46,535 - trading_system - INFO - No news found via yfinance for ITM.
+2025-03-11 09:27:55,760 - trading_system - INFO - No news found via yfinance for TSLZ.
+2025-03-11 09:27:57,194 - trading_system - INFO - No news found via yfinance for NVDQ.
+2025-03-11 09:27:58,266 - trading_system - INFO - No news found via yfinance for FAZ.
+2025-03-11 09:27:59,699 - trading_system - INFO - No news found via yfinance for MSTZ.
+2025-03-11 09:28:01,995 - trading_system - INFO - No news found via yfinance for SPTI.
+2025-03-11 09:28:04,676 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:04] "GET /analyze?risk=ultra HTTP/1.1" 200 -
+2025-03-11 09:28:04,724 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:04] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:28:04,724 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:04] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:28:31,148 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:31] "GET /market_sentiment HTTP/1.1" 200 -
+2025-03-11 09:28:31,197 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:31] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:28:31,214 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:31] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:28:42,012 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 09:28:42,024 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:42] "GET / HTTP/1.1" 200 -
+2025-03-11 09:28:42,061 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:42] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:28:42,074 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:42] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:28:48,441 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:48] "GET /optimize HTTP/1.1" 200 -
+2025-03-11 09:28:48,488 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:48] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:28:48,505 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:28:48] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:02,046 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:02] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:02,068 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:02] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:02,069 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:02] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:04,306 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:04] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:04,336 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:04] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:04,336 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:04] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:05,023 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:05,045 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:05,046 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:05,322 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:05,341 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:05,342 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:05,484 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:05,497 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:05,498 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:05,669 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:05,690 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:05,691 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:05,818 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:05,831 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:05,831 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:05,986 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:05] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:06,006 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:06] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:06,007 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:06] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:12,696 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:12] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:12,717 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:12] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:12,717 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:12] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:15,058 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:15,086 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:15,089 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:15,233 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:15,245 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:15,246 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:15,417 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:15,437 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:15,438 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:15,600 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "POST /optimize HTTP/1.1" 200 -
+2025-03-11 09:29:15,613 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:15,614 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:15] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:18,598 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:18] "[32mGET /refresh_prices HTTP/1.1[0m" 302 -
+2025-03-11 09:29:18,626 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 09:29:18,626 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:18] "GET / HTTP/1.1" 200 -
+2025-03-11 09:29:18,712 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:18] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:18,737 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:18] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:29:20,739 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:20] "[32mGET /refresh_prices HTTP/1.1[0m" 302 -
+2025-03-11 09:29:20,768 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 09:29:20,769 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:20] "GET / HTTP/1.1" 200 -
+2025-03-11 09:29:20,828 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:20] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:29:20,829 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:29:20] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:30:04,573 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:04] "GET /indicators?ticker=IAK HTTP/1.1" 200 -
+2025-03-11 09:30:04,599 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:04] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:30:04,611 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:04] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:30:10,729 - trading_system - INFO - Extended hours mode active for IAK (current market: extended)
+2025-03-11 09:30:10,730 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for IAK, falling back to default behavior
+2025-03-11 09:30:11,111 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:11] "POST /indicators HTTP/1.1" 200 -
+2025-03-11 09:30:11,170 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:11] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:30:11,170 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:11] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:30:23,447 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:23] "GET /account HTTP/1.1" 200 -
+2025-03-11 09:30:23,468 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:23] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:30:23,476 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:23] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:30:25,192 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:25] "GET /trade HTTP/1.1" 200 -
+2025-03-11 09:30:25,238 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:25] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:30:25,256 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:25] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:30:26,908 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:26] "[35m[1mGET /backtest HTTP/1.1[0m" 500 -
+2025-03-11 09:30:26,948 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:26] "[36mGET /backtest?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-03-11 09:30:26,950 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:26] "[36mGET /backtest?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-03-11 09:30:27,001 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:30:27] "GET /backtest?__debugger__=yes&cmd=resource&f=console.png&s=OMhMXDDU6G5mQjvbYnUG HTTP/1.1" 200 -
