@@ -163,6 +163,9 @@ except ImportError:
 # =============================================================================
 # 1. DataLoader – Obter dados via yfinance (ou Polygon se necessário)
 # =============================================================================
+# =============================================================================
+# 1. DataLoader – Obter dados via yfinance (ou Polygon se necessário)
+# =============================================================================
 class DataLoader:
     @staticmethod
     @timed_cache(seconds=300)  # 5-minute cache
@@ -192,6 +195,54 @@ class DataLoader:
         except Exception as e:
             logger.error(f"Error loading data for {ticker}: {e}")
             return pd.DataFrame()
+    
+    @staticmethod
+    def is_market_hours() -> tuple:
+        """
+        Determines if the current time is during regular market hours, pre-market, or post-market.
+        Returns a tuple of (is_regular_hours, is_extended_hours)
+        
+        Regular US market hours: 9:30 AM - 4:00 PM Eastern Time, Monday to Friday
+        Pre-market hours: 4:00 AM - 9:30 AM Eastern Time
+        Post-market hours: 4:00 PM - 8:00 PM Eastern Time
+        """
+        try:
+            import pytz
+            from datetime import datetime, time
+            
+            # Define Eastern Time Zone
+            eastern = pytz.timezone('US/Eastern')
+            
+            # Get current Eastern Time
+            now_et = datetime.now(pytz.utc).astimezone(eastern)
+            current_time = now_et.time()
+            
+            # Check if it's a weekday (0 = Monday, 4 = Friday)
+            is_weekday = 0 <= now_et.weekday() <= 4
+            
+            # Define market hours
+            market_open = time(9, 30)  # 9:30 AM ET
+            market_close = time(16, 0)  # 4:00 PM ET
+            pre_market_open = time(4, 0)  # 4:00 AM ET
+            post_market_close = time(20, 0)  # 8:00 PM ET
+            
+            # Check if we're in regular market hours
+            is_regular_hours = (
+                is_weekday and 
+                market_open <= current_time < market_close
+            )
+            
+            # Check if we're in extended hours (pre or post)
+            is_extended_hours = (
+                is_weekday and 
+                ((pre_market_open <= current_time < market_open) or  # Pre-market
+                 (market_close <= current_time < post_market_close))  # Post-market
+            )
+            
+            return (is_regular_hours, is_extended_hours)
+        except Exception as e:
+            logger.warning(f"Error detecting market hours: {e}")
+            return (False, False)  # Conservative default - assume market is closed
 
     @staticmethod
     def _get_asset_data_yfinance(ticker: str, days: int, interval: str = "1d", include_prepost: bool = False) -> pd.DataFrame:
@@ -209,11 +260,35 @@ class DataLoader:
                 period = f"{days}d"
             else:
                 period = "max"
+            
+            # Check current market hours
+            try:
+                is_regular_hours, is_extended_hours = DataLoader.is_market_hours()
+                # Auto-detect if we should include extended hours data
+                # If user explicitly asks for it, or if we're currently in extended hours
+                should_include_prepost = include_prepost or is_extended_hours
+                
+                if should_include_prepost:
+                    logger.info(f"Extended hours mode active for {ticker} (current market: {'regular' if is_regular_hours else 'extended' if is_extended_hours else 'closed'})")
+            except Exception as e:
+                # If market hours detection fails, fall back to the user's preference
+                logger.warning(f"Market hours detection failed: {e}. Using explicit include_prepost={include_prepost}")
+                should_include_prepost = include_prepost
                 
             # Get historical data
             stock = yf.Ticker(ticker)
-            df = stock.history(period=period, interval=interval, auto_adjust=True, 
-                              include_prepost=include_prepost)
+            try:
+                # Try with include_prepost parameter
+                df = stock.history(period=period, interval=interval, auto_adjust=True, 
+                                  include_prepost=should_include_prepost)
+            except TypeError as e:
+                # If the parameter is not supported, try without it
+                if "include_prepost" in str(e) or "unexpected keyword argument" in str(e):
+                    logger.warning(f"include_prepost parameter not supported in this version of yfinance for {ticker}, falling back to default behavior")
+                    df = stock.history(period=period, interval=interval, auto_adjust=True)
+                else:
+                    # If it's a different TypeError, re-raise it
+                    raise
             
             if df.empty:
                 return pd.DataFrame()
@@ -356,11 +431,23 @@ class DataLoader:
     def _get_single_ticker_price(ticker):
         """Helper method for single ticker price"""
         try:
-            hist = yf.Ticker(ticker).history(period="1d", auto_adjust=True)
+            # Check if we're in extended hours for single price requests too
+            is_regular_hours, is_extended_hours = DataLoader.is_market_hours()
+            
+            try:
+                # Try with extended hours if needed
+                if is_extended_hours:
+                    hist = yf.Ticker(ticker).history(period="1d", include_prepost=True)
+                else:
+                    hist = yf.Ticker(ticker).history(period="1d")
+            except TypeError:
+                # Fall back to regular behavior if include_prepost is not supported
+                hist = yf.Ticker(ticker).history(period="1d")
+                
             if not hist.empty and 'Close' in hist.columns:
                 return float(hist['Close'].iloc[-1])
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Error in single ticker price for {ticker}: {e}")
         return None
 
     @staticmethod
