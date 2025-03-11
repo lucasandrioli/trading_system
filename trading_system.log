@@ -1852,3 +1852,498 @@ Comissão: $1.00
 2025-03-11 08:29:38,117 - werkzeug - INFO -  * Debugger PIN: 817-908-197
 2025-03-11 08:29:59,344 - werkzeug - INFO -  * Detected change in '/Users/Lucas/Documents/GitHub/trading_system/trading_system.py', reloading
 2025-03-11 08:29:59,548 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 08:41:47,740 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 08:41:47,791 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.15.135:5001
+2025-03-11 08:41:47,792 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-11 08:41:47,792 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 08:41:48,663 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 08:41:48,682 - werkzeug - WARNING -  * Debugger is active!
+2025-03-11 08:41:48,689 - werkzeug - INFO -  * Debugger PIN: 817-908-197
+2025-03-11 08:41:57,409 - trading_system - ERROR - Error loading data for SPY: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:41:57,412 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:41:57,412 - trading_system - ERROR - Error loading data for QQQ: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:41:57,413 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:41:57,413 - trading_system - ERROR - Error loading data for TLT: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:41:57,413 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:41:57,413 - trading_system - ERROR - Error loading data for GLD: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:41:57,414 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:41:57,414 - trading_system - ERROR - Error loading data for ^VIX: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:41:57,414 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:41:57,414 - trading_system - ERROR - Error loading data for EEM: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:41:57,414 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:41:57,414 - trading_system - ERROR - Error loading data for USO: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:41:57,415 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:41:57,415 - trading_system - ERROR - Error loading data for BTC-USD: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:41:57,415 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:41:57,425 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:41:57,446 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:41:57] "GET / HTTP/1.1" 200 -
+2025-03-11 08:41:57,457 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:41:57] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:41:57,468 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:41:57] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:41:57,897 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:41:57] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-03-11 08:42:00,555 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:00,555 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:00,555 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:00,555 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:00,555 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:00,555 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:00,555 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:00,556 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:00,559 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:42:00,561 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:00] "GET / HTTP/1.1" 200 -
+2025-03-11 08:42:00,583 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:00] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-03-11 08:42:00,583 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:00] "GET /static/css/custom.css HTTP/1.1" 200 -
+2025-03-11 08:42:00,697 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:00] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-03-11 08:42:01,964 - app - ERROR - Error updating prices: type object 'DataLoader' has no attribute '_get_batch_prices'
+2025-03-11 08:42:01,965 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:01] "[32mGET /refresh_prices HTTP/1.1[0m" 302 -
+2025-03-11 08:42:01,974 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:01,974 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:01,974 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:01,974 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:01,974 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:01,975 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:01,975 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:01,975 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:01,977 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:42:01,980 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:01] "GET / HTTP/1.1" 200 -
+2025-03-11 08:42:02,018 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:02] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:42:02,032 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:02] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:42:12,911 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:12] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:42:29,293 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:29,293 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:29,293 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:29,293 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:29,293 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:29,293 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:29,294 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:29,294 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:29,294 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 08:42:29,294 - app - ERROR - Erro na análise: type object 'DataLoader' has no attribute '_get_batch_prices'
+2025-03-11 08:42:29,300 - app - ERROR - Traceback (most recent call last):
+  File "/Users/Lucas/Documents/GitHub/trading_system/app.py", line 810, in analyze
+    portfolio_analysis = analyze_portfolio(
+        portfolio, account_balance, risk_profile,
+        trailing_data, extended_hours, goals
+    )
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 1667, in analyze_portfolio
+    price_map = DataLoader.get_realtime_prices_bulk(tickers)
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 219, in get_realtime_prices_bulk
+    batch_results = list(executor.map(DataLoader._get_batch_prices, ticker_batches))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'DataLoader' has no attribute '_get_batch_prices'
+
+2025-03-11 08:42:29,301 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:29] "[32mGET /analyze?risk=medium HTTP/1.1[0m" 302 -
+2025-03-11 08:42:29,305 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:29,305 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:29,305 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:29,305 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:29,305 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:29,305 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:29,306 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:29,306 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:29,308 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:42:29,309 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:29] "GET / HTTP/1.1" 200 -
+2025-03-11 08:42:29,367 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:29] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:42:29,388 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:29] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:42:30,446 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:30,446 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:30,446 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:30,446 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:30,446 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:30,446 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:30,446 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:30,446 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:30,446 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 08:42:30,446 - app - ERROR - Erro na análise: type object 'DataLoader' has no attribute '_get_batch_prices'
+2025-03-11 08:42:30,448 - app - ERROR - Traceback (most recent call last):
+  File "/Users/Lucas/Documents/GitHub/trading_system/app.py", line 810, in analyze
+    portfolio_analysis = analyze_portfolio(
+        portfolio, account_balance, risk_profile,
+        trailing_data, extended_hours, goals
+    )
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 1667, in analyze_portfolio
+    price_map = DataLoader.get_realtime_prices_bulk(tickers)
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 219, in get_realtime_prices_bulk
+    batch_results = list(executor.map(DataLoader._get_batch_prices, ticker_batches))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'DataLoader' has no attribute '_get_batch_prices'
+
+2025-03-11 08:42:30,449 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:30] "[32mGET /analyze?risk=medium HTTP/1.1[0m" 302 -
+2025-03-11 08:42:30,456 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:30,457 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:30,457 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:30,457 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:30,457 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:30,457 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:30,457 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:30,457 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:30,460 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:42:30,463 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:30] "GET / HTTP/1.1" 200 -
+2025-03-11 08:42:30,503 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:30] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:42:30,506 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:30] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:42:31,028 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:31,028 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:31,028 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:31,028 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:31,028 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:31,028 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:31,028 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:31,028 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:31,028 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 08:42:31,028 - app - ERROR - Erro na análise: type object 'DataLoader' has no attribute '_get_batch_prices'
+2025-03-11 08:42:31,030 - app - ERROR - Traceback (most recent call last):
+  File "/Users/Lucas/Documents/GitHub/trading_system/app.py", line 810, in analyze
+    portfolio_analysis = analyze_portfolio(
+        portfolio, account_balance, risk_profile,
+        trailing_data, extended_hours, goals
+    )
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 1667, in analyze_portfolio
+    price_map = DataLoader.get_realtime_prices_bulk(tickers)
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 219, in get_realtime_prices_bulk
+    batch_results = list(executor.map(DataLoader._get_batch_prices, ticker_batches))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'DataLoader' has no attribute '_get_batch_prices'
+
+2025-03-11 08:42:31,031 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:31] "[32mGET /analyze?risk=medium HTTP/1.1[0m" 302 -
+2025-03-11 08:42:31,040 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:31,040 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:31,041 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:31,041 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:31,041 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:31,041 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:31,041 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:31,041 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:31,043 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:42:31,044 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:31] "GET / HTTP/1.1" 200 -
+2025-03-11 08:42:31,082 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:31] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:42:31,100 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:31] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:42:31,190 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:31,190 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:31,190 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:31,191 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:31,191 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:31,191 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:31,191 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:31,191 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:31,191 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 08:42:31,191 - app - ERROR - Erro na análise: type object 'DataLoader' has no attribute '_get_batch_prices'
+2025-03-11 08:42:31,192 - app - ERROR - Traceback (most recent call last):
+  File "/Users/Lucas/Documents/GitHub/trading_system/app.py", line 810, in analyze
+    portfolio_analysis = analyze_portfolio(
+        portfolio, account_balance, risk_profile,
+        trailing_data, extended_hours, goals
+    )
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 1667, in analyze_portfolio
+    price_map = DataLoader.get_realtime_prices_bulk(tickers)
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 219, in get_realtime_prices_bulk
+    batch_results = list(executor.map(DataLoader._get_batch_prices, ticker_batches))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'DataLoader' has no attribute '_get_batch_prices'
+
+2025-03-11 08:42:31,192 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:31] "[32mGET /analyze?risk=medium HTTP/1.1[0m" 302 -
+2025-03-11 08:42:31,203 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:31,203 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:31,204 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:31,204 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:31,204 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:31,204 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:31,204 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:31,204 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:31,205 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:42:31,208 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:31] "GET / HTTP/1.1" 200 -
+2025-03-11 08:42:31,311 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:31] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:42:31,313 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:31] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:42:55,449 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:55] "GET /indicators HTTP/1.1" 200 -
+2025-03-11 08:42:55,479 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:55] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:42:55,490 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:55] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:42:57,072 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:57] "GET /portfolio HTTP/1.1" 200 -
+2025-03-11 08:42:57,110 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:57] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:42:57,113 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:57] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:42:58,780 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:58,781 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:58,781 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:58,781 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:58,781 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:58,781 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:58,781 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:58,781 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:58,781 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 08:42:58,782 - app - ERROR - Erro na análise: type object 'DataLoader' has no attribute '_get_batch_prices'
+2025-03-11 08:42:58,782 - app - ERROR - Traceback (most recent call last):
+  File "/Users/Lucas/Documents/GitHub/trading_system/app.py", line 810, in analyze
+    portfolio_analysis = analyze_portfolio(
+        portfolio, account_balance, risk_profile,
+        trailing_data, extended_hours, goals
+    )
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 1667, in analyze_portfolio
+    price_map = DataLoader.get_realtime_prices_bulk(tickers)
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 219, in get_realtime_prices_bulk
+    batch_results = list(executor.map(DataLoader._get_batch_prices, ticker_batches))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'DataLoader' has no attribute '_get_batch_prices'
+
+2025-03-11 08:42:58,783 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:58] "[32mGET /analyze?risk=medium HTTP/1.1[0m" 302 -
+2025-03-11 08:42:58,799 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:42:58,799 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:42:58,799 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:42:58,799 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:42:58,799 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:42:58,799 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:42:58,800 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:42:58,800 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:42:58,803 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:42:58,804 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:58] "GET / HTTP/1.1" 200 -
+2025-03-11 08:42:58,849 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:58] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:42:58,866 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:42:58] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:43:59,139 - werkzeug - INFO -  * Detected change in '/Users/Lucas/Documents/GitHub/trading_system/trading_system.py', reloading
+2025-03-11 08:43:59,350 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 08:44:00,678 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 08:44:00,702 - werkzeug - WARNING -  * Debugger is active!
+2025-03-11 08:44:00,709 - werkzeug - INFO -  * Debugger PIN: 817-908-197
+2025-03-11 08:45:17,599 - werkzeug - INFO -  * Detected change in '/Users/Lucas/Documents/GitHub/trading_system/trading_system.py', reloading
+2025-03-11 08:45:17,825 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 08:50:08,898 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 08:50:08,927 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.15.135:5001
+2025-03-11 08:50:08,927 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-11 08:50:08,928 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 08:50:09,779 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 08:50:09,796 - werkzeug - WARNING -  * Debugger is active!
+2025-03-11 08:50:09,803 - werkzeug - INFO -  * Debugger PIN: 817-908-197
+2025-03-11 08:50:17,355 - trading_system - ERROR - Error loading data for SPY: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:17,360 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:50:17,360 - trading_system - ERROR - Error loading data for QQQ: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:17,361 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:50:17,361 - trading_system - ERROR - Error loading data for TLT: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:17,361 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:50:17,362 - trading_system - ERROR - Error loading data for GLD: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:17,362 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:50:17,362 - trading_system - ERROR - Error loading data for ^VIX: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:17,362 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:50:17,363 - trading_system - ERROR - Error loading data for EEM: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:17,363 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:50:17,363 - trading_system - ERROR - Error loading data for USO: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:17,364 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:50:17,364 - trading_system - ERROR - Error loading data for BTC-USD: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:17,364 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:50:17,369 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:50:17,403 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:50:17] "GET / HTTP/1.1" 200 -
+2025-03-11 08:50:17,435 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:50:17] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-03-11 08:50:17,435 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:50:17] "GET /static/css/custom.css HTTP/1.1" 200 -
+2025-03-11 08:50:17,553 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:50:17] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-03-11 08:50:21,950 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:50:21] "GET /portfolio HTTP/1.1" 200 -
+2025-03-11 08:50:21,992 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:50:21] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:50:21,992 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:50:21] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:50:23,987 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:50:23,988 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:50:23,988 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:50:23,988 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:50:23,988 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:50:23,988 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:50:23,988 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:50:23,988 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:50:23,988 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 08:50:28,396 - trading_system - ERROR - Error loading data for IAK: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,397 - trading_system - ERROR - Error loading data for BERZ: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,397 - trading_system - ERROR - Error loading data for STVN: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,397 - trading_system - ERROR - Error loading data for EPI: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,398 - trading_system - ERROR - Error loading data for FILL: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,398 - trading_system - ERROR - Error loading data for DGRS: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,398 - trading_system - ERROR - Error loading data for GSPY: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,398 - trading_system - ERROR - Error loading data for VAMO: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,399 - trading_system - ERROR - Error loading data for BJ: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,399 - trading_system - ERROR - Error loading data for ITM: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,399 - trading_system - ERROR - Error loading data for XHB: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,399 - trading_system - ERROR - Error loading data for ITB: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,399 - trading_system - ERROR - Error loading data for SQQQ: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:28,400 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:50:28,400 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:50:28,400 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:50:28,400 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:50:28,400 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:50:28,400 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:50:28,400 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:50:28,400 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:50:30,303 - trading_system - ERROR - Error loading data for TSLZ: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:30,303 - trading_system - ERROR - Error loading data for NVDQ: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:30,303 - trading_system - ERROR - Error loading data for FAZ: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:30,304 - trading_system - ERROR - Error loading data for MSTZ: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:30,304 - trading_system - ERROR - Error loading data for SPTS: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:30,304 - trading_system - ERROR - Error loading data for SPTI: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:30,304 - trading_system - ERROR - Error loading data for STIP: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:50:30,336 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:50:30] "GET /analyze?risk=medium HTTP/1.1" 200 -
+2025-03-11 08:50:30,376 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:50:30] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:50:30,386 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:50:30] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:56:15,949 - werkzeug - INFO -  * Detected change in '/Users/Lucas/Documents/GitHub/trading_system/trading_system.py', reloading
+2025-03-11 08:56:16,163 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 08:56:17,420 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 08:56:17,441 - werkzeug - WARNING -  * Debugger is active!
+2025-03-11 08:56:17,447 - werkzeug - INFO -  * Debugger PIN: 817-908-197
+2025-03-11 08:56:18,466 - werkzeug - INFO -  * Detected change in '/Users/Lucas/Documents/GitHub/trading_system/trading_system.py', reloading
+2025-03-11 08:56:18,672 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 08:56:19,619 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 08:56:19,638 - werkzeug - WARNING -  * Debugger is active!
+2025-03-11 08:56:19,643 - werkzeug - INFO -  * Debugger PIN: 817-908-197
+2025-03-11 08:56:41,642 - trading_system - ERROR - Error loading data for SPY: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:56:41,647 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:56:41,647 - trading_system - ERROR - Error loading data for QQQ: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:56:41,648 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:56:41,648 - trading_system - ERROR - Error loading data for TLT: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:56:41,648 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:56:41,648 - trading_system - ERROR - Error loading data for GLD: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:56:41,649 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:56:41,649 - trading_system - ERROR - Error loading data for ^VIX: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:56:41,649 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:56:41,649 - trading_system - ERROR - Error loading data for EEM: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:56:41,649 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:56:41,649 - trading_system - ERROR - Error loading data for USO: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:56:41,650 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:56:41,650 - trading_system - ERROR - Error loading data for BTC-USD: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:56:41,650 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:56:41,650 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 08:56:41,651 - app - ERROR - Erro na análise: type object 'DataLoader' has no attribute 'get_realtime_prices_bulk'
+2025-03-11 08:56:41,656 - app - ERROR - Traceback (most recent call last):
+  File "/Users/Lucas/Documents/GitHub/trading_system/app.py", line 810, in analyze
+    portfolio_analysis = analyze_portfolio(
+        portfolio, account_balance, risk_profile,
+        trailing_data, extended_hours, goals
+    )
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 1794, in analyze_portfolio
+    price_map = DataLoader.get_realtime_prices_bulk(tickers)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'DataLoader' has no attribute 'get_realtime_prices_bulk'
+
+2025-03-11 08:56:41,659 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:41] "[32mGET /analyze?risk=medium HTTP/1.1[0m" 302 -
+2025-03-11 08:56:41,663 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:56:41,663 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:56:41,663 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:56:41,663 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:56:41,663 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:56:41,663 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:56:41,664 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:56:41,664 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:56:41,667 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:56:41,689 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:41] "GET / HTTP/1.1" 200 -
+2025-03-11 08:56:41,786 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:41] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:56:41,787 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:41] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:56:45,384 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:56:45,385 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:56:45,385 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:56:45,385 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:56:45,385 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:56:45,385 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:56:45,385 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:56:45,385 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:56:45,388 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:56:45,392 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:45] "GET / HTTP/1.1" 200 -
+2025-03-11 08:56:45,412 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:45] "GET /static/css/custom.css HTTP/1.1" 200 -
+2025-03-11 08:56:45,412 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:45] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-03-11 08:56:45,513 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:45] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-03-11 08:56:53,271 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:56:53,271 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:56:53,271 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:56:53,271 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:56:53,271 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:56:53,271 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:56:53,271 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:56:53,271 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:56:53,271 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 08:56:53,271 - app - ERROR - Erro na análise: type object 'DataLoader' has no attribute 'get_realtime_prices_bulk'
+2025-03-11 08:56:53,272 - app - ERROR - Traceback (most recent call last):
+  File "/Users/Lucas/Documents/GitHub/trading_system/app.py", line 810, in analyze
+    portfolio_analysis = analyze_portfolio(
+        portfolio, account_balance, risk_profile,
+        trailing_data, extended_hours, goals
+    )
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 1794, in analyze_portfolio
+    price_map = DataLoader.get_realtime_prices_bulk(tickers)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'DataLoader' has no attribute 'get_realtime_prices_bulk'
+
+2025-03-11 08:56:53,273 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:53] "[32mGET /analyze?risk=medium HTTP/1.1[0m" 302 -
+2025-03-11 08:56:53,281 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:56:53,282 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:56:53,282 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:56:53,282 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:56:53,282 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:56:53,282 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:56:53,282 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:56:53,282 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:56:53,285 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:56:53,287 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:53] "GET / HTTP/1.1" 200 -
+2025-03-11 08:56:53,325 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:53] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:56:53,326 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:56:53] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:57:07,605 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 08:57:07,635 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.15.135:5001
+2025-03-11 08:57:07,635 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-11 08:57:07,636 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 08:57:08,489 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 08:57:08,507 - werkzeug - WARNING -  * Debugger is active!
+2025-03-11 08:57:08,516 - werkzeug - INFO -  * Debugger PIN: 817-908-197
+2025-03-11 08:57:10,598 - trading_system - ERROR - Error loading data for SPY: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:57:10,600 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:57:10,600 - trading_system - ERROR - Error loading data for QQQ: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:57:10,601 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:57:10,601 - trading_system - ERROR - Error loading data for TLT: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:57:10,602 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:57:10,602 - trading_system - ERROR - Error loading data for GLD: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:57:10,602 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:57:10,602 - trading_system - ERROR - Error loading data for ^VIX: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:57:10,603 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:57:10,603 - trading_system - ERROR - Error loading data for EEM: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:57:10,603 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:57:10,603 - trading_system - ERROR - Error loading data for USO: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:57:10,603 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:57:10,603 - trading_system - ERROR - Error loading data for BTC-USD: type object 'DataLoader' has no attribute '_get_asset_data_yfinance'
+2025-03-11 08:57:10,604 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:57:10,608 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:57:10,641 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:10] "GET / HTTP/1.1" 200 -
+2025-03-11 08:57:10,665 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:10] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-03-11 08:57:10,665 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:10] "GET /static/css/custom.css HTTP/1.1" 200 -
+2025-03-11 08:57:10,775 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-03-11 08:57:17,200 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:17] "GET /portfolio HTTP/1.1" 200 -
+2025-03-11 08:57:17,227 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:17] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:57:17,239 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:17] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:57:18,604 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:57:18,605 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:57:18,605 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:57:18,605 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:57:18,605 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:57:18,605 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:57:18,605 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:57:18,605 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:57:18,605 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 08:57:18,605 - app - ERROR - Erro na análise: type object 'DataLoader' has no attribute 'get_realtime_prices_bulk'
+2025-03-11 08:57:18,610 - app - ERROR - Traceback (most recent call last):
+  File "/Users/Lucas/Documents/GitHub/trading_system/app.py", line 810, in analyze
+    portfolio_analysis = analyze_portfolio(
+        portfolio, account_balance, risk_profile,
+        trailing_data, extended_hours, goals
+    )
+  File "/Users/Lucas/Documents/GitHub/trading_system/trading_system.py", line 1794, in analyze_portfolio
+    price_map = DataLoader.get_realtime_prices_bulk(tickers)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'DataLoader' has no attribute 'get_realtime_prices_bulk'
+
+2025-03-11 08:57:18,611 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:18] "[32mGET /analyze?risk=medium HTTP/1.1[0m" 302 -
+2025-03-11 08:57:18,625 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 08:57:18,625 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 08:57:18,625 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 08:57:18,625 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 08:57:18,625 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 08:57:18,625 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 08:57:18,625 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 08:57:18,625 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 08:57:18,628 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 08:57:18,629 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:18] "GET / HTTP/1.1" 200 -
+2025-03-11 08:57:18,725 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:18] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 08:57:18,742 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:18] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 08:57:56,034 - werkzeug - INFO -  * Detected change in '/Users/Lucas/Documents/GitHub/trading_system/trading_system.py', reloading
+2025-03-11 08:57:56,241 - werkzeug - INFO -  * Restarting with stat

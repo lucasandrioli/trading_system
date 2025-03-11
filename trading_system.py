@@ -16,6 +16,8 @@ from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional, List, Tuple, Any
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
+import requests
+
 
 # Create a session with connection pooling and retry logic
 def create_session():
@@ -190,19 +192,113 @@ class DataLoader:
         except Exception as e:
             logger.error(f"Error loading data for {ticker}: {e}")
             return pd.DataFrame()
-
-    @staticmethod
-    def _optimize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-        """Optimize memory usage of dataframe"""
-        for col in df.columns:
-            if df[col].dtype == 'float64':
-                df[col] = df[col].astype('float32')
-            elif df[col].dtype == 'int64':
-                df[col] = df[col].astype('int32')
+@staticmethod
+def _get_asset_data_yfinance(ticker: str, days: int, interval: str = "1d", include_prepost: bool = False) -> pd.DataFrame:
+    """Gets historical data for a ticker using yfinance."""
+    try:
+        if days <= 0:
+            return pd.DataFrame()
+            
+        # Determine period based on days
+        if days <= 7:
+            period = f"{days}d"
+        elif days <= 60:
+            period = f"{days}d"
+        elif days <= 365:
+            period = f"{days}d"
+        else:
+            period = "max"
+            
+        # Get historical data
+        stock = yf.Ticker(ticker)
+        df = stock.history(period=period, interval=interval, auto_adjust=True, 
+                          include_prepost=include_prepost)
+        
+        if df.empty:
+            return pd.DataFrame()
+            
+        # Add daily returns
+        if 'Close' in df.columns and len(df) > 1:
+            df['Daily_Return'] = df['Close'].pct_change()
+            
         return df
+    except Exception as e:
+        logger.error(f"Error getting data from yfinance for {ticker}: {e}")
+        return pd.DataFrame()
 
-    @staticmethod
-    def get_realtime_prices_bulk(tickers: list) -> dict:
+@staticmethod
+def _get_asset_data_polygon(ticker: str, days: int, interval: str = "1d") -> pd.DataFrame:
+    """Gets historical data for a ticker using Polygon API."""
+    try:
+        if POLYGON_API_KEY == "YOUR_API_KEY_HERE":
+            return pd.DataFrame()
+            
+        # Determine time parameters
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+        
+        # Convert interval to Polygon format
+        if interval == "1d":
+            timespan = "day"
+            multiplier = 1
+        elif interval == "1h":
+            timespan = "hour"
+            multiplier = 1
+        elif interval == "1wk":
+            timespan = "week"
+            multiplier = 1
+        else:
+            # Default to daily
+            timespan = "day"
+            multiplier = 1
+            
+        # Format dates for API
+        from_date = start_date.strftime("%Y-%m-%d")
+        to_date = end_date.strftime("%Y-%m-%d")
+        
+        # Construct API URL
+        base_url = "https://api.polygon.io/v2/aggs/ticker"
+        url = f"{base_url}/{ticker}/range/{multiplier}/{timespan}/{from_date}/{to_date}"
+        
+        # Make request
+        params = {"apiKey": POLYGON_API_KEY, "sort": "asc", "limit": 5000}
+        response = http_session.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+        
+        if data.get("resultsCount", 0) == 0:
+            return pd.DataFrame()
+            
+        # Convert to DataFrame
+        bars = data.get("results", [])
+        df = pd.DataFrame(bars)
+        
+        # Rename columns to match yfinance format
+        if not df.empty:
+            df = df.rename(columns={
+                "o": "Open",
+                "h": "High",
+                "l": "Low",
+                "c": "Close",
+                "v": "Volume",
+                "t": "timestamp"
+            })
+            
+            # Convert timestamp to datetime
+            df['Date'] = pd.to_datetime(df['timestamp'], unit='ms')
+            df.set_index('Date', inplace=True)
+            
+            # Add daily returns
+            if 'Close' in df.columns and len(df) > 1:
+                df['Daily_Return'] = df['Close'].pct_change()
+                
+        return df
+    except Exception as e:
+        logger.error(f"Error getting data from Polygon for {ticker}: {e}")
+        return pd.DataFrame()
+
+   @staticmethod
+   def get_realtime_prices_bulk(tickers: list) -> dict:
         """Gets real-time prices for multiple tickers using parallel processing."""
         prices = {}
         if not tickers:
@@ -236,6 +332,28 @@ class DataLoader:
         return prices
 
     @staticmethod
+    def _get_batch_prices(tickers):
+        """Helper method to get prices for a batch of tickers."""
+        result = {}
+        try:
+            tickers_str = " ".join(tickers)
+            data = yf.Tickers(tickers_str)
+            for ticker in tickers:
+                try:
+                    ticker_data = data.tickers[ticker]
+                    hist = ticker_data.history(period="1d")
+                    if not hist.empty and 'Close' in hist.columns:
+                        result[ticker] = float(hist['Close'].iloc[-1])
+                except Exception as e:
+                    logger.warning(f"Error fetching batch price for {ticker}: {e}")
+        except Exception as e:
+            logger.error(f"Error in batch price fetching: {e}")
+        
+        return result
+
+ 
+
+    @staticmethod
     def _get_single_ticker_price(ticker):
         """Helper method for single ticker price"""
         try:
@@ -245,6 +363,18 @@ class DataLoader:
         except Exception:
             pass
         return None
+
+
+    @staticmethod
+    def _optimize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+        """Optimize memory usage of dataframe"""
+        for col in df.columns:
+            if df[col].dtype == 'float64':
+                df[col] = df[col].astype('float32')
+            elif df[col].dtype == 'int64':
+                df[col] = df[col].astype('int32')
+        return df
+
 
     @staticmethod
     @lru_cache(maxsize=128)
