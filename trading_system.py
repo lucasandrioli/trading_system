@@ -14,6 +14,25 @@ import argparse
 import traceback
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional, List, Tuple, Any
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
+
+# Create a session with connection pooling and retry logic
+def create_session():
+    """Create a session with retry logic and connection pooling"""
+    session = requests.Session()
+    retries = Retry(
+        total=5,
+        backoff_factor=0.5,
+        status_forcelist=[429, 500, 502, 503, 504]
+    )
+    adapter = HTTPAdapter(pool_connections=10, pool_maxsize=20, max_retries=retries)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
+# Use this session for all HTTP requests
+http_session = create_session()
 
 import numpy as np
 import pandas as pd
@@ -22,6 +41,38 @@ import yfinance as yf
 from textblob import TextBlob
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
+
+import time
+import functools
+import concurrent.futures
+from functools import lru_cache
+
+# Cache configuration
+CACHE_ENABLED = True
+CACHE_DURATION = 3600  # 1 hour in seconds
+
+# Function cache decorator with time expiry
+def timed_cache(seconds=CACHE_DURATION, maxsize=128):
+    def wrapper_decorator(func):
+        if not CACHE_ENABLED:
+            return func
+        
+        @functools.lru_cache(maxsize=maxsize)
+        def time_bounded(*args, _cache_time=None, **kwargs):
+            if _cache_time is None or time.time() - _cache_time > seconds:
+                _cache_time = time.time()
+            return func(*args, **kwargs), _cache_time
+        
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            result, _ = time_bounded(*args, _cache_time=int(time.time() / seconds), **kwargs)
+            return result
+        
+        # Add a clear method
+        wrapper.cache_clear = time_bounded.cache_clear
+        return wrapper
+    
+    return wrapper_decorator
 
 # Tenta importar tabulate para saída em tabela
 try:
@@ -112,168 +163,93 @@ except ImportError:
 # =============================================================================
 class DataLoader:
     @staticmethod
+    @timed_cache(seconds=300)  # 5-minute cache
     def get_asset_data(ticker: str, days: int = 60, interval: str = "1d",
                        use_polygon: bool = False, extended_hours: bool = False) -> pd.DataFrame:
-        """Obtém dados históricos para um ticker específico."""
+        """Gets historical data for a specific ticker."""
         try:
             if not ticker or not isinstance(ticker, str):
-                raise ValueError(f"Ticker inválido: {ticker}")
+                raise ValueError(f"Invalid ticker: {ticker}")
             
-            # Tentar primeiro com yfinance (mais confiável)
+            # Try first with yfinance (more reliable)
             df = DataLoader._get_asset_data_yfinance(ticker, days, interval, include_prepost=extended_hours)
             
-            # Se yfinance falhar e Polygon estiver configurado, tente Polygon como fallback
+            # If yfinance fails and Polygon is configured, try Polygon as fallback
             if (df is None or df.empty) and use_polygon and POLYGON_API_KEY != "YOUR_API_KEY_HERE":
-                logger.info(f"Dados não encontrados via yfinance para {ticker}, tentando Polygon...")
+                logger.info(f"Data not found via yfinance for {ticker}, trying Polygon...")
                 df = DataLoader._get_asset_data_polygon(ticker, days, interval)
             
             if df is None or df.empty:
-                logger.warning(f"Dados vazios retornados para {ticker}")
+                logger.warning(f"Empty data returned for {ticker}")
                 return pd.DataFrame()
+            
+            # Optimize memory usage
+            df = DataLoader._optimize_dataframe(df)
             
             return df
         except Exception as e:
-            logger.error(f"Erro ao carregar dados para {ticker}: {e}")
+            logger.error(f"Error loading data for {ticker}: {e}")
             return pd.DataFrame()
 
     @staticmethod
-    def _get_asset_data_yfinance(ticker: str, days: int = 60, interval: str = "1d",
-                                 include_prepost: bool = False) -> pd.DataFrame:
-        period = f"{days}d"
-        ticker_obj = yf.Ticker(ticker)
-        try:
-            df = ticker_obj.history(period=period, interval=interval, auto_adjust=True, prepost=include_prepost)
-            
-            if df.empty:
-                logger.warning(f"Nenhum dado retornado do yfinance para {ticker}.")
-                return pd.DataFrame()
-            
-            # Padronização dos nomes das colunas
-            df = df.rename(columns=str.title)
-            
-            # Garante que a coluna Close existe e adiciona retorno diário
-            if 'Close' in df.columns:
-                df['Daily_Return'] = df['Close'].pct_change()
-            
-            # Processamento do índice/data
-            df = df.reset_index()
-            if 'Date' in df.columns:
-                df['Date'] = pd.to_datetime(df['Date'])
-            elif 'Datetime' in df.columns:
-                df['Date'] = pd.to_datetime(df['Datetime'])
-                df.drop(columns=['Datetime'], inplace=True)
-            
-            df = df.sort_values('Date').set_index('Date')
-            return df
-        except Exception as e:
-            logger.error(f"Erro ao obter dados via yfinance para {ticker}: {e}")
-            return pd.DataFrame()
-
-    @staticmethod
-    def _get_asset_data_polygon(ticker: str, days: int = 60, interval: str = "1d") -> pd.DataFrame:
-        try:
-            end_date = datetime.now()
-            start_date = end_date - timedelta(days=days)
-            
-            timespan_map = {"1d": "day", "1h": "hour", "1m": "minute"}
-            api_timespan = timespan_map.get(interval, "day")
-            
-            url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/1/{api_timespan}/{start_date.strftime('%Y-%m-%d')}/{end_date.strftime('%Y-%m-%d')}"
-            params = {"apiKey": POLYGON_API_KEY, "limit": 5000, "adjusted": "true", "sort": "asc"}
-            
-            response = requests.get(url, params=params, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-            
-            if not data or "results" not in data:
-                logger.warning(f"Nenhum dado encontrado na Polygon para {ticker}.")
-                return pd.DataFrame()
-            
-            df = pd.DataFrame(data["results"])
-            if df.empty:
-                return pd.DataFrame()
-            
-            df['Date'] = pd.to_datetime(df['t'], unit='ms')
-            df = df.rename(columns={
-                "o": "Open", "h": "High", "l": "Low",
-                "c": "Close", "v": "Volume", "n": "Transactions", "vw": "VWAP"
-            })
-            
-            df = df.sort_values('Date').set_index('Date')
-            df.drop(columns=['t'], errors='ignore', inplace=True)
-            
-            if 'Close' in df.columns:
-                df['Daily_Return'] = df['Close'].pct_change()
-            
-            return df
-        except Exception as e:
-            logger.error(f"Erro na chamada Polygon para {ticker}: {e}")
-            return pd.DataFrame()
+    def _optimize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+        """Optimize memory usage of dataframe"""
+        for col in df.columns:
+            if df[col].dtype == 'float64':
+                df[col] = df[col].astype('float32')
+            elif df[col].dtype == 'int64':
+                df[col] = df[col].astype('int32')
+        return df
 
     @staticmethod
     def get_realtime_prices_bulk(tickers: list) -> dict:
-        """Obtém preços em tempo real para múltiplos tickers."""
+        """Gets real-time prices for multiple tickers using parallel processing."""
         prices = {}
         if not tickers:
             return prices
         
-        # Dividir tickers em lotes menores para evitar falhas com muitos tickers
-        max_batch_size = 50
+        # Split tickers into smaller batches
+        max_batch_size = 30
         ticker_batches = [tickers[i:i + max_batch_size] for i in range(0, len(tickers), max_batch_size)]
         
-        for batch in ticker_batches:
-            try:
-                batch_prices = DataLoader._get_batch_prices(batch)
-                prices.update(batch_prices)
-            except Exception as e:
-                logger.error(f"Erro ao obter preços para lote de tickers: {e}")
-        
-        # Verificar tickers que não foram obtidos e tentar individualmente
-        missing = [t for t in tickers if t not in prices]
-        for t in missing:
-            try:
-                hist = yf.Ticker(t).history(period="1d", auto_adjust=True)
-                if not hist.empty and 'Close' in hist.columns:
-                    latest_close = hist['Close'].iloc[-1]
-                    if not pd.isna(latest_close):
-                        prices[t] = float(latest_close)
-            except Exception as e:
-                logger.error(f"Não foi possível obter preço para {t}: {e}")
-        
-        return prices
-
-    @staticmethod
-    def _get_batch_prices(tickers: list) -> dict:
-        """Método auxiliar para obter preços em lote."""
-        prices = {}
-        if not tickers:
-            return prices
-        
-        try:
-            tickers_str = " ".join(tickers)
-            data = yf.download(tickers_str, period="1d", group_by="ticker", auto_adjust=True, progress=False, threads=True)
+        # Use ThreadPoolExecutor for parallel processing
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            batch_results = list(executor.map(DataLoader._get_batch_prices, ticker_batches))
             
-            if len(tickers) == 1 and not data.empty:
-                t = tickers[0]
-                if 'Close' in data.columns:
-                    prices[t] = float(data['Close'].iloc[-1])
-            elif len(tickers) > 1:
-                for t in tickers:
+        for result in batch_results:
+            prices.update(result)
+        
+        # Process any missing tickers
+        missing = [t for t in tickers if t not in prices]
+        if missing:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+                futures = {executor.submit(DataLoader._get_single_ticker_price, t): t for t in missing}
+                for future in concurrent.futures.as_completed(futures):
+                    ticker = futures[future]
                     try:
-                        if t in data and not data[t].empty and 'Close' in data[t].columns:
-                            latest_close = data[t]['Close'].iloc[-1]
-                            if not pd.isna(latest_close):
-                                prices[t] = float(latest_close)
+                        result = future.result()
+                        if result:
+                            prices[ticker] = result
                     except Exception as e:
-                        logger.error(f"Erro ao processar preço para {t}: {e}")
-        except Exception as e:
-            logger.error(f"Erro geral ao obter preços em lote: {e}")
+                        logger.error(f"Error fetching price for {ticker}: {e}")
         
         return prices
 
     @staticmethod
+    def _get_single_ticker_price(ticker):
+        """Helper method for single ticker price"""
+        try:
+            hist = yf.Ticker(ticker).history(period="1d", auto_adjust=True)
+            if not hist.empty and 'Close' in hist.columns:
+                return float(hist['Close'].iloc[-1])
+        except Exception:
+            pass
+        return None
+
+    @staticmethod
+    @lru_cache(maxsize=128)
     def check_ticker_valid(ticker: str) -> bool:
-        """Verifica se um ticker é válido e tem dados disponíveis."""
+        """Cached version of ticker validation."""
         try:
             ticker_obj = yf.Ticker(ticker)
             hist = ticker_obj.history(period="5d")
@@ -671,36 +647,40 @@ class MarketAnalysis:
 # =============================================================================
 class APIClient:
     @staticmethod
-    def get_polygon_news(ticker: str, limit: int = 10) -> list:
-        """Obtém notícias relacionadas a um ticker via Polygon API."""
+    def get_polygon_technical_data(ticker: str, indicator: str, params: dict = None) -> dict:
+        """Gets technical indicator data via Polygon API."""
         if not POLYGON_API_KEY or POLYGON_API_KEY == "YOUR_API_KEY_HERE":
-            return []
+            return {}
         
         try:
-            url = "https://api.polygon.io/v2/reference/news"
-            params = {"apiKey": POLYGON_API_KEY, "ticker": ticker, "limit": limit, "order": "desc"}
-            resp = requests.get(url, params=params, timeout=10)
+            url = f"https://api.polygon.io/v1/indicators/{indicator}/{ticker}"
+            req_params = {"apiKey": POLYGON_API_KEY}
+            if params:
+                req_params.update(params)
+                
+            resp = http_session.get(url, params=params, timeout=10)
             resp.raise_for_status()
             data = resp.json()
-            return data.get("results", [])
+            return data.get("results", {})
         except Exception as e:
-            logger.error(f"Erro ao obter notícias da Polygon: {e}")
-            return []
-
+            logger.error(f"Error getting technical data from Polygon: {e}")
+            return {}
+    
     @staticmethod
     def get_polygon_related(ticker: str) -> list:
-        """Obtém tickers relacionados via Polygon API."""
+        """Gets related tickers via Polygon API."""
+        # Keep this method as is - it doesn't fetch news
         if not POLYGON_API_KEY or POLYGON_API_KEY == "YOUR_API_KEY_HERE":
             return []
         
         try:
             url = f"https://api.polygon.io/vX/reference/tickers/{ticker}/relationships"
             params = {"apiKey": POLYGON_API_KEY}
-            resp = requests.get(url, params=params, timeout=10)
+            resp = http_session.get(url, params=params, timeout=10)
             
             if resp.status_code == 404:
                 url = f"https://api.polygon.io/v3/reference/tickers/{ticker}"
-                resp = requests.get(url, params=params, timeout=10)
+                resp = http_session.get(url, params=params, timeout=10)
             
             if resp.status_code != 200:
                 return []
@@ -717,7 +697,7 @@ class APIClient:
             
             return list(set(results))
         except Exception as e:
-            logger.error(f"Erro ao obter relacionados da Polygon para {ticker}: {e}")
+            logger.error(f"Error getting related tickers from Polygon for {ticker}: {e}")
             return []
 
 
@@ -727,10 +707,10 @@ class APIClient:
 class QualitativeAnalysis:
     @staticmethod
     def analyze_news_sentiment(ticker: str) -> dict:
-        """Analisa o sentimento de notícias relacionadas a um ticker."""
+        """Analyzes sentiment of news related to a ticker using only yfinance."""
         news_items = []
         
-        # Tenta obter notícias via yfinance
+        # Use ONLY yfinance for news
         try:
             yf_news = yf.Ticker(ticker).get_news()
             if yf_news:
@@ -742,21 +722,11 @@ class QualitativeAnalysis:
                         "url": item.get("link", "")
                     })
             else:
-                logger.info(f"Nenhuma notícia encontrada via yfinance para {ticker}.")
+                logger.info(f"No news found via yfinance for {ticker}.")
         except Exception as e:
-            logger.error(f"Erro ao obter notícias via yfinance: {e}")
+            logger.error(f"Error fetching news via yfinance: {e}")
         
-        # Tenta obter notícias via Polygon
-        poly_items = APIClient.get_polygon_news(ticker, limit=5)
-        for item in poly_items:
-            news_items.append({
-                "title": item.get("title", ""),
-                "published": item.get("published_utc", ""),
-                "time": item.get("timestamp", None),
-                "url": item.get("article_url", "")
-            })
-        
-        # Remove notícias duplicadas
+        # Remove duplicates
         titles_seen = set()
         unique_news = []
         for item in news_items:
@@ -767,7 +737,7 @@ class QualitativeAnalysis:
         
         news_items = unique_news
         
-        # Calcula o sentimento das notícias
+        # Calculate news sentiment
         total_weighted_sent = 0.0
         total_weight = 0.0
         sentiment_details = []
@@ -806,7 +776,7 @@ class QualitativeAnalysis:
                 "weight": round(weight, 2)
             })
         
-        # Calcula o sentimento médio
+        # Calculate average sentiment
         avg_sentiment = total_weighted_sent / total_weight if total_weight > 0 else 0.0
         
         if avg_sentiment > 0.3:
@@ -826,39 +796,6 @@ class QualitativeAnalysis:
             "news_count": len(news_items),
             "details": sentiment_details
         }
-
-    @staticmethod
-    def qualitative_score(ticker: str) -> dict:
-        """Calcula um score qualitativo com base nas notícias e dados relacionados."""
-        result = {"qualitative_score": 0, "details": {}}
-        
-        try:
-            news_result = QualitativeAnalysis.analyze_news_sentiment(ticker)
-            sent_score = news_result["sentiment_score"] * 20
-            
-            news_volume_bonus = min(10, news_result["news_count"])
-            
-            related_bonus = 0
-            related_list = APIClient.get_polygon_related(ticker)
-            if related_list:
-                related_bonus = min(5, len(related_list))
-            
-            total = sent_score + news_volume_bonus + related_bonus
-            
-            result["qualitative_score"] = float(np.clip(total, -100, 100))
-            result["details"] = {
-                "sentiment_component": float(sent_score),
-                "news_count": news_result["news_count"],
-                "related_count": len(related_list),
-                "sentiment_label": news_result["sentiment_label"],
-                "news_samples": news_result["details"][:3] if len(news_result["details"]) >= 3 else news_result["details"]
-            }
-        except Exception as e:
-            logger.error(f"Erro ao calcular qualitative_score para {ticker}: {e}")
-            result["details"]["error"] = str(e)
-        
-        return result
-
 
 # =============================================================================
 # 6. FundamentalAnalysis – Análise fundamental com yfinance
@@ -2011,34 +1948,28 @@ def generate_rebalance_plan(portfolio_analysis: dict, watchlist_analysis: dict,
             
             sell_capital += cand["capital_freed"]
             capital_gap -= cand["capital_freed"]
+            available_capital += cand["capital_freed"]
     
     # 7. Definir compras com o capital disponível
     available_capital = account_balance + sell_capital
     total_commission = 0
     
+    # Ordenar novamente por score (pode ter mudado com vendas adicionais)
+    buy_candidates.sort(key=lambda x: x["score"], reverse=True)
+    
     for candidate in buy_candidates:
-        qty = candidate["suggested_qty"]
-        price = candidate["current_price"]
+        # Calcular quantidade máxima comprável com o capital restante
+        max_affordable_qty = int((available_capital * 0.95) / candidate["current_price"]) if candidate["current_price"] > 0 else 0
+        qty = min(candidate["suggested_qty"], max_affordable_qty)
         
+        # Se não podemos comprar pelo menos 1, pular
+        if qty < 1 or available_capital < params.get("min_transaction_value", 50.0):
+            continue
+        
+        price = candidate["current_price"]
         operation_value = qty * price
         commission = calculate_xp_commission(operation_value)
         total_cost = operation_value + commission
-        
-        # Verificar se há capital suficiente
-        if total_cost > available_capital * 0.95:  # Reservar 5% de margem
-            adjusted_qty = int((available_capital * 0.95 - commission) / price)
-            
-            if adjusted_qty >= 1:
-                operation_value = adjusted_qty * price
-                commission = calculate_xp_commission(operation_value)
-                total_cost = operation_value + commission
-                qty = adjusted_qty
-            else:
-                continue
-        
-        # Verificar valor mínimo de transação
-        if operation_value < params.get("min_transaction_value", 50.0):
-            continue
         
         # Adicionar à lista de compras
         plan["buy"].append({
@@ -2051,11 +1982,12 @@ def generate_rebalance_plan(portfolio_analysis: dict, watchlist_analysis: dict,
             "reason": candidate["reason"]
         })
         
+        # IMPORTANTE: Reduzir o capital disponível para próximas recomendações
         available_capital -= total_cost
         total_commission += commission
         
         # Limitar número de compras para não diluir demais a carteira
-        if len(plan["buy"]) >= 5 or available_capital < 100:
+        if len(plan["buy"]) >= params.get("max_portfolio_assets", 5) // 2 or available_capital < 100:
             break
     
     # 8. Calcular estatísticas do plano de rebalanceamento
@@ -2074,7 +2006,7 @@ def generate_rebalance_plan(portfolio_analysis: dict, watchlist_analysis: dict,
         "numero_rebalanceamentos": len(plan["rebalance"]),
         "numero_compras": len(plan["buy"])
     }
-    
+
     # Add debug logging before return
     try:
         logger.debug(f"Returning rebalance plan: {len(plan['sell'])} sells, {len(plan['rebalance'])} rebalances, {len(plan['buy'])} buys")
@@ -2098,6 +2030,9 @@ def generate_rebalance_plan(portfolio_analysis: dict, watchlist_analysis: dict,
                 "numero_compras": 0
             }
         }
+    
+    return plan
+    
 
 def calculate_xp_commission(value: float) -> float:
     """
@@ -2463,7 +2398,7 @@ class NotificationSystem:
             }
             
             # Enviar para webhook
-            response = requests.post(url, json=payload, timeout=10)
+            response = http_session.post(url, json=payload, timeout=10)
             response.raise_for_status()
             
             return True

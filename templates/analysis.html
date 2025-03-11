@@ -329,6 +329,11 @@
                                             <a href="/news?ticker={{ ticker }}" class="btn btn-sm btn-outline-warning" title="Notícias">
                                                 <i class="bi bi-newspaper"></i>
                                             </a>
+                                            {% if details.decision in ['COMPRAR', 'COMPRAR PARCIAL'] and details.position_sizing and details.position_sizing.suggested_shares > 0 %}
+                                            <a href="/trade?ticker={{ ticker }}&quantity={{ details.position_sizing.suggested_shares }}&price={{ '%.2f'|format(details.current_price) }}&trade_type=COMPRA" class="btn btn-sm btn-outline-success" title="Comprar mais">
+                                                <i class="bi bi-cart-plus"></i> {{ details.position_sizing.suggested_shares }}
+                                            </a>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>

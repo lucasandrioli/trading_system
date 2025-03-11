@@ -1,164 +1,102 @@
 {
   "portfolio": {
-    "TECS": {
-      "symbol": "TECS",
-      "quantity": 3,
-      "avg_price": 55.84,
-      "current_price": 55.310001373291016,
-      "current_position": 165.93000411987305,
-      "last_sell": null,
-      "last_buy": null
-    },
     "IAK": {
       "symbol": "IAK",
       "quantity": 2,
       "avg_price": 134.88,
-      "current_price": 134.32000732421875,
-      "current_position": 268.6400146484375,
-      "last_sell": null,
-      "last_buy": null
-    },
-    "ASAN": {
-      "symbol": "ASAN",
-      "quantity": 7,
-      "avg_price": 18.54,
-      "current_price": 18.25,
-      "current_position": 127.75,
-      "last_sell": null,
-      "last_buy": null
-    },
-    "FBTC": {
-      "symbol": "FBTC",
-      "quantity": 1,
-      "avg_price": 78.52,
-      "current_price": 75.94999694824219,
-      "current_position": 75.94999694824219,
+      "current_price": 133.4199981689453,
+      "current_position": 266.8399963378906,
       "last_sell": null,
       "last_buy": null
     },
     "BERZ": {
       "symbol": "BERZ",
-      "quantity": 7,
-      "avg_price": 15.12,
-      "current_price": 14.869999885559082,
-      "current_position": 104.08999919891357,
-      "last_sell": null,
-      "last_buy": null
-    },
-    "CWEB": {
-      "symbol": "CWEB",
-      "quantity": 2,
-      "avg_price": 49.71,
-      "current_price": 49.09000015258789,
-      "current_position": 98.18000030517578,
-      "last_sell": null,
-      "last_buy": null
-    },
-    "TQQQ": {
-      "symbol": "TQQQ",
-      "quantity": 2,
-      "avg_price": 68.24,
-      "current_price": 67.41000366210938,
-      "current_position": 134.82000732421875,
-      "last_sell": null,
-      "last_buy": null
-    },
-    "KWEB": {
-      "symbol": "KWEB",
-      "quantity": 3,
-      "avg_price": 37.27,
-      "current_price": 36.9900016784668,
-      "current_position": 110.97000503540039,
-      "last_sell": null,
-      "last_buy": null
+      "quantity": 19,
+      "avg_price": 17.070000000000004,
+      "current_price": 17.1200008392334,
+      "current_position": 325.28001594543457,
+      "last_sell": {
+        "price": 17.12,
+        "quantity": 3,
+        "date": "2025-03-10T14:13:49.977237"
+      },
+      "last_buy": {
+        "price": 17.59,
+        "quantity": 15,
+        "date": "2025-03-10T16:14:33.000526"
+      }
     },
     "STVN": {
       "symbol": "STVN",
-      "quantity": 8,
-      "avg_price": 21.26,
-      "current_price": 21.559999465942383,
-      "current_position": 172.47999572753906,
+      "quantity": 15,
+      "avg_price": 21.591333333333335,
+      "current_price": 22.1299991607666,
+      "current_position": 331.949987411499,
       "last_sell": null,
-      "last_buy": null
-    },
-    "VKTX": {
-      "symbol": "VKTX",
-      "quantity": 2,
-      "avg_price": 29.83,
-      "current_price": 29.100000381469727,
-      "current_position": 58.20000076293945,
-      "last_sell": null,
-      "last_buy": null
-    },
-    "BBAI": {
-      "symbol": "BBAI",
-      "quantity": 50,
-      "avg_price": 3.39,
-      "current_price": 3.3399999141693115,
-      "current_position": 166.99999570846558,
-      "last_sell": null,
-      "last_buy": null
-    },
-    "KC": {
-      "symbol": "KC",
-      "quantity": 4,
-      "avg_price": 17.59,
-      "current_price": 17.540000915527344,
-      "current_position": 70.16000366210938,
-      "last_sell": null,
-      "last_buy": null
+      "last_buy": {
+        "price": 21.97,
+        "quantity": 7,
+        "date": "2025-03-10T16:16:03.483656"
+      }
     },
     "EPI": {
       "symbol": "EPI",
-      "quantity": 2,
-      "avg_price": 42.09,
-      "current_price": 41.66999816894531,
-      "current_position": 83.33999633789062,
+      "quantity": 8,
+      "avg_price": 41.30375000000001,
+      "current_price": 40.90999984741211,
+      "current_position": 327.2799987792969,
       "last_sell": null,
-      "last_buy": null
+      "last_buy": {
+        "price": 41.85,
+        "quantity": 1,
+        "date": "2025-03-10T16:15:00.812193"
+      }
     },
     "FILL": {
       "symbol": "FILL",
-      "quantity": 3,
-      "avg_price": 23.57,
-      "current_price": 23.18000030517578,
-      "current_position": 69.54000091552734,
+      "quantity": 14,
+      "avg_price": 23.192857142857147,
+      "current_price": 23.260000228881836,
+      "current_position": 325.6400032043457,
       "last_sell": null,
-      "last_buy": null
+      "last_buy": {
+        "price": 23.09,
+        "quantity": 11,
+        "date": "2025-03-10T16:15:52.693250"
+      }
     },
     "DGRS": {
       "symbol": "DGRS",
-      "quantity": 3,
-      "avg_price": 48.49,
-      "current_price": 48.40999984741211,
-      "current_position": 145.22999954223633,
+      "quantity": 7,
+      "avg_price": 47.89,
+      "current_price": 47.86000061035156,
+      "current_position": 335.02000427246094,
       "last_sell": null,
-      "last_buy": null
-    },
-    "SMIN": {
-      "symbol": "SMIN",
-      "quantity": 18,
-      "avg_price": 65.78,
-      "current_price": 65.8499984741211,
-      "current_position": 1185.2999725341797,
-      "last_sell": null,
-      "last_buy": null
+      "last_buy": {
+        "price": 47.44,
+        "quantity": 4,
+        "date": "2025-03-10T16:15:30.224919"
+      }
     },
     "GSPY": {
       "symbol": "GSPY",
-      "quantity": 9,
-      "avg_price": 31.44,
-      "current_price": 31.707000732421875,
-      "current_position": 285.3630065917969,
+      "quantity": 10,
+      "avg_price": 31.360000000000003,
+      "current_price": 30.780000686645508,
+      "current_position": 307.8000068664551,
       "last_sell": null,
-      "last_buy": null
+      "last_buy": {
+        "price": 30.64,
+        "quantity": 1,
+        "date": "2025-03-10T16:15:17.812804"
+      }
     },
     "VAMO": {
       "symbol": "VAMO",
       "quantity": 20,
       "avg_price": 28.85,
-      "current_price": 28.854999542236328,
-      "current_position": 577.0999908447266,
+      "current_price": 28.75,
+      "current_position": 575.0,
       "last_sell": null,
       "last_buy": null
     },
@@ -166,245 +104,105 @@
       "symbol": "BJ",
       "quantity": 2,
       "avg_price": 112.95,
-      "current_price": 115.5,
-      "current_position": 231.0,
+      "current_price": 115.71499633789062,
+      "current_position": 231.42999267578125,
       "last_sell": null,
       "last_buy": null
     },
     "ITM": {
       "symbol": "ITM",
-      "quantity": 2,
-      "avg_price": 46.61,
-      "current_price": 46.130001068115234,
-      "current_position": 92.26000213623047,
+      "quantity": 7,
+      "avg_price": 46.36,
+      "current_price": 46.255001068115234,
+      "current_position": 323.78500747680664,
       "last_sell": null,
-      "last_buy": null
+      "last_buy": {
+        "price": 46.26,
+        "quantity": 5,
+        "date": "2025-03-10T16:16:26.981388"
+      }
     },
     "XHB": {
       "symbol": "XHB",
       "quantity": 4,
       "avg_price": 100.88,
-      "current_price": 101.87999725341797,
-      "current_position": 407.5199890136719,
-      "last_sell": null,
-      "last_buy": null
-    },
-    "PTIR": {
-      "symbol": "PTIR",
-      "quantity": 8,
-      "avg_price": 134.14,
-      "current_price": 140.9199981689453,
-      "current_position": 1127.3599853515625,
+      "current_price": 101.83999633789062,
+      "current_position": 407.3599853515625,
       "last_sell": null,
       "last_buy": null
     },
     "ITB": {
       "symbol": "ITB",
-      "quantity": 2,
-      "avg_price": 99.96,
-      "current_price": 99.94000244140625,
-      "current_position": 199.8800048828125,
-      "last_sell": null,
-      "last_buy": null
+      "quantity": 17,
+      "avg_price": 99.94226890756303,
+      "current_price": 100.06500244140625,
+      "current_position": 1701.1050415039062,
+      "last_sell": {
+        "price": 3.0,
+        "quantity": 3,
+        "date": "2025-03-10T16:13:58.229809"
+      },
+      "last_buy": {
+        "price": 99.75,
+        "quantity": 5,
+        "date": "2025-03-10T16:56:31.125472"
+      }
+    },
+    "SQQQ": {
+      "symbol": "SQQQ",
+      "quantity": 10,
+      "avg_price": 38.24,
+      "current_price": 38.26689910888672,
+      "current_position": 382.6689910888672,
+      "last_buy": {
+        "price": 38.24,
+        "quantity": 10,
+        "date": "2025-03-10T16:37:28.277540"
+      },
+      "last_sell": null
     }
   },
   "watchlist": {
-    "FNGU": {
-      "symbol": "FNGU",
-      "monitor": true
-    },
-    "TSLQ": {
-      "symbol": "TSLQ",
-      "monitor": true
-    },
-    "FAST": {
-      "symbol": "FAST",
-      "monitor": true
-    },
-    "PCAR": {
-      "symbol": "PCAR",
-      "monitor": true
-    },
-    "ZS": {
-      "symbol": "ZS",
-      "monitor": true
-    },
-    "BIIB": {
-      "symbol": "BIIB",
-      "monitor": true
-    },
-    "EA": {
-      "symbol": "EA",
-      "monitor": true
-    },
-    "MAGS": {
-      "symbol": "MAGS",
-      "monitor": true
-    },
-    "CSCO": {
-      "symbol": "CSCO",
-      "monitor": true
-    },
-    "GDS": {
-      "symbol": "GDS",
-      "monitor": true
-    },
-    "SMMT": {
-      "symbol": "SMMT",
-      "monitor": true
-    },
-    "PONY": {
-      "symbol": "PONY",
-      "monitor": true
-    },
-    "EFA": {
-      "symbol": "EFA",
-      "monitor": true
-    },
-    "FXI": {
-      "symbol": "FXI",
-      "monitor": true
-    },
-    "UBRL": {
-      "symbol": "UBRL",
-      "monitor": true
-    },
-    "WLY": {
-      "symbol": "WLY",
-      "monitor": true
-    },
-    "VDE": {
-      "symbol": "VDE",
-      "monitor": true
-    },
-    "DHLGY": {
-      "symbol": "DHLGY",
-      "monitor": true
-    },
-    "DLAKY": {
-      "symbol": "DLAKY",
-      "monitor": true
-    },
-    "IMPUY": {
-      "symbol": "IMPUY",
-      "monitor": true
-    },
-    "WEEV": {
-      "symbol": "WEEV",
-      "monitor": true
-    },
-    "BKRIF": {
-      "symbol": "BKRIF",
-      "monitor": true
-    },
-    "MHVY": {
-      "symbol": "MHVY",
-      "monitor": true
-    },
-    "ALGM": {
-      "symbol": "ALGM",
-      "monitor": true
-    },
-    "QKHUY": {
-      "symbol": "QKHUY",
-      "monitor": true
-    },
-    "ZK": {
-      "symbol": "ZK",
-      "monitor": true
-    },
-    "TKAMY": {
-      "symbol": "TKAMY",
-      "monitor": true
-    },
-    "EWTX": {
-      "symbol": "EWTX",
-      "monitor": true
-    },
-    "DNBBF": {
-      "symbol": "DNBBF",
-      "monitor": true
-    },
-    "NHYDY": {
-      "symbol": "NHYDY",
-      "monitor": true
-    },
-    "XPEV": {
-      "symbol": "XPEV",
-      "monitor": true
-    },
-    "TUR": {
-      "symbol": "TUR",
-      "monitor": true
-    },
-    "SURE": {
-      "symbol": "SURE",
-      "monitor": true
-    },
     "ITB": {
       "symbol": "ITB",
       "monitor": true
     },
-    "SPXV": {
-      "symbol": "SPXV",
+    "SQQQ": {
+      "symbol": "SQQQ",
       "monitor": true
     },
-    "HOMZ": {
-      "symbol": "HOMZ",
+    "TSLZ": {
+      "symbol": "TSLZ",
       "monitor": true
     },
-    "ECH": {
-      "symbol": "ECH",
+    "NVDQ": {
+      "symbol": "NVDQ",
       "monitor": true
     },
-    "CNYA": {
-      "symbol": "CNYA",
+    "FAZ": {
+      "symbol": "FAZ",
       "monitor": true
     },
-    "EWW": {
-      "symbol": "EWW",
+    "MSTZ": {
+      "symbol": "MSTZ",
       "monitor": true
     },
-    "IYK": {
-      "symbol": "IYK",
+    "SPTS": {
+      "symbol": "SPTS",
       "monitor": true
     },
-    "EZA": {
-      "symbol": "EZA",
+    "SPTI": {
+      "symbol": "SPTI",
       "monitor": true
     },
-    "IDOG": {
-      "symbol": "IDOG",
-      "monitor": true
-    },
-    "NHTY": {
-      "symbol": "NHTY",
-      "monitor": true
-    },
-    "XLE": {
-      "symbol": "XLE",
-      "monitor": true
-    },
-    "CHIQ": {
-      "symbol": "CHIQ",
-      "monitor": true
-    },
-    "FEMS": {
-      "symbol": "FEMS",
-      "monitor": true
-    },
-    "GNMA": {
-      "symbol": "GNMA",
-      "monitor": true
-    },
-    "RFV": {
-      "symbol": "RFV",
+    "STIP": {
+      "symbol": "STIP",
       "monitor": true
     }
   },
-  "account_balance": 12.280000000000001,
+  "account_balance": 32.8,
   "goals": {
     "target_recovery": 500,
-    "days": 10
+    "days": 5
   }
 }

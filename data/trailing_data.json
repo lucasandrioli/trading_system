@@ -1,11 +1,11 @@
 {
   "TECS": {
-    "highest_price": 55.310001373291016,
-    "stop_level": 53.65070133209228
+    "highest_price": 61.470001220703125,
+    "stop_level": 59.62590118408203
   },
   "IAK": {
-    "highest_price": 134.32000732421875,
-    "stop_level": 130.29040710449217
+    "highest_price": 134.85499572753906,
+    "stop_level": 130.80934585571288
   },
   "ASAN": {
     "highest_price": 18.25,
@@ -16,8 +16,8 @@
     "stop_level": 73.67149703979491
   },
   "BERZ": {
-    "highest_price": 14.869999885559082,
-    "stop_level": 14.42389988899231
+    "highest_price": 17.239999771118164,
+    "stop_level": 16.72279977798462
   },
   "CWEB": {
     "highest_price": 49.09000015258789,
@@ -32,8 +32,8 @@
     "stop_level": 35.88030162811279
   },
   "STVN": {
-    "highest_price": 21.559999465942383,
-    "stop_level": 20.91319948196411
+    "highest_price": 22.1299991607666,
+    "stop_level": 21.4660991859436
   },
   "VKTX": {
     "highest_price": 29.100000381469727,
@@ -52,8 +52,8 @@
     "stop_level": 40.41989822387695
   },
   "FILL": {
-    "highest_price": 23.18000030517578,
-    "stop_level": 22.484600296020506
+    "highest_price": 23.271299362182617,
+    "stop_level": 22.573160381317138
   },
   "DGRS": {
     "highest_price": 48.40999984741211,
@@ -72,23 +72,27 @@
     "stop_level": 27.989349555969238
   },
   "BJ": {
-    "highest_price": 115.5,
-    "stop_level": 112.035
+    "highest_price": 117.79499816894531,
+    "stop_level": 114.26114822387694
   },
   "ITM": {
-    "highest_price": 46.130001068115234,
-    "stop_level": 44.74610103607178
+    "highest_price": 46.255001068115234,
+    "stop_level": 44.867351036071774
   },
   "XHB": {
-    "highest_price": 101.87999725341797,
-    "stop_level": 98.82359733581542
+    "highest_price": 102.44999694824219,
+    "stop_level": 99.37649703979491
   },
   "PTIR": {
     "highest_price": 140.9199981689453,
     "stop_level": 136.69239822387695
   },
   "ITB": {
-    "highest_price": 99.94000244140625,
-    "stop_level": 96.94180236816406
+    "highest_price": 100.83499908447266,
+    "stop_level": 97.80994911193848
+  },
+  "SQQQ": {
+    "highest_price": 38.26689910888672,
+    "stop_level": 37.118892135620115
   }
 }

@@ -758,32 +758,33 @@ def refresh_prices():
     portfolio = data.get('portfolio', {})
     
     if not portfolio:
-        flash('Nenhum ativo na carteira para atualizar.', 'warning')
+        flash('No assets in portfolio to update.', 'warning')
         return redirect(url_for('index'))
     
-    # Obter todos os tickers
+    # Get all tickers at once
     tickers = list(portfolio.keys())
     
-    # Obter preços atuais
     try:
+        # Single bulk call instead of multiple individual calls
+        start_time = datetime.now()
         prices = DataLoader.get_realtime_prices_bulk(tickers)
         
-        # Atualizar preços no portfólio
+        # Update prices in portfolio
+        updates = 0
         for ticker, price in prices.items():
             if ticker in portfolio:
-                old_price = portfolio[ticker].get('current_price', 0)
                 portfolio[ticker]['current_price'] = price
                 portfolio[ticker]['current_position'] = portfolio[ticker]['quantity'] * price
-                
-                # Calcular variação
-                change = (price / old_price - 1) * 100 if old_price > 0 else 0
-                flash(f'{ticker}: ${old_price:.2f} → ${price:.2f} ({change:.2f}%)', 'info')
+                updates += 1
         
         save_portfolio(data)
-        flash('Preços atualizados com sucesso!', 'success')
+        end_time = datetime.now()
+        elapsed = (end_time - start_time).total_seconds()
+        
+        flash(f'Updated {updates} prices in {elapsed:.2f} seconds!', 'success')
     except Exception as e:
-        app.logger.error(f"Erro ao atualizar preços: {e}")
-        flash(f'Erro ao atualizar preços: {str(e)}', 'danger')
+        app.logger.error(f"Error updating prices: {e}")
+        flash(f'Error updating prices: {str(e)}', 'danger')
     
     return redirect(url_for('index'))
 
