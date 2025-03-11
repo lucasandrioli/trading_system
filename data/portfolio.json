@@ -4,47 +4,17 @@
       "symbol": "IAK",
       "quantity": 2,
       "avg_price": 134.88,
-      "current_price": 133.36000061035156,
-      "current_position": 266.7200012207031,
+      "current_price": 132.73500061035156,
+      "current_position": 265.4700012207031,
       "last_sell": null,
       "last_buy": null
-    },
-    "BERZ": {
-      "symbol": "BERZ",
-      "quantity": 19,
-      "avg_price": 17.070000000000004,
-      "current_price": 17.1200008392334,
-      "current_position": 325.28001594543457,
-      "last_sell": {
-        "price": 17.12,
-        "quantity": 3,
-        "date": "2025-03-10T14:13:49.977237"
-      },
-      "last_buy": {
-        "price": 17.59,
-        "quantity": 15,
-        "date": "2025-03-10T16:14:33.000526"
-      }
-    },
-    "STVN": {
-      "symbol": "STVN",
-      "quantity": 15,
-      "avg_price": 21.591333333333335,
-      "current_price": 22.600000381469727,
-      "current_position": 339.0000057220459,
-      "last_sell": null,
-      "last_buy": {
-        "price": 21.97,
-        "quantity": 7,
-        "date": "2025-03-10T16:16:03.483656"
-      }
     },
     "EPI": {
       "symbol": "EPI",
       "quantity": 8,
       "avg_price": 41.30375000000001,
-      "current_price": 40.9900016784668,
-      "current_position": 327.9200134277344,
+      "current_price": 41.290000915527344,
+      "current_position": 330.32000732421875,
       "last_sell": null,
       "last_buy": {
         "price": 41.85,
@@ -56,8 +26,8 @@
       "symbol": "FILL",
       "quantity": 14,
       "avg_price": 23.192857142857147,
-      "current_price": 23.260000228881836,
-      "current_position": 325.6400032043457,
+      "current_price": 23.389999389648438,
+      "current_position": 327.4599914550781,
       "last_sell": null,
       "last_buy": {
         "price": 23.09,
@@ -69,26 +39,13 @@
       "symbol": "DGRS",
       "quantity": 7,
       "avg_price": 47.89,
-      "current_price": 47.72999954223633,
-      "current_position": 334.1099967956543,
+      "current_price": 47.765201568603516,
+      "current_position": 334.3564109802246,
       "last_sell": null,
       "last_buy": {
         "price": 47.44,
         "quantity": 4,
         "date": "2025-03-10T16:15:30.224919"
-      }
-    },
-    "GSPY": {
-      "symbol": "GSPY",
-      "quantity": 10,
-      "avg_price": 31.360000000000003,
-      "current_price": 30.878999710083008,
-      "current_position": 308.7899971008301,
-      "last_sell": null,
-      "last_buy": {
-        "price": 30.64,
-        "quantity": 1,
-        "date": "2025-03-10T16:15:17.812804"
       }
     },
     "VAMO": {
@@ -100,66 +57,18 @@
       "last_sell": null,
       "last_buy": null
     },
-    "BJ": {
-      "symbol": "BJ",
-      "quantity": 2,
-      "avg_price": 112.95,
-      "current_price": 115.37999725341797,
-      "current_position": 230.75999450683594,
-      "last_sell": null,
-      "last_buy": null
-    },
     "ITM": {
       "symbol": "ITM",
       "quantity": 7,
       "avg_price": 46.36,
-      "current_price": 46.27000045776367,
-      "current_position": 323.8900032043457,
+      "current_price": 46.18000030517578,
+      "current_position": 323.26000213623047,
       "last_sell": null,
       "last_buy": {
         "price": 46.26,
         "quantity": 5,
         "date": "2025-03-10T16:16:26.981388"
       }
-    },
-    "XHB": {
-      "symbol": "XHB",
-      "quantity": 4,
-      "avg_price": 100.88,
-      "current_price": 101.2300033569336,
-      "current_position": 404.9200134277344,
-      "last_sell": null,
-      "last_buy": null
-    },
-    "ITB": {
-      "symbol": "ITB",
-      "quantity": 17,
-      "avg_price": 99.94226890756303,
-      "current_price": 99.62000274658203,
-      "current_position": 1693.5400466918945,
-      "last_sell": {
-        "price": 3.0,
-        "quantity": 3,
-        "date": "2025-03-10T16:13:58.229809"
-      },
-      "last_buy": {
-        "price": 99.75,
-        "quantity": 5,
-        "date": "2025-03-10T16:56:31.125472"
-      }
-    },
-    "SQQQ": {
-      "symbol": "SQQQ",
-      "quantity": 10,
-      "avg_price": 38.24,
-      "current_price": 38.369998931884766,
-      "current_position": 383.69998931884766,
-      "last_buy": {
-        "price": 38.24,
-        "quantity": 10,
-        "date": "2025-03-10T16:37:28.277540"
-      },
-      "last_sell": null
     }
   },
   "watchlist": {
@@ -198,9 +107,41 @@
     "STIP": {
       "symbol": "STIP",
       "monitor": true
+    },
+    "LABD": {
+      "symbol": "LABD",
+      "monitor": true
+    },
+    "TECS": {
+      "symbol": "TECS",
+      "monitor": true
+    },
+    "NVDD": {
+      "symbol": "NVDD",
+      "monitor": true
+    },
+    "SOXS": {
+      "symbol": "SOXS",
+      "monitor": true
+    },
+    "KC": {
+      "symbol": "KC",
+      "monitor": true
+    },
+    "AIBD": {
+      "symbol": "AIBD",
+      "monitor": true
+    },
+    "IAU": {
+      "symbol": "IAU",
+      "monitor": true
+    },
+    "SGOL": {
+      "symbol": "SGOL",
+      "monitor": true
     }
   },
-  "account_balance": 32.8,
+  "account_balance": 3623.17,
   "goals": {
     "target_recovery": 500,
     "days": 5

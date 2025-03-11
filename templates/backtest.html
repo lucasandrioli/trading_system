@@ -1,195 +1,61 @@
-{% extends "base.html" %}
-
-{% block title %}Backtest - Sistema de Trading{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
-    <h1 class="mb-4">Backtesting da Carteira</h1>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Backtest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Backtest</h1>
+        <nav>
+            <ul>
+                <!-- Alterado para usar o endpoint 'optimize' -->
+                <li><a href="{{ url_for('optimize') }}">Home</a></li>
+                <li><a href="{{ url_for('backtest') }}">Backtest</a></li>
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            </ul>
+        </nav>
+    </header>
     
-    <div class="row">
-        <div class="col-lg-4 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Configurações de Backtest</h5>
-                </div>
-                <div class="card-body">
-                    <form method="post" action="/backtest">
-                        {{ form.csrf_token }}
-                        <div class="mb-3">
-                            <label for="days" class="form-label">Período (dias)</label>
-                            {{ form.days(class="form-control", type="number") }}
-                        </div>
-                        <div class="mb-3">
-                            <label for="benchmark" class="form-label">Benchmark</label>
-                            {{ form.benchmark(class="form-control", placeholder="Ex: SPY") }}
-                        </div>
-                        <div class="mb-3">
-                            <label for="risk_profile" class="form-label">Perfil de Risco</label>
-                            {{ form.risk_profile(class="form-select") }}
-                        </div>
-                        <div class="d-grid">
-                            {{ form.submit(class="btn btn-primary") }}
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        
-        {% if results %}
-        <div class="col-lg-8 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Resultados do Backtest</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Métricas da Carteira</h6>
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <tbody>
-                                        <tr>
-                                            <td>Retorno Total:</td>
-                                            <td class="{% if results.portfolio_metrics.total_return_pct >= 0 %}positive{% else %}negative{% endif %}">
-                                                {{ "%.2f"|format(results.portfolio_metrics.total_return_pct) }}%
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Retorno Anualizado:</td>
-                                            <td class="{% if results.portfolio_metrics.annual_return_pct >= 0 %}positive{% else %}negative{% endif %}">
-                                                {{ "%.2f"|format(results.portfolio_metrics.annual_return_pct) }}%
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Volatilidade:</td>
-                                            <td>{{ "%.2f"|format(results.portfolio_metrics.volatility_pct) }}%</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sharpe Ratio:</td>
-                                            <td>{{ "%.2f"|format(results.portfolio_metrics.sharpe_ratio) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sortino Ratio:</td>
-                                            <td>{{ "%.2f"|format(results.portfolio_metrics.sortino_ratio) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Max Drawdown:</td>
-                                            <td class="negative">{{ "%.2f"|format(results.portfolio_metrics.max_drawdown_pct) }}%</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Win Rate:</td>
-                                            <td>{{ "%.2f"|format(results.portfolio_metrics.win_rate * 100) }}%</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Comparação com Benchmark ({{ results.benchmark_ticker }})</h6>
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <tbody>
-                                        <tr>
-                                            <td>Benchmark Retorno:</td>
-                                            <td class="{% if results.benchmark_metrics.total_return_pct >= 0 %}positive{% else %}negative{% endif %}">
-                                                {{ "%.2f"|format(results.benchmark_metrics.total_return_pct) }}%
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Retorno Ativo:</td>
-                                            <td class="{% if results.active_return >= 0 %}positive{% else %}negative{% endif %}">
-                                                {{ "%.2f"|format(results.active_return * 100) }}%
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Correlação:</td>
-                                            <td>{{ "%.2f"|format(results.correlation) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Information Ratio:</td>
-                                            <td>{{ "%.2f"|format(results.information_ratio) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Tracking Error:</td>
-                                            <td>{{ "%.2f"|format(results.tracking_error * 100) }}%</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Período:</td>
-                                            <td>{{ results.period_days }} dias</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {% if chart_data %}
-                    <div class="mt-4">
-                        <h6>Desempenho</h6>
-                        <canvas id="performanceChart" height="250"></canvas>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+    <main>
+        {% if backtest_results %}
+            <section id="results">
+                <h2>Resultados do Backtest</h2>
+                {% if backtest_results.success %}
+                    <p>O backtest foi realizado com sucesso!</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Valor</th>
+                                <th>Operação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in backtest_results.data %}
+                                <tr>
+                                    <td>{{ result.date }}</td>
+                                    <td>{{ result.value }}</td>
+                                    <td>{{ result.operation }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Ocorreu um erro ao realizar o backtest. Verifique os parâmetros ou consulte os logs.</p>
+                {% endif %}
+            </section>
+        {% else %}
+            <section id="no-results">
+                <h2>Nenhum resultado encontrado</h2>
+                <p>Por favor, configure os parâmetros do backtest e tente novamente.</p>
+            </section>
         {% endif %}
-    </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-{% if chart_data %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('performanceChart').getContext('2d');
-        
-        const chartData = {
-            labels: {{ chart_data.dates|tojson }},
-            datasets: [
-                {
-                    label: 'Carteira',
-                    data: {{ chart_data.portfolio|tojson }},
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderWidth: 2,
-                    fill: false,
-                    tension: 0.1
-                },
-                {
-                    label: 'Benchmark',
-                    data: {{ chart_data.benchmark|tojson }},
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderWidth: 2,
-                    fill: false,
-                    tension: 0.1
-                }
-            ]
-        };
-        
-        new Chart(ctx, {
-            type: 'line',
-            data: chartData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': $';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += new Intl.NumberFormat('en-US', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    }).format(context.parsed.y);
-                                }
-                                return label;
-                            }
-                        }
-                    }
+    </main>
+    
+    <footer>
+        <p>&copy; {{ current_year }} Trading System</p>
+    </footer>
+</body>
+</html>

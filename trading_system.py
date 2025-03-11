@@ -17,6 +17,8 @@ from typing import Dict, Optional, List, Tuple, Any
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 import requests
+import yfinance as yf
+from yfinance import EquityQuery, screen
 
 
 # Create a session with connection pooling and retry logic
