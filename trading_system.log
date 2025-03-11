@@ -2347,3 +2347,350 @@ AttributeError: type object 'DataLoader' has no attribute 'get_realtime_prices_b
 2025-03-11 08:57:18,742 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 08:57:18] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
 2025-03-11 08:57:56,034 - werkzeug - INFO -  * Detected change in '/Users/Lucas/Documents/GitHub/trading_system/trading_system.py', reloading
 2025-03-11 08:57:56,241 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 09:05:57,273 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 09:05:57,308 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.15.135:5001
+2025-03-11 09:05:57,308 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-11 09:05:57,309 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 09:05:58,285 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 09:05:58,309 - werkzeug - WARNING -  * Debugger is active!
+2025-03-11 09:05:58,320 - werkzeug - INFO -  * Debugger PIN: 817-908-197
+2025-03-11 09:06:01,007 - trading_system - ERROR - Error getting data from yfinance for SPY: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:01,009 - trading_system - WARNING - Empty data returned for SPY
+2025-03-11 09:06:01,009 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:06:01,010 - trading_system - ERROR - Error getting data from yfinance for QQQ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:01,010 - trading_system - WARNING - Empty data returned for QQQ
+2025-03-11 09:06:01,010 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:06:01,010 - trading_system - ERROR - Error getting data from yfinance for TLT: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:01,011 - trading_system - WARNING - Empty data returned for TLT
+2025-03-11 09:06:01,011 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:06:01,011 - trading_system - ERROR - Error getting data from yfinance for GLD: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:01,011 - trading_system - WARNING - Empty data returned for GLD
+2025-03-11 09:06:01,011 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:06:01,012 - trading_system - ERROR - Error getting data from yfinance for ^VIX: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:01,012 - trading_system - WARNING - Empty data returned for ^VIX
+2025-03-11 09:06:01,012 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:06:01,013 - trading_system - ERROR - Error getting data from yfinance for EEM: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:01,013 - trading_system - WARNING - Empty data returned for EEM
+2025-03-11 09:06:01,013 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:06:01,013 - trading_system - ERROR - Error getting data from yfinance for USO: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:01,013 - trading_system - WARNING - Empty data returned for USO
+2025-03-11 09:06:01,013 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:06:01,013 - trading_system - ERROR - Error getting data from yfinance for BTC-USD: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:01,014 - trading_system - WARNING - Empty data returned for BTC-USD
+2025-03-11 09:06:01,014 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:06:01,016 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 09:06:01,034 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:01] "GET / HTTP/1.1" 200 -
+2025-03-11 09:06:01,060 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:01] "GET /static/css/custom.css HTTP/1.1" 200 -
+2025-03-11 09:06:01,060 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:01] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-03-11 09:06:01,182 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:01] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-03-11 09:06:04,394 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:04] "GET /portfolio HTTP/1.1" 200 -
+2025-03-11 09:06:04,419 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:04] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:06:04,426 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:04] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:06:05,864 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:06:05,864 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:06:05,864 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:06:05,864 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:06:05,864 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:06:05,864 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:06:05,864 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:06:05,865 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:06:05,865 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 09:06:06,426 - trading_system - ERROR - Error getting data from yfinance for IAK: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,426 - trading_system - WARNING - Empty data returned for IAK
+2025-03-11 09:06:06,426 - trading_system - ERROR - Error getting data from yfinance for BERZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,426 - trading_system - WARNING - Empty data returned for BERZ
+2025-03-11 09:06:06,426 - trading_system - ERROR - Error getting data from yfinance for STVN: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,427 - trading_system - WARNING - Empty data returned for STVN
+2025-03-11 09:06:06,427 - trading_system - ERROR - Error getting data from yfinance for EPI: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,427 - trading_system - WARNING - Empty data returned for EPI
+2025-03-11 09:06:06,427 - trading_system - ERROR - Error getting data from yfinance for FILL: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,427 - trading_system - WARNING - Empty data returned for FILL
+2025-03-11 09:06:06,427 - trading_system - ERROR - Error getting data from yfinance for DGRS: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,427 - trading_system - WARNING - Empty data returned for DGRS
+2025-03-11 09:06:06,427 - trading_system - ERROR - Error getting data from yfinance for GSPY: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,427 - trading_system - WARNING - Empty data returned for GSPY
+2025-03-11 09:06:06,428 - trading_system - ERROR - Error getting data from yfinance for VAMO: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,428 - trading_system - WARNING - Empty data returned for VAMO
+2025-03-11 09:06:06,428 - trading_system - ERROR - Error getting data from yfinance for BJ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,428 - trading_system - WARNING - Empty data returned for BJ
+2025-03-11 09:06:06,428 - trading_system - ERROR - Error getting data from yfinance for ITM: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,428 - trading_system - WARNING - Empty data returned for ITM
+2025-03-11 09:06:06,428 - trading_system - ERROR - Error getting data from yfinance for XHB: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,428 - trading_system - WARNING - Empty data returned for XHB
+2025-03-11 09:06:06,429 - trading_system - ERROR - Error getting data from yfinance for ITB: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,429 - trading_system - WARNING - Empty data returned for ITB
+2025-03-11 09:06:06,429 - trading_system - ERROR - Error getting data from yfinance for SQQQ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,429 - trading_system - WARNING - Empty data returned for SQQQ
+2025-03-11 09:06:06,429 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:06:06,429 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:06:06,429 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:06:06,429 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:06:06,429 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:06:06,429 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:06:06,429 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:06:06,429 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:06:06,458 - trading_system - ERROR - Error getting data from yfinance for TSLZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,458 - trading_system - WARNING - Empty data returned for TSLZ
+2025-03-11 09:06:06,459 - trading_system - ERROR - Error getting data from yfinance for NVDQ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,459 - trading_system - WARNING - Empty data returned for NVDQ
+2025-03-11 09:06:06,459 - trading_system - ERROR - Error getting data from yfinance for FAZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,459 - trading_system - WARNING - Empty data returned for FAZ
+2025-03-11 09:06:06,459 - trading_system - ERROR - Error getting data from yfinance for MSTZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,459 - trading_system - WARNING - Empty data returned for MSTZ
+2025-03-11 09:06:06,459 - trading_system - ERROR - Error getting data from yfinance for SPTS: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,459 - trading_system - WARNING - Empty data returned for SPTS
+2025-03-11 09:06:06,460 - trading_system - ERROR - Error getting data from yfinance for SPTI: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,460 - trading_system - WARNING - Empty data returned for SPTI
+2025-03-11 09:06:06,460 - trading_system - ERROR - Error getting data from yfinance for STIP: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:06,460 - trading_system - WARNING - Empty data returned for STIP
+2025-03-11 09:06:06,473 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:06] "GET /analyze?risk=medium HTTP/1.1" 200 -
+2025-03-11 09:06:06,532 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:06] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:06:06,550 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:06] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:06:13,152 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:06:13,152 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:06:13,152 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:06:13,152 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:06:13,152 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:06:13,152 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:06:13,152 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:06:13,152 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:06:13,152 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 09:06:13,236 - trading_system - ERROR - Error getting data from yfinance for IAK: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,236 - trading_system - WARNING - Empty data returned for IAK
+2025-03-11 09:06:13,237 - trading_system - ERROR - Error getting data from yfinance for BERZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,237 - trading_system - WARNING - Empty data returned for BERZ
+2025-03-11 09:06:13,237 - trading_system - ERROR - Error getting data from yfinance for STVN: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,237 - trading_system - WARNING - Empty data returned for STVN
+2025-03-11 09:06:13,237 - trading_system - ERROR - Error getting data from yfinance for EPI: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,237 - trading_system - WARNING - Empty data returned for EPI
+2025-03-11 09:06:13,237 - trading_system - ERROR - Error getting data from yfinance for FILL: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,237 - trading_system - WARNING - Empty data returned for FILL
+2025-03-11 09:06:13,238 - trading_system - ERROR - Error getting data from yfinance for DGRS: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,238 - trading_system - WARNING - Empty data returned for DGRS
+2025-03-11 09:06:13,238 - trading_system - ERROR - Error getting data from yfinance for GSPY: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,238 - trading_system - WARNING - Empty data returned for GSPY
+2025-03-11 09:06:13,238 - trading_system - ERROR - Error getting data from yfinance for VAMO: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,238 - trading_system - WARNING - Empty data returned for VAMO
+2025-03-11 09:06:13,238 - trading_system - ERROR - Error getting data from yfinance for BJ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,238 - trading_system - WARNING - Empty data returned for BJ
+2025-03-11 09:06:13,239 - trading_system - ERROR - Error getting data from yfinance for ITM: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,239 - trading_system - WARNING - Empty data returned for ITM
+2025-03-11 09:06:13,239 - trading_system - ERROR - Error getting data from yfinance for XHB: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,239 - trading_system - WARNING - Empty data returned for XHB
+2025-03-11 09:06:13,239 - trading_system - ERROR - Error getting data from yfinance for ITB: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,239 - trading_system - WARNING - Empty data returned for ITB
+2025-03-11 09:06:13,239 - trading_system - ERROR - Error getting data from yfinance for SQQQ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,239 - trading_system - WARNING - Empty data returned for SQQQ
+2025-03-11 09:06:13,240 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:06:13,240 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:06:13,240 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:06:13,240 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:06:13,240 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:06:13,240 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:06:13,240 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:06:13,240 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:06:13,268 - trading_system - ERROR - Error getting data from yfinance for TSLZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,269 - trading_system - WARNING - Empty data returned for TSLZ
+2025-03-11 09:06:13,269 - trading_system - ERROR - Error getting data from yfinance for NVDQ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,269 - trading_system - WARNING - Empty data returned for NVDQ
+2025-03-11 09:06:13,269 - trading_system - ERROR - Error getting data from yfinance for FAZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,269 - trading_system - WARNING - Empty data returned for FAZ
+2025-03-11 09:06:13,269 - trading_system - ERROR - Error getting data from yfinance for MSTZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,269 - trading_system - WARNING - Empty data returned for MSTZ
+2025-03-11 09:06:13,270 - trading_system - ERROR - Error getting data from yfinance for SPTS: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,270 - trading_system - WARNING - Empty data returned for SPTS
+2025-03-11 09:06:13,270 - trading_system - ERROR - Error getting data from yfinance for SPTI: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,270 - trading_system - WARNING - Empty data returned for SPTI
+2025-03-11 09:06:13,270 - trading_system - ERROR - Error getting data from yfinance for STIP: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:06:13,270 - trading_system - WARNING - Empty data returned for STIP
+2025-03-11 09:06:13,271 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:13] "GET /analyze?risk=medium&extended=true HTTP/1.1" 200 -
+2025-03-11 09:06:13,329 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:13] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:06:13,348 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:13] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:06:15,982 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:06:15,982 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:06:15,983 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:06:15,983 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:06:15,983 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:06:15,983 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:06:15,983 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:06:15,983 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:06:15,983 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 09:06:16,067 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:06:16,068 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:06:16,068 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:06:16,068 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:06:16,068 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:06:16,068 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:06:16,068 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:06:16,068 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:06:16,096 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:16] "GET /analyze?risk=medium&extended=true HTTP/1.1" 200 -
+2025-03-11 09:06:16,127 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:16] "GET /static/css/custom.css HTTP/1.1" 200 -
+2025-03-11 09:06:16,127 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:16] "GET /static/js/script.js HTTP/1.1" 200 -
+2025-03-11 09:06:16,225 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:16] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-03-11 09:06:18,203 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:18] "GET /portfolio HTTP/1.1" 200 -
+2025-03-11 09:06:18,239 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:18] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:06:18,242 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:06:18] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:07:30,935 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 09:07:30,966 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.15.135:5001
+2025-03-11 09:07:30,966 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-11 09:07:30,966 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 09:07:31,847 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 09:07:31,865 - werkzeug - WARNING -  * Debugger is active!
+2025-03-11 09:07:31,872 - werkzeug - INFO -  * Debugger PIN: 817-908-197
+2025-03-11 09:07:39,627 - trading_system - ERROR - Error getting data from yfinance for SPY: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:39,627 - trading_system - WARNING - Empty data returned for SPY
+2025-03-11 09:07:39,628 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:07:39,629 - trading_system - ERROR - Error getting data from yfinance for QQQ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:39,629 - trading_system - WARNING - Empty data returned for QQQ
+2025-03-11 09:07:39,629 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:07:39,629 - trading_system - ERROR - Error getting data from yfinance for TLT: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:39,629 - trading_system - WARNING - Empty data returned for TLT
+2025-03-11 09:07:39,629 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:07:39,630 - trading_system - ERROR - Error getting data from yfinance for GLD: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:39,630 - trading_system - WARNING - Empty data returned for GLD
+2025-03-11 09:07:39,630 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:07:39,630 - trading_system - ERROR - Error getting data from yfinance for ^VIX: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:39,631 - trading_system - WARNING - Empty data returned for ^VIX
+2025-03-11 09:07:39,631 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:07:39,631 - trading_system - ERROR - Error getting data from yfinance for EEM: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:39,631 - trading_system - WARNING - Empty data returned for EEM
+2025-03-11 09:07:39,631 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:07:39,631 - trading_system - ERROR - Error getting data from yfinance for USO: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:39,631 - trading_system - WARNING - Empty data returned for USO
+2025-03-11 09:07:39,631 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:07:39,631 - trading_system - ERROR - Error getting data from yfinance for BTC-USD: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:39,631 - trading_system - WARNING - Empty data returned for BTC-USD
+2025-03-11 09:07:39,632 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:07:39,633 - trading_system - INFO - Verificando atualizações. Versão atual: 2.0.0
+2025-03-11 09:07:39,647 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:07:39] "GET / HTTP/1.1" 200 -
+2025-03-11 09:07:39,655 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:07:39] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:07:39,671 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:07:39] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:07:48,468 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:07:48] "GET /portfolio HTTP/1.1" 200 -
+2025-03-11 09:07:48,493 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:07:48] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:07:48,498 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:07:48] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:07:50,764 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:07:50,764 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:07:50,764 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:07:50,764 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:07:50,764 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:07:50,764 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:07:50,764 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:07:50,764 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:07:50,764 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 09:07:54,424 - trading_system - ERROR - Error getting data from yfinance for IAK: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,424 - trading_system - WARNING - Empty data returned for IAK
+2025-03-11 09:07:54,425 - trading_system - ERROR - Error getting data from yfinance for BERZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,425 - trading_system - WARNING - Empty data returned for BERZ
+2025-03-11 09:07:54,426 - trading_system - ERROR - Error getting data from yfinance for STVN: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,426 - trading_system - WARNING - Empty data returned for STVN
+2025-03-11 09:07:54,426 - trading_system - ERROR - Error getting data from yfinance for EPI: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,426 - trading_system - WARNING - Empty data returned for EPI
+2025-03-11 09:07:54,427 - trading_system - ERROR - Error getting data from yfinance for FILL: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,427 - trading_system - WARNING - Empty data returned for FILL
+2025-03-11 09:07:54,427 - trading_system - ERROR - Error getting data from yfinance for DGRS: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,428 - trading_system - WARNING - Empty data returned for DGRS
+2025-03-11 09:07:54,428 - trading_system - ERROR - Error getting data from yfinance for GSPY: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,428 - trading_system - WARNING - Empty data returned for GSPY
+2025-03-11 09:07:54,428 - trading_system - ERROR - Error getting data from yfinance for VAMO: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,429 - trading_system - WARNING - Empty data returned for VAMO
+2025-03-11 09:07:54,429 - trading_system - ERROR - Error getting data from yfinance for BJ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,429 - trading_system - WARNING - Empty data returned for BJ
+2025-03-11 09:07:54,429 - trading_system - ERROR - Error getting data from yfinance for ITM: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,430 - trading_system - WARNING - Empty data returned for ITM
+2025-03-11 09:07:54,430 - trading_system - ERROR - Error getting data from yfinance for XHB: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,430 - trading_system - WARNING - Empty data returned for XHB
+2025-03-11 09:07:54,430 - trading_system - ERROR - Error getting data from yfinance for ITB: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,431 - trading_system - WARNING - Empty data returned for ITB
+2025-03-11 09:07:54,431 - trading_system - ERROR - Error getting data from yfinance for SQQQ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:54,431 - trading_system - WARNING - Empty data returned for SQQQ
+2025-03-11 09:07:54,431 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:07:54,431 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:07:54,431 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:07:54,431 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:07:54,431 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:07:54,431 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:07:54,431 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:07:54,432 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:07:56,395 - trading_system - ERROR - Error getting data from yfinance for TSLZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:56,396 - trading_system - WARNING - Empty data returned for TSLZ
+2025-03-11 09:07:56,396 - trading_system - ERROR - Error getting data from yfinance for NVDQ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:56,396 - trading_system - WARNING - Empty data returned for NVDQ
+2025-03-11 09:07:56,397 - trading_system - ERROR - Error getting data from yfinance for FAZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:56,397 - trading_system - WARNING - Empty data returned for FAZ
+2025-03-11 09:07:56,397 - trading_system - ERROR - Error getting data from yfinance for MSTZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:56,398 - trading_system - WARNING - Empty data returned for MSTZ
+2025-03-11 09:07:56,398 - trading_system - ERROR - Error getting data from yfinance for SPTS: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:56,398 - trading_system - WARNING - Empty data returned for SPTS
+2025-03-11 09:07:56,398 - trading_system - ERROR - Error getting data from yfinance for SPTI: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:56,399 - trading_system - WARNING - Empty data returned for SPTI
+2025-03-11 09:07:56,399 - trading_system - ERROR - Error getting data from yfinance for STIP: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:07:56,399 - trading_system - WARNING - Empty data returned for STIP
+2025-03-11 09:07:56,422 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:07:56] "GET /analyze?risk=medium HTTP/1.1" 200 -
+2025-03-11 09:07:56,463 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:07:56] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:07:56,465 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:07:56] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 09:08:00,431 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:08:00,431 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:08:00,431 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:08:00,432 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:08:00,432 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:08:00,432 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:08:00,432 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:08:00,432 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:08:00,432 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 0.0)
+2025-03-11 09:08:00,517 - trading_system - ERROR - Error getting data from yfinance for IAK: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,517 - trading_system - WARNING - Empty data returned for IAK
+2025-03-11 09:08:00,517 - trading_system - ERROR - Error getting data from yfinance for BERZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,517 - trading_system - WARNING - Empty data returned for BERZ
+2025-03-11 09:08:00,517 - trading_system - ERROR - Error getting data from yfinance for STVN: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,518 - trading_system - WARNING - Empty data returned for STVN
+2025-03-11 09:08:00,518 - trading_system - ERROR - Error getting data from yfinance for EPI: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,518 - trading_system - WARNING - Empty data returned for EPI
+2025-03-11 09:08:00,518 - trading_system - ERROR - Error getting data from yfinance for FILL: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,518 - trading_system - WARNING - Empty data returned for FILL
+2025-03-11 09:08:00,518 - trading_system - ERROR - Error getting data from yfinance for DGRS: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,518 - trading_system - WARNING - Empty data returned for DGRS
+2025-03-11 09:08:00,518 - trading_system - ERROR - Error getting data from yfinance for GSPY: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,518 - trading_system - WARNING - Empty data returned for GSPY
+2025-03-11 09:08:00,519 - trading_system - ERROR - Error getting data from yfinance for VAMO: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,519 - trading_system - WARNING - Empty data returned for VAMO
+2025-03-11 09:08:00,519 - trading_system - ERROR - Error getting data from yfinance for BJ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,519 - trading_system - WARNING - Empty data returned for BJ
+2025-03-11 09:08:00,519 - trading_system - ERROR - Error getting data from yfinance for ITM: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,519 - trading_system - WARNING - Empty data returned for ITM
+2025-03-11 09:08:00,519 - trading_system - ERROR - Error getting data from yfinance for XHB: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,519 - trading_system - WARNING - Empty data returned for XHB
+2025-03-11 09:08:00,520 - trading_system - ERROR - Error getting data from yfinance for ITB: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,520 - trading_system - WARNING - Empty data returned for ITB
+2025-03-11 09:08:00,520 - trading_system - ERROR - Error getting data from yfinance for SQQQ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,520 - trading_system - WARNING - Empty data returned for SQQQ
+2025-03-11 09:08:00,520 - trading_system - WARNING - Dados insuficientes para análise de mercado: SPY
+2025-03-11 09:08:00,520 - trading_system - WARNING - Dados insuficientes para análise de mercado: QQQ
+2025-03-11 09:08:00,520 - trading_system - WARNING - Dados insuficientes para análise de mercado: TLT
+2025-03-11 09:08:00,520 - trading_system - WARNING - Dados insuficientes para análise de mercado: GLD
+2025-03-11 09:08:00,520 - trading_system - WARNING - Dados insuficientes para análise de mercado: ^VIX
+2025-03-11 09:08:00,520 - trading_system - WARNING - Dados insuficientes para análise de mercado: EEM
+2025-03-11 09:08:00,520 - trading_system - WARNING - Dados insuficientes para análise de mercado: USO
+2025-03-11 09:08:00,520 - trading_system - WARNING - Dados insuficientes para análise de mercado: BTC-USD
+2025-03-11 09:08:00,548 - trading_system - ERROR - Error getting data from yfinance for TSLZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,549 - trading_system - WARNING - Empty data returned for TSLZ
+2025-03-11 09:08:00,549 - trading_system - ERROR - Error getting data from yfinance for NVDQ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,549 - trading_system - WARNING - Empty data returned for NVDQ
+2025-03-11 09:08:00,549 - trading_system - ERROR - Error getting data from yfinance for FAZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,549 - trading_system - WARNING - Empty data returned for FAZ
+2025-03-11 09:08:00,549 - trading_system - ERROR - Error getting data from yfinance for MSTZ: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,549 - trading_system - WARNING - Empty data returned for MSTZ
+2025-03-11 09:08:00,550 - trading_system - ERROR - Error getting data from yfinance for SPTS: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,550 - trading_system - WARNING - Empty data returned for SPTS
+2025-03-11 09:08:00,550 - trading_system - ERROR - Error getting data from yfinance for SPTI: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,550 - trading_system - WARNING - Empty data returned for SPTI
+2025-03-11 09:08:00,550 - trading_system - ERROR - Error getting data from yfinance for STIP: PriceHistory.history() got an unexpected keyword argument 'include_prepost'
+2025-03-11 09:08:00,550 - trading_system - WARNING - Empty data returned for STIP
+2025-03-11 09:08:00,551 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:08:00] "GET /analyze?risk=medium&extended=true HTTP/1.1" 200 -
+2025-03-11 09:08:00,606 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:08:00] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 09:08:00,606 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 09:08:00] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
