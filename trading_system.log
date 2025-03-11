@@ -830,3 +830,58 @@ Comissão: $1.00
 2025-03-11 14:52:45,695 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 14:52:45] "GET /watchlist HTTP/1.1" 200 -
 2025-03-11 14:52:45,756 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 14:52:45] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
 2025-03-11 14:52:45,757 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 14:52:45] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 15:00:23,098 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SPY, falling back to default behavior
+2025-03-11 15:00:23,904 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for QQQ, falling back to default behavior
+2025-03-11 15:00:24,421 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for TLT, falling back to default behavior
+2025-03-11 15:00:24,763 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for GLD, falling back to default behavior
+2025-03-11 15:00:25,070 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for ^VIX, falling back to default behavior
+2025-03-11 15:00:25,371 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for EEM, falling back to default behavior
+2025-03-11 15:00:25,728 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for USO, falling back to default behavior
+2025-03-11 15:00:26,044 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for BTC-USD, falling back to default behavior
+2025-03-11 15:00:26,371 - trading_system - INFO - Sentimento de mercado atual: NEUTRO (viés 9.8)
+2025-03-11 15:00:28,379 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for IAK, falling back to default behavior
+2025-03-11 15:00:34,222 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for EPI, falling back to default behavior
+2025-03-11 15:00:39,747 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for FILL, falling back to default behavior
+2025-03-11 15:00:40,793 - trading_system - INFO - No news found via yfinance for FILL.
+2025-03-11 15:00:46,102 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for DGRS, falling back to default behavior
+2025-03-11 15:00:46,837 - trading_system - INFO - No news found via yfinance for DGRS.
+2025-03-11 15:00:50,456 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for VAMO, falling back to default behavior
+2025-03-11 15:00:51,330 - trading_system - INFO - No news found via yfinance for VAMO.
+2025-03-11 15:00:56,921 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for ITM, falling back to default behavior
+2025-03-11 15:00:57,677 - trading_system - INFO - No news found via yfinance for ITM.
+2025-03-11 15:01:06,679 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for ITB, falling back to default behavior
+2025-03-11 15:01:11,593 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SQQQ, falling back to default behavior
+2025-03-11 15:01:16,151 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for TSLZ, falling back to default behavior
+2025-03-11 15:01:16,875 - trading_system - INFO - No news found via yfinance for TSLZ.
+2025-03-11 15:01:19,458 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for NVDQ, falling back to default behavior
+2025-03-11 15:01:20,331 - trading_system - INFO - No news found via yfinance for NVDQ.
+2025-03-11 15:01:23,116 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for FAZ, falling back to default behavior
+2025-03-11 15:01:23,847 - trading_system - INFO - No news found via yfinance for FAZ.
+2025-03-11 15:01:28,002 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for MSTZ, falling back to default behavior
+2025-03-11 15:01:28,750 - trading_system - INFO - No news found via yfinance for MSTZ.
+2025-03-11 15:01:31,087 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SPTS, falling back to default behavior
+2025-03-11 15:01:35,529 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SPTI, falling back to default behavior
+2025-03-11 15:01:36,256 - trading_system - INFO - No news found via yfinance for SPTI.
+2025-03-11 15:01:40,027 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for STIP, falling back to default behavior
+2025-03-11 15:01:44,873 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for LABD, falling back to default behavior
+2025-03-11 15:01:45,582 - trading_system - INFO - No news found via yfinance for LABD.
+2025-03-11 15:01:48,944 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for TECS, falling back to default behavior
+2025-03-11 15:01:49,717 - trading_system - INFO - No news found via yfinance for TECS.
+2025-03-11 15:01:53,519 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for NVDD, falling back to default behavior
+2025-03-11 15:01:54,217 - trading_system - INFO - No news found via yfinance for NVDD.
+2025-03-11 15:01:57,493 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SOXS, falling back to default behavior
+2025-03-11 15:02:02,058 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for KC, falling back to default behavior
+2025-03-11 15:02:06,848 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for AIBD, falling back to default behavior
+2025-03-11 15:02:07,574 - trading_system - INFO - No news found via yfinance for AIBD.
+2025-03-11 15:02:12,360 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for IAU, falling back to default behavior
+2025-03-11 15:02:17,021 - trading_system - WARNING - include_prepost parameter not supported in this version of yfinance for SGOL, falling back to default behavior
+2025-03-11 15:02:22,099 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 15:02:22] "GET /analyze?risk=medium HTTP/1.1" 200 -
+2025-03-11 15:02:22,134 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 15:02:22] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2025-03-11 15:02:22,135 - werkzeug - INFO - 127.0.0.1 - - [11/Mar/2025 15:02:22] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+2025-03-11 15:03:16,866 - werkzeug - INFO -  * Detected change in '/Users/Lucas/Documents/GitHub/trading_system/trading_system.py', reloading
+2025-03-11 15:03:17,124 - werkzeug - INFO -  * Restarting with stat
+2025-03-11 15:03:18,512 - trading_system - INFO - Cache de requests ativado (expire_after=3600s).
+2025-03-11 15:03:18,537 - werkzeug - WARNING -  * Debugger is active!
+2025-03-11 15:03:18,547 - werkzeug - INFO -  * Debugger PIN: 817-908-197
+2025-03-11 15:06:04,314 - werkzeug - INFO -  * Detected change in '/Users/Lucas/Documents/GitHub/trading_system/trading_system.py', reloading
+2025-03-11 15:06:04,560 - werkzeug - INFO -  * Restarting with stat

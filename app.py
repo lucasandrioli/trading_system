@@ -536,6 +536,31 @@ def delete_from_watchlist(ticker):
     
     return redirect(url_for('watchlist'))
 
+    
+@app.route('/refresh_market_watchlist')
+def refresh_market_watchlist():
+    """Refresh watchlist with market movers."""
+    categories = request.args.get('categories', 'gainers').split(',')
+    replace = request.args.get('replace', 'false').lower() == 'true'
+    count = int(request.args.get('count', '5'))
+    
+    try:
+        data = load_portfolio()
+        updated_data = update_watchlist_with_market_movers(
+            data, 
+            categories=categories,
+            replace=replace,
+            count_per_category=count
+        )
+        
+        if save_portfolio(updated_data):
+            flash(f'Watchlist refreshed with {", ".join(categories)}!', 'success')
+        else:
+            flash('Failed to save updated watchlist.', 'danger')
+    except Exception as e:
+        flash(f'Error refreshing watchlist: {e}', 'danger')
+    return redirect(url_for('watchlist'))
+
 @app.route('/account', methods=['GET', 'POST'])
 def account():
     data = load_portfolio()

@@ -17,8 +17,6 @@ from typing import Dict, Optional, List, Tuple, Any
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 import requests
-import yfinance as yf
-from yfinance import EquityQuery, screen
 
 
 # Create a session with connection pooling and retry logic
@@ -3308,6 +3306,28 @@ def parse_command_line_args():
     parser.add_argument(
         "--interactive", action="store_true", help="Iniciar modo interativo"
     )
+    parser.add_argument(
+        "--refresh-watchlist",
+        action="store_true",
+        help="Refresh watchlist with market movers"
+    )
+    parser.add_argument(
+        "--watchlist-categories",
+        type=str,
+        default="gainers",
+        help="Categories for watchlist refresh (comma-separated: gainers,losers,active)"
+    )
+    parser.add_argument(
+        "--watchlist-count",
+        type=int,
+        default=5,
+        help="Number of stocks to include per category"
+    )
+    parser.add_argument(
+        "--watchlist-replace",
+        action="store_true",
+        help="Replace existing watchlist instead of merging"
+    )    
 
     return parser.parse_args()
 
@@ -4266,6 +4286,95 @@ class PortfolioExecutor:
             logger.error(f"Erro ao salvar portfólio: {e}")
             return False
 
+    def get_market_movers(category='gainers', count=10):
+    
+        try:
+            movers = {}
+            
+            if category == 'gainers':
+                # Get top gainers
+                screener = screen.get_day_gainers()
+            elif category == 'losers':
+                # Get top losers
+                screener = screen.get_day_losers()
+            elif category == 'active':
+                # Get most active
+                screener = screen.get_most_actives()
+            else:
+                logger.warning(f"Unknown category: {category}. Using 'gainers' instead.")
+                screener = screen.get_day_gainers()
+            
+            # Limit to the requested count
+            if not screener.empty and len(screener) > 0:
+                screener = screener.head(min(len(screener), count))
+            
+            # Convert to watchlist format
+            for _, row in screener.iterrows():
+                ticker = row.get('Symbol', '')
+                if ticker:
+                    movers[ticker] = {
+                        "symbol": ticker,
+                        "monitor": True,
+                        "source": f"auto_{category}",
+                        "added_date": datetime.now().strftime("%Y-%m-%d")
+                    }
+            
+            return movers
+        except Exception as e:
+            logger.error(f"Error getting market movers ({category}): {e}")
+            return {}
+
+    def update_watchlist_with_market_movers(data, categories=None, replace=False, count_per_category=5):
+    """
+        Update watchlist with market movers.
+        
+        Args:
+            data (dict): Portfolio data containing watchlist
+            categories (list): List of categories to include ('gainers', 'losers', 'active')
+            replace (bool): If True, replace existing watchlist; if False, merge with it
+            count_per_category (int): Number of stocks to include per category
+            
+        Returns:
+            dict: Updated portfolio data with new watchlist
+        """
+        if categories is None:
+            categories = ['gainers']
+        
+        # Get current watchlist or create empty one
+        watchlist = {} if replace else data.get('watchlist', {})
+        
+        for category in categories:
+            movers = get_market_movers(category, count_per_category)
+            watchlist.update(movers)
+        
+        # Update portfolio data with new watchlist
+        data['watchlist'] = watchlist
+        return data
+
+    def refresh_watchlist(file_path, categories=None, replace=False, count_per_category=5):
+    
+        try:
+            # Load existing portfolio data
+            data = load_portfolio(file_path)
+            if not data:
+                logger.error("Could not load portfolio data")
+                return False
+                
+            # Update with market movers
+            updated_data = update_watchlist_with_market_movers(
+                data, 
+                categories=categories,
+                replace=replace,
+                count_per_category=count_per_category
+            )
+            
+            # Save updated data
+            return save_portfolio(updated_data, file_path)
+            
+        except Exception as e:
+            logger.error(f"Error refreshing watchlist: {e}")
+            return False    
+
 
 class PortfolioOptimizer:
     """Otimiza uma carteira para maximizar potencial de retorno dentro dos limites de risco."""
@@ -4759,6 +4868,26 @@ def main():
     watchlist = data.get("watchlist", {})
     account_balance = data.get("account_balance", 0.0)
     goals = data.get("goals", {})
+
+    # Refresh watchlist if requested
+    if args.refresh_watchlist:
+        categories = args.watchlist_categories.split(',')
+        print(f"Refreshing watchlist with {', '.join(categories)}...")
+        if refresh_watchlist(
+            args.json_file, 
+            categories=categories, 
+            replace=args.watchlist_replace,
+            count_per_category=args.watchlist_count
+        ):
+            print("Watchlist refreshed successfully.")
+            # Reload data after refresh
+            data = load_portfolio(args.json_file)
+            portfolio = data.get("portfolio", {})
+            watchlist = data.get("watchlist", {})
+            account_balance = data.get("account_balance", 0.0)
+            goals = data.get("goals", {})
+        else:
+            print("Failed to refresh watchlist.")
 
     if args.debug:
         print(

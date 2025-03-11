@@ -19,7 +19,7 @@
                             <label for="ticker" class="form-label">Ticker</label>
                             {{ form.ticker(class="form-control", placeholder="Ex: AAPL") }}
                         </div>
-                        <div class="mb-3 form-check">
+                          <div class="mb-3 form-check">
                             {{ form.monitor(class="form-check-input") }}
                             <label class="form-check-label" for="monitor">Monitorar para análises</label>
                         </div>
@@ -57,7 +57,29 @@
                                     <th>Monitorando</th>
                                     <th>Ações</th>
                                 </tr>
+                                <!-- Add this inside the card where you add items to watchlist -->
+<div class="card-footer">
+    <div class="d-grid gap-2">
+        <a href="/watchlist/add" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Adicionar Manualmente
+        </a>
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="marketMoversDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-graph-up-arrow"></i> Adicionar Market Movers
+            </button>
+            <ul class="dropdown-menu w-100" aria-labelledby="marketMoversDropdown">
+                <li><a class="dropdown-item" href="/refresh_market_watchlist?categories=gainers&replace=false&count=5">Top 5 Gainers</a></li>
+                <li><a class="dropdown-item" href="/refresh_market_watchlist?categories=losers&replace=false&count=5">Top 5 Losers</a></li>
+                <li><a class="dropdown-item" href="/refresh_market_watchlist?categories=active&replace=false&count=5">Top 5 Most Active</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/refresh_market_watchlist?categories=gainers,losers,active&replace=false&count=3">All Categories (3 each)</a></li>
+                <li><a class="dropdown-item text-danger" href="/refresh_market_watchlist?categories=gainers&replace=true&count=10">Replace with Top 10 Gainers</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
                             </thead>
+
                             <tbody>
                                 {% for ticker, details in watchlist.items() %}
                                 <tr>
